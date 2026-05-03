@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parent_prunning"
+version = "0.1.0"
+keywords = ["parent prunning", "algorithm", "optimization", "Evalutionary Algorithm"]
+description = """This Python framework provides a comprehensive implementation of evolutionary algorithms, 
+supporting both binary and ordinal individuals, as well as their crossover and mutation operations. The framework includes features such as
+automated result analysis and diagram plotting for better visualization. It is specifically designed to facilitate the 
+`Parent Pruning Algorithm`, which evaluates the contribution of parents involved in crossover operations and prunes those 
+deemed less effective based on their performance scores."""
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name="Sayed Mohammad Ali Mirkazemi", email="esmirk.137@gmail.com" }
+]
+maintainers = [
+    { name="Sayed Mohammad Ali Mirkazemi", email="esmirk.137@gmail.com" }
+]
+license = { file="LICENSE" }
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    'matplotlib==3.9.1',
+    'matplotlib-inline==0.1.7',
+    'numpy==2.0.0',
+    'tqdm==4.66.4',
+]
+
+[project.urls]
+Homepage = "https://github.com/MmdSparrow/parent_prunning_framework"
+Documentation = "https://readthedocs.org"
+Repository = "https://github.com/MmdSparrow/parent_prunning_framework.git"
+"Bug Tracker" = "https://github.com/MmdSparrow/parent_prunning_framework/issues"

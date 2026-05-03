@@ -1,0 +1,19 @@
+TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY= 'phenotypic diversity'
+TERMINATION_CONDITION_GENOTYPIC_DIVERSITY= 'genotypic diversity'
+TERMINATION_CONDITION_FITNESS_LIMIT= 'fitness limit'
+TERMINATION_CONDITION_ITERATION_NUMBER= 'iteration number'
+TERMINATION_CONDITION_EVALUATION_NUMBER= 'evaluation number'
+
+MODE_AGGREGGATE= 'm+l'
+MODE_FORGETFUL= 'm,l'
+
+STATISTIC_AVG_FITNESS= 'avg_fitness'
+STATISTIC_BEST_FITNESS= 'best_fitness'
+STATISTIC_VAR_FITNESS= 'var_fitness'
+STATISTIC_PRUNE_BAD_PARENT_COUNT= 'prune_bad_parent_count'
+STATISTIC_PRUNE_OLD_CHROMOSOME_COUNT= 'prune_old_chromosome_count'
+
+####################################################################
+RESULT_DIRECTORY_DEFAULT= 'results'
+LOG_DIRECTORY_DEFAULT= 'logs'
+CHECKPOINT_DIRECTORY_DEFAULT= 'checkpoints'
