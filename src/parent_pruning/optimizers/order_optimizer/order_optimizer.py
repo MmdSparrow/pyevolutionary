@@ -1,7 +1,7 @@
 import os
 
 from parent_pruning.optimizers.utils import init_function_by_name
-from parent_pruning.optimizers.base_optimizer import BaseOptimizer
+from parent_pruning.optimizers.base_optimizer.base_optimizer import BaseOptimizer
 from parent_pruning.individuals.order_individual import OrderIndividual
 from parent_pruning.mutation_algorithms import order_mutation as order_mutation_module
 from parent_pruning.crossover_algorithms import order_crossover as order_crossover_module
@@ -25,11 +25,6 @@ from parent_pruning.configs.order_optimizer_config import (
 
 
 class OrderOptimizer(BaseOptimizer):
-    def __validation(self, crossover_type, mutation_type,):
-        if crossover_type not in AVAILABLE_CROSSOVER_ALGORITHMS:
-            raise Exception('')
-        if mutation_type not in AVAILABLE_MUTATION_ALGORITHMS:
-            raise Exception('')
 
     def __mutation_func_determiner(self, mutation_type):
         self.mutation_func = init_function_by_name(

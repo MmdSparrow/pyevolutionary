@@ -10,8 +10,7 @@ MODE_FORGETFUL= 'm,l'
 STATISTIC_AVG_FITNESS= 'avg_fitness'
 STATISTIC_BEST_FITNESS= 'best_fitness'
 STATISTIC_VAR_FITNESS= 'var_fitness'
-STATISTIC_PRUNE_BAD_PARENT_COUNT= 'prune_bad_parent_count'
-STATISTIC_PRUNE_OLD_CHROMOSOME_COUNT= 'prune_old_chromosome_count'
+STATISTIC_PRUNING= 'pruning'
 
 ####################################################################
 RESULT_DIRECTORY_DEFAULT= 'results'

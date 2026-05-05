@@ -1,4 +1,4 @@
-from .order_optimizer import OrderOptimizer
+from .order_optimizer.order_optimizer import OrderOptimizer
 
 __all__=[
     'OrderOptimizer',
