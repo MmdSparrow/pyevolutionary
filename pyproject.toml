@@ -6,11 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "parent_prunning"
 version = "0.1.0"
 keywords = ["parent prunning", "algorithm", "optimization", "Evalutionary Algorithm"]
-description = """This Python framework provides a comprehensive implementation of evolutionary algorithms, 
-supporting both binary and ordinal individuals, as well as their crossover and mutation operations. The framework includes features such as
-automated result analysis and diagram plotting for better visualization. It is specifically designed to facilitate the 
-`Parent Pruning Algorithm`, which evaluates the contribution of parents involved in crossover operations and prunes those 
-deemed less effective based on their performance scores."""
+description = "This Python framework provides a comprehensive implementation of evolutionary algorithms, supporting both binary and ordinal individuals, as well as their crossover and mutation operations. The framework includes features such as automated result analysis and diagram plotting for better visualization. It is specifically designed to facilitate the `Parent Pruning Algorithm`, which evaluates the contribution of parents involved in crossover operations and prunes those deemed less effective based on their performance scores."
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [

@@ -5,12 +5,7 @@ from parent_pruning.individuals.base_individual import Individual
 
 
 class BinaryIndividual(Individual):
-    def __init__(
-        self,
-        genome_size,
-        input_genome=None,
-        init_with_random_genome=True,
-    ) -> None:
+    def __init__(self, genome_size, input_genome=None, init_with_random_genome=True):
         super().__init__()
         
         if input_genome is not None and init_with_random_genome:

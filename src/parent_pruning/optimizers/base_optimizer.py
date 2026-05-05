@@ -4,6 +4,7 @@ import json
 import copy
 import pickle
 import random
+import parent_pruning.pruning_methods.pruning_methods as pruning_methods_module
 import parent_pruning.selection_algorithms.parent_selection as parent_selection_module
 import parent_pruning.selection_algorithms.remaining_selection as remaining_selection_module
 import parent_pruning.thereshold_scheduler.thereshold_scheduler as thereshold_scheduler_module
@@ -23,6 +24,7 @@ from parent_pruning.configs.common import (
 )
 from parent_pruning.configs.base_optimizer_config import (
     AVAILABLE_MODES,
+    AVAILABLE_PRUNING_METHODS,
     AVAILABLE_TERMINATION_CONDITIONS,
     AVAILABLE_STATISTICS,
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
@@ -37,13 +39,16 @@ from parent_pruning.configs.base_optimizer_config import (
 
 
 class BaseOptimizer(Base):
-    def __validation(self, parent_selection_type, remaining_selection_type, termination_conditions, statistics, mode, bad_parent_score_thereshold_scheduler_type, bad_parent_score_thereshold_scheduler_start_number, bad_parent_score_thereshold_scheduler_end_number, age_thereshold):
+    def __validation(self, parent_selection_type, remaining_selection_type, pruning_methods, termination_conditions, statistics, mode, bad_parent_score_thereshold_scheduler_type, bad_parent_score_thereshold_scheduler_start_number, bad_parent_score_thereshold_scheduler_end_number, age_thereshold):
         if parent_selection_type.split('#')[0] not in AVAILABLE_PARENT_SELECTION_ALGORITHMS:
             raise Exception('')
         if remaining_selection_type.split('#')[0] not in AVAILABLE_REMAINING_SELECTION_ALGORITHMS:
             raise Exception('')
         if mode not in AVAILABLE_MODES:
             raise Exception('')
+        for pruning_method in pruning_methods:
+            if pruning_method not in AVAILABLE_PRUNING_METHODS:
+                raise Exception('')
         for termination_condition in termination_conditions:
             if termination_condition not in AVAILABLE_TERMINATION_CONDITIONS:
                 raise Exception('')
@@ -62,9 +67,6 @@ class BaseOptimizer(Base):
         if STATISTIC_PRUNE_OLD_CHROMOSOME_COUNT in statistics and age_thereshold is None:
             raise Exception('')
         
-    def __log_project_information(self, project_name, population_size, generation_size):
-        pass
-
     def __parent_selection_fucn_determiner(self, parent_selection_type):
         func_name = parent_selection_type
         if parent_selection_type.startswith("q_tournoment"):
@@ -89,6 +91,15 @@ class BaseOptimizer(Base):
             bad_parent_score_thereshold_scheduler_type,
             "bad parent score thereshold scheduler ",
         )
+    
+    def __pruning_methods_funcs_determiner(self, pruning_methods):
+        self.pruning_methods_functions_list= []
+        for method_name in pruning_methods:
+            self.pruning_methods_functions_list.append(init_function_by_name(
+                pruning_methods_module,
+                method_name,
+                f'pruning method {method_name}'
+            ))
     
     def __save_checkpoint(self,
             chromosome_list,
@@ -237,15 +248,13 @@ class BaseOptimizer(Base):
         crossover_probability=CROSSOVER_PROBABILITY_DEFAULT_VALUE,
         mutation_probability=MUTATION_PROBABILITY_DEFAULT_VALUE,
         mode=MODE_DEFAULT_VALUE,
+        pruning_methods=None,
+        pruning_methods_params=None,
         iterations_number=None,
         statistics=None,
         statistic_sampling_period=None,
         evaluation_number=None,
         fitness_limit_threshold=None,
-        age_thereshold=None,
-        bad_parent_score_thereshold_scheduler_type=None,
-        bad_parent_score_thereshold_scheduler_start_number=None,
-        bad_parent_score_thereshold_scheduler_end_number=None,
         phenotypic_diversity_window_size=None,
         phenotypic_diversity_error_thereshold=None,
         genotypic_diversity_window_size=None,
@@ -264,13 +273,14 @@ class BaseOptimizer(Base):
         self._logger.info(f'List of available `Bad Parent Score Thereshold Scheduler Type` functions:{AVAILABLE_BAD_PARENT_SCORE_THERESHOLD_SCHEDULER_TYPE}')
         self._logger.info(f'List of available `Parent Selection Algorithm` functions:{AVAILABLE_PARENT_SELECTION_ALGORITHMS}')
         self._logger.info(f'List of available `Remaining Selection Algorithm` functions:{AVAILABLE_REMAINING_SELECTION_ALGORITHMS}')
+        self._logger.info(f'List of available `Pruning Methods` functions: {AVAILABLE_PRUNING_METHODS}')
         
         self.checkpoint_base_directory= checkpoint_base_directory
         if checkpoint_base_directory is not None:
             self._logger.info(f'Load checkpoint \"{self.checkpoint_base_directory}\"')
             self.__load_checkpoint(checkpoint_base_directory)
         else:
-            self.__validation(parent_selection_type, remaining_selection_type, termination_conditions, statistics, mode, bad_parent_score_thereshold_scheduler_type, bad_parent_score_thereshold_scheduler_start_number, bad_parent_score_thereshold_scheduler_end_number, age_thereshold)
+            self.__validation(parent_selection_type, remaining_selection_type, pruning_methods,termination_conditions, statistics, mode, bad_parent_score_thereshold_scheduler_type, bad_parent_score_thereshold_scheduler_start_number, bad_parent_score_thereshold_scheduler_end_number, age_thereshold)
             self._logger.info('Initialize optimzier')
             self.elapsed_time= 0
             self.genome_size = genome_size
@@ -282,6 +292,8 @@ class BaseOptimizer(Base):
             self.mutation_type= mutation_type
             self.crossover_probability = crossover_probability
             self.mutation_probability = mutation_probability
+            self.pruning_methods = pruning_methods
+            self.pruning_methods_params= pruning_methods_params
             self.age_thereshold= age_thereshold
             self.bad_parent_score_thereshold_scheduler_type= bad_parent_score_thereshold_scheduler_type
             self.bad_parent_score_thereshold_scheduler_start_number = bad_parent_score_thereshold_scheduler_start_number
@@ -492,15 +504,14 @@ class BaseOptimizer(Base):
 
             population = self.__remaining_selection(next_generation_candidates, self.population_size)
 
-            prune_bad_parent_count= 0
-            if self.bad_parent_score_thereshold_scheduler_type is not None:
-                prune_bad_parent_count= self.__prune_bad_parent(population, current_iteration_number)
             
             self.__increase_age_of_all_population(population)
             
-            prune_old_chromosome_count= 0
-            if self.age_thereshold is not None:
-                prune_old_chromosome_count= self.__prune_old_chromosome(population)
+            pruning_count_list_current_iteration=[]
+            if self.pruning_methods is not None:
+                for index, pruning_method_function in zip(range(len(self.pruning_methods_functions_list)), self.pruning_methods_functions_list):
+                    pruning_count_list_current_iteration.append(pruning_method_function(population, *self.pruning_methods_params[index]))
+                    
             
             avg_fitness= None
             if TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY in self.termination_condition_handler.termination_conditions:
