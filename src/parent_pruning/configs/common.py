@@ -10,7 +10,7 @@ MODE_FORGETFUL= 'm,l'
 STATISTIC_AVG_FITNESS= 'avg_fitness'
 STATISTIC_BEST_FITNESS= 'best_fitness'
 STATISTIC_VAR_FITNESS= 'var_fitness'
-STATISTIC_PRUNING= 'pruning'
+STATISTIC_PRUNINGS= 'prunings'
 
 ####################################################################
 RESULT_DIRECTORY_DEFAULT= 'results'

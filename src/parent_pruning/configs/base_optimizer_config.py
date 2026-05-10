@@ -1,14 +1,14 @@
-import parent_pruning.pruning_methods.pruning_methods as pruning_methods_module
-import parent_pruning.selection_algorithms.parent_selection as parent_selection_module
-import parent_pruning.selection_algorithms.remaining_selection as remaining_selection_module
-import parent_pruning.thereshold_scheduler.thereshold_scheduler as thereshold_scheduler_module
+import parent_pruning.pruning.pruning_methods as pruning_methods_module
+import parent_pruning.selection_methods.parent_selection as parent_selection_module
+import parent_pruning.selection_methods.remaining_selection as remaining_selection_module
+import parent_pruning.thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
 
-from parent_pruning.configs.utils import get_list_of_the_not_private_functions_in_module
-from parent_pruning.configs.common import (
+from .__utils import get_list_of_the_not_private_functions_in_module
+from .common import (
     STATISTIC_AVG_FITNESS,
     STATISTIC_VAR_FITNESS,
     STATISTIC_BEST_FITNESS,
-    STATISTIC_PRUNING,
+    STATISTIC_PRUNINGS,
     TERMINATION_CONDITION_FITNESS_LIMIT,
     TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY,
     TERMINATION_CONDITION_EVALUATION_NUMBER,
@@ -26,11 +26,11 @@ MODE_DEFAULT_VALUE= MODE_AGGREGGATE
 
 AVAILABLE_MODES= [MODE_AGGREGGATE, MODE_FORGETFUL]
 AVAILABLE_TERMINATION_CONDITIONS= [TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY, TERMINATION_CONDITION_GENOTYPIC_DIVERSITY, TERMINATION_CONDITION_FITNESS_LIMIT, TERMINATION_CONDITION_ITERATION_NUMBER, TERMINATION_CONDITION_EVALUATION_NUMBER]
-AVAILABLE_STATISTICS= [STATISTIC_AVG_FITNESS, STATISTIC_BEST_FITNESS, STATISTIC_VAR_FITNESS, STATISTIC_PRUNING]
+AVAILABLE_STATISTICS= [STATISTIC_AVG_FITNESS, STATISTIC_BEST_FITNESS, STATISTIC_VAR_FITNESS, STATISTIC_PRUNINGS]
 
 VISUALIZE_DEFAULT_VALUE= False
 
-AVAILABLE_SCHEDULER_TYPE= get_list_of_the_not_private_functions_in_module(thereshold_scheduler_module)
-AVAILABLE_PARENT_SELECTION_ALGORITHMS= get_list_of_the_not_private_functions_in_module(parent_selection_module)
-AVAILABLE_REMAINING_SELECTION_ALGORITHMS= get_list_of_the_not_private_functions_in_module(remaining_selection_module)
+AVAILABLE_SCHEDULER_METHODS= get_list_of_the_not_private_functions_in_module(thereshold_scheduler_module) + get
+AVAILABLE_PARENT_SELECTION_METHODS= get_list_of_the_not_private_functions_in_module(parent_selection_module)
+AVAILABLE_REMAINING_SELECTION_METHODS= get_list_of_the_not_private_functions_in_module(remaining_selection_module)
 AVAILABLE_PRUNING_METHODS= get_list_of_the_not_private_functions_in_module(pruning_methods_module)

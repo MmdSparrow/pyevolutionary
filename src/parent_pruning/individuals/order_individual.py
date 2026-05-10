@@ -43,6 +43,9 @@ class OrderIndividual(Individual):
     def __eq__(self, value):
         return self.__circular_equivalence(self.genome, value)
     
+    def __repr__(self):
+        return f"OrderIndividual(genome={self.genome!r}, fitness={self.fitness!r}, age={self.age!r}, crossover_attendance={self.crossover_attendance!r}, parent_score={self.parent_score!r})"
+
     
 
         

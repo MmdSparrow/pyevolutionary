@@ -1,7 +1,7 @@
-import parent_pruning.mutation_algorithms.order_mutation as order_mutation_module
-import parent_pruning.crossover_algorithms.order_crossover as order_crossover_module
+import parent_pruning.mutation.order_mutation_methods as order_mutation_module
+import parent_pruning.crossover.order_crossover_methods as order_crossover_module
 
-from parent_pruning.configs.utils import get_list_of_the_not_private_functions_in_module
+from .__utils import get_list_of_the_not_private_functions_in_module
 
 
 TERMINATION_CONDITIONS_DEFAULT_VALUE=["iteration number"]
@@ -11,5 +11,5 @@ MODE_DEFAULT_VALUE="m+l"
 
 VISUALIZE_DEFAULT_VALUE= False
 
-AVAILABLE_CROSSOVER_ALGORITHMS= get_list_of_the_not_private_functions_in_module(order_crossover_module)
-AVAILABLE_MUTATION_ALGORITHMS= get_list_of_the_not_private_functions_in_module(order_mutation_module)
+AVAILABLE_CROSSOVER_METHODS= get_list_of_the_not_private_functions_in_module(order_crossover_module)
+AVAILABLE_MUTATION_METHODS= get_list_of_the_not_private_functions_in_module(order_mutation_module)

@@ -1,7 +1,16 @@
-def __validation(self, parent_selection_type, remaining_selection_type, pruning_methods, termination_conditions, statistics, mode, logger):
-    if parent_selection_type.split('#')[0] not in AVAILABLE_PARENT_SELECTION_ALGORITHMS:
+from parent_pruning.configs.base_optimizer_config import (
+    AVAILABLE_MODES,
+    AVAILABLE_PRUNING_METHODS,
+    AVAILABLE_TERMINATION_CONDITIONS,
+    AVAILABLE_STATISTICS,
+    AVAILABLE_PARENT_SELECTION_METHODS,
+    AVAILABLE_REMAINING_SELECTION_METHODS,
+)
+
+def validation(parent_selection_type, remaining_selection_type, pruning_methods, termination_conditions, statistics, mode, logger):
+    if parent_selection_type.split('#')[0] not in AVAILABLE_PARENT_SELECTION_METHODS:
         raise Exception('')
-    if remaining_selection_type.split('#')[0] not in AVAILABLE_REMAINING_SELECTION_ALGORITHMS:
+    if remaining_selection_type.split('#')[0] not in AVAILABLE_REMAINING_SELECTION_METHODS:
         raise Exception('')
     if mode not in AVAILABLE_MODES:
         raise Exception('')

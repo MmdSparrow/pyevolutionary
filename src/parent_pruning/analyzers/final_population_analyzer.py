@@ -7,6 +7,9 @@ class FinalPopulationAnalyzer:
         self.results_directory= results_directory
         
         self.genome_dict= {}
+        
+    def run_full_analyzer(self):
+        pass
     
     def genotypic_diversity_equivalence(self):
         for chromosome in self.chromosome_list:
@@ -36,5 +39,14 @@ class FinalPopulationAnalyzer:
             for j in range(i+1, N):
                 dists.append(genome_count[i] * self.__hamming(genome_list[i], genome_list[j]))
         return np.mean(dists)
+    
+    def score_analyzer(self):
+        # distribution
+        # count
+        # store in file
+        pass
+    
+    def age_analyzer(self):
+        pass
 
     

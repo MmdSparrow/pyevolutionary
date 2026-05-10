@@ -5,6 +5,9 @@ from parent_pruning.individuals.base_individual import Individual
 
 
 class BinaryIndividual(Individual):
+    def __generate_uniform_random_binary(self, genome_size):
+        return [random.randint(0, 1) for _ in range(genome_size)]
+    
     def __init__(self, genome_size, input_genome=None, init_with_random_genome=True):
         super().__init__()
         
@@ -20,5 +23,7 @@ class BinaryIndividual(Individual):
         else:
             self.genome = [None] * genome_size
 
-    def __generate_uniform_random_binary(self, genome_size):
-        return [random.randint(0, 1) for _ in range(genome_size)]
+    def __repr__(self):
+        return f"BinaryIndividual(genome={self.genome!r}, fitness={self.fitness!r}, age={self.age!r}, crossover_attendance={self.crossover_attendance!r}, parent_score={self.parent_score!r})"
+
+

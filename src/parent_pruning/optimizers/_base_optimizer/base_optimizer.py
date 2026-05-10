@@ -4,38 +4,44 @@ import json
 import copy
 import pickle
 import random
-import parent_pruning.pruning_methods.pruning_methods as pruning_methods_module
-import parent_pruning.selection_algorithms.parent_selection as parent_selection_module
-import parent_pruning.selection_algorithms.remaining_selection as remaining_selection_module
-import parent_pruning.thereshold_scheduler.thereshold_scheduler as thereshold_scheduler_module
+import parent_pruning.pruning.pruning_methods as pruning_methods_module
+import parent_pruning.selection_methods.parent_selection as parent_selection_module
+import parent_pruning.selection_methods.remaining_selection as remaining_selection_module
+import parent_pruning.thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
 
 
+from .__validator import validation
 from parent_pruning.base.base import Base
 from parent_pruning.visualization.visualizer import Visualizer
-from parent_pruning.optimizers.utils import init_function_by_name
+from parent_pruning.optimizers._utils import init_function_by_name
 from parent_pruning.individuals.base_individual import Individual
-from parent_pruning.termination_condition_algorithms.termination_condition import TerminationCondition
-from parent_pruning.optimizers.base_optimizer.utils import(
-    
+from parent_pruning.termination_condition.termination_condition import TerminationCondition
+from .__utils import(
+    compute_avg_fitness,
+    compute_var_fitness_with_avg,
+    copy_parent_to_child,
+    increase_age_of_all_population,
+    show_all_available_functions_and_values_of_project,
+    show_available_mode,
+    show_available_parent_selection_methods,
+    show_available_remaining_selection_methods,
+    show_available_termination_conditions,
+    show_available_statistics,
 )
 from parent_pruning.configs.common import (
     STATISTIC_AVG_FITNESS,
     STATISTIC_VAR_FITNESS,
     STATISTIC_BEST_FITNESS,
-    STATISTIC_PRUNING,
+    STATISTIC_PRUNINGS,
     TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY,
 )
 from parent_pruning.configs.base_optimizer_config import (
-    AVAILABLE_MODES,
     AVAILABLE_PRUNING_METHODS,
-    AVAILABLE_TERMINATION_CONDITIONS,
-    AVAILABLE_STATISTICS,
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
     MUTATION_PROBABILITY_DEFAULT_VALUE,
-    AVAILABLE_SCHEDULER_TYPE,
-    AVAILABLE_PARENT_SELECTION_ALGORITHMS,
-    AVAILABLE_REMAINING_SELECTION_ALGORITHMS,
+    AVAILABLE_PARENT_SELECTION_METHODS,
+    AVAILABLE_REMAINING_SELECTION_METHODS,
     VISUALIZE_DEFAULT_VALUE,
     TERMINATION_CONDITIONS_DEFAULT_VALUE,
 )
@@ -95,10 +101,10 @@ class BaseOptimizer(Base):
             pickle.dump(self.genome_size, file_to_write)
             pickle.dump(self.population_size, file_to_write)
             pickle.dump(self.generation_size, file_to_write)
-            pickle.dump(self.parent_selection_type, file_to_write)
-            pickle.dump(self.remaining_selection_type, file_to_write)
-            pickle.dump(self.crossover_type, file_to_write)
-            pickle.dump(self.mutation_type, file_to_write)
+            pickle.dump(self.parent_selection_method, file_to_write)
+            pickle.dump(self.remaining_selection_method, file_to_write)
+            pickle.dump(self.crossover_method, file_to_write)
+            pickle.dump(self.mutation_method, file_to_write)
             pickle.dump(self.crossover_probability, file_to_write)
             pickle.dump(self.mutation_probability, file_to_write)
             pickle.dump(termination_conditions, file_to_write)
@@ -106,6 +112,7 @@ class BaseOptimizer(Base):
             pickle.dump(self.mode, file_to_write)
             pickle.dump(self.pruning_methods, file_to_write)
             pickle.dump(self.pruning_methods_params, file_to_write)
+            pickle.dump(self.pruning_count_list, file_to_write)
 
             pickle.dump(phenotypic_diversity_window_size, file_to_write)
             pickle.dump(phenotypic_diversity_error_thereshold, file_to_write)
@@ -121,8 +128,6 @@ class BaseOptimizer(Base):
             pickle.dump(self.avg_fitness_list, file_to_write)
             pickle.dump(self.var_fitness_list, file_to_write)
             pickle.dump(self.best_fitness_list, file_to_write)
-            pickle.dump(self.prune_bad_parent_count_list, file_to_write)
-            pickle.dump(self.prune_old_chromosome_count_list, file_to_write)
             
             pickle.dump(elapsed_time, file_to_write)
         
@@ -139,26 +144,22 @@ class BaseOptimizer(Base):
             self.genome_size= pickle.load(file_to_read)
             self.population_size= pickle.load(file_to_read)
             self.generation_size= pickle.load(file_to_read)
-            self.parent_selection_type= pickle.load(file_to_read)
-            self.remaining_selection_type= pickle.load(file_to_read)
-            self.crossover_type= pickle.load(file_to_read)
-            self.mutation_type= pickle.load(file_to_read)
+            self.parent_selection_method= pickle.load(file_to_read)
+            self.remaining_selection_method= pickle.load(file_to_read)
+            self.crossover_method= pickle.load(file_to_read)
+            self.mutation_method= pickle.load(file_to_read)
             self.crossover_probability= pickle.load(file_to_read)
             self.mutation_probability= pickle.load(file_to_read)
             termination_conditions= pickle.load(file_to_read)
             self.statistics= pickle.load(file_to_read)
             self.mode= pickle.load(file_to_read)
             self.pruning_methods=  pickle.load(file_to_read)
+            self.__pruning_methods_funcs_determiner(self.pruning_methods)
             self.pruning_methods_params= pickle.load(file_to_read)
-            self.__validation(
-                self.parent_selection_type,
-                self.remaining_selection_type,
-                termination_conditions,
-                self.statistics,
-                self.mode,
-            )
-            self.__parent_selection_fucn_determiner(self.parent_selection_type)
-            self.__remaining_selection_func_determiner(self.remaining_selection_type)
+            self.pruning_count_list= pickle.load(file_to_read)
+            validation(self.parent_selection_method, self.remaining_selection_method, termination_conditions, self.statistics, self.mode, self._logger)
+            self.__parent_selection_fucn_determiner(self.parent_selection_method)
+            self.__remaining_selection_func_determiner(self.remaining_selection_method)
             phenotypic_diversity_window_size= pickle.load(file_to_read)
             phenotypic_diversity_error_thereshold= pickle.load(file_to_read)
             genotypic_diversity_window_size= pickle.load(file_to_read)
@@ -186,8 +187,6 @@ class BaseOptimizer(Base):
             self.avg_fitness_list= pickle.load(file_to_read)
             self.var_fitness_list= pickle.load(file_to_read)
             self.best_fitness_list= pickle.load(file_to_read)
-            self.prune_bad_parent_count_list= pickle.load(file_to_read)
-            self.prune_old_chromosome_count_list= pickle.load(file_to_read)
             
             self.elapsed_time= pickle.load(file_to_read)
         
@@ -198,10 +197,10 @@ class BaseOptimizer(Base):
         genome_size,
         population_size,
         generation_size,
-        parent_selection_type,
-        remaining_selection_type,
-        crossover_type,
-        mutation_type,
+        parent_selection_method,
+        remaining_selection_method,
+        crossover_method,
+        mutation_method,
         termination_conditions=TERMINATION_CONDITIONS_DEFAULT_VALUE,
         crossover_probability=CROSSOVER_PROBABILITY_DEFAULT_VALUE,
         mutation_probability=MUTATION_PROBABILITY_DEFAULT_VALUE,
@@ -220,6 +219,7 @@ class BaseOptimizer(Base):
         visualize= VISUALIZE_DEFAULT_VALUE,
         checkpoint_save_period=None,
         checkpoint_base_directory=None,
+        extension_directory= None,
         # TODO:
         # source_spots_in_genome=None,
         # destination_spots_in_genome=None,
@@ -228,8 +228,8 @@ class BaseOptimizer(Base):
         self.input_data = input_data
         self.individual_class= None
         
-        self._logger.info(f'List of available `Parent Selection Algorithm` functions:{AVAILABLE_PARENT_SELECTION_ALGORITHMS}')
-        self._logger.info(f'List of available `Remaining Selection Algorithm` functions:{AVAILABLE_REMAINING_SELECTION_ALGORITHMS}')
+        self._logger.info(f'List of available `Parent Selection Methods` functions:{AVAILABLE_PARENT_SELECTION_METHODS}')
+        self._logger.info(f'List of available `Remaining Selection Methods` functions:{AVAILABLE_REMAINING_SELECTION_METHODS}')
         self._logger.info(f'List of available `Pruning Methods` functions: {AVAILABLE_PRUNING_METHODS}')
         
         self.checkpoint_base_directory= checkpoint_base_directory
@@ -237,22 +237,23 @@ class BaseOptimizer(Base):
             self._logger.info(f'Load checkpoint \"{self.checkpoint_base_directory}\"')
             self.__load_checkpoint(checkpoint_base_directory)
         else:
-            self.__validation(parent_selection_type, remaining_selection_type, pruning_methods,termination_conditions, statistics, mode)
+            validation(parent_selection_method, remaining_selection_method, pruning_methods,termination_conditions, statistics, mode, self._logger)
             self._logger.info('Initialize optimzier')
             self.elapsed_time= 0
             self.genome_size = genome_size
             self.population_size = population_size
             self.generation_size = generation_size
-            self.parent_selection_type= parent_selection_type
-            self.remaining_selection_type= remaining_selection_type
-            self.crossover_type= crossover_type
-            self.mutation_type= mutation_type
+            self.parent_selection_method= parent_selection_method
+            self.remaining_selection_method= remaining_selection_method
+            self.crossover_method= crossover_method
+            self.mutation_method= mutation_method
             self.crossover_probability = crossover_probability
             self.mutation_probability = mutation_probability
             self.pruning_methods = pruning_methods
+            self.__pruning_methods_funcs_determiner(pruning_methods)
             self.pruning_methods_params= pruning_methods_params
-            self.__parent_selection_fucn_determiner(parent_selection_type)
-            self.__remaining_selection_func_determiner(remaining_selection_type)
+            self.__parent_selection_fucn_determiner(parent_selection_method)
+            self.__remaining_selection_func_determiner(remaining_selection_method)
             self.termination_condition_handler = TerminationCondition(
                 termination_conditions,
                 phenotypic_diversity_window_size,
@@ -282,7 +283,7 @@ class BaseOptimizer(Base):
                 self.var_fitness_list= []
             if STATISTIC_BEST_FITNESS in statistics:
                 self.best_fitness_list= []
-            if STATISTIC_PRUNING in statistics:
+            if STATISTIC_PRUNINGS in statistics:
                 self.pruning_count_list= []
     
     def __create_individual(self):
@@ -327,8 +328,8 @@ class BaseOptimizer(Base):
             if random.random() < self.crossover_probability:
                 child1, child2 = self.crossover_func(parent1, parent2)
             else:
-                child1 = self.__copy_parent_to_child(parent1)
-                child2 = self.__copy_parent_to_child(parent2)
+                child1 = copy_parent_to_child(parent1)
+                child2 = copy_parent_to_child(parent2)
 
             if random.random() < self.mutation_probability:
                 self.mutation_func(child1)
@@ -339,13 +340,13 @@ class BaseOptimizer(Base):
             self.evaluation_func(child2)
 
             if child1.fitness <= parent1.fitness and child2.fitness <= parent1.fitness:
-                parent1.increase_bad_parent_score()
+                parent1.decrease_parent_score()
             else:
-                parent1.decrease_bad_parent_score()
+                parent1.increase_parent_score()
             if child1.fitness <= parent2.fitness and child2.fitness <= parent2.fitness:
-                parent2.increase_bad_parent_score()
+                parent2.decrease_parent_score()
             else:
-                parent2.decrease_bad_parent_score()
+                parent2.increase_parent_score()
 
             # add to list
             children_list.append(child1)
@@ -361,10 +362,11 @@ class BaseOptimizer(Base):
             pickle.dump([self.avg_fitness_list,
                          self.var_fitness_list,
                          self.best_fitness_list,
-                         self.prune_bad_parent_count_list,
                          self.prune_old_chromosome_count_list], file_to_write)
             pickle.dump(self.statistics, file_to_write)
             pickle.dump(self.statistic_sampling_period, file_to_write)
+            pickle.dump(self.pruning_count_list, file_to_write)
+            pickle.dump(self.pruning_methods, file_to_write)
             pickle.dump(current_iteration_number, file_to_write)
             
     def run(self):
@@ -399,30 +401,31 @@ class BaseOptimizer(Base):
             population = self.__remaining_selection(next_generation_candidates, self.population_size)
 
             
-            self.__increase_age_of_all_population(population)
+            increase_age_of_all_population(population)
             
             pruning_count_list_current_iteration=[]
             if self.pruning_methods is not None:
                 for index, pruning_method_function in zip(range(len(self.pruning_methods_functions_list)), self.pruning_methods_functions_list):
-                    pruning_count_list_current_iteration.append(pruning_method_function(population, *self.pruning_methods_params[index]))
+                    # pruning_count_list_current_iteration.append(pruning_method_function(population, *self.pruning_methods_params[index])) # for list
+                    pruning_count_list_current_iteration.append(pruning_method_function(population, **self.pruning_methods_params[index])) # for dict
                     
             avg_fitness= None
             if TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY in self.termination_condition_handler.termination_conditions:
-                avg_fitness= self.__compute_avg_fitness(population)
+                avg_fitness= compute_avg_fitness(population)
                
             if current_iteration_number % self.statistic_sampling_period==0:
                 if self.avg_fitness_list is not None:
                     if avg_fitness is not None:
                         self.avg_fitness_list.append(avg_fitness)
                     else:
-                        self.avg_fitness_list.append(self.__compute_avg_fitness(population))
+                        self.avg_fitness_list.append(compute_avg_fitness(population))
                 if self.var_fitness_list is not None:
                     if avg_fitness is not None:
-                        self.var_fitness_list.append(self.__compute_var_fitness_with_avg(population, avg_fitness))
+                        self.var_fitness_list.append(compute_var_fitness_with_avg(population, avg_fitness))
                     elif self.avg_fitness_list is not None:
-                        self.var_fitness_list.append(self.__compute_var_fitness_with_avg(population, self.avg_fitness_list[-1]))
+                        self.var_fitness_list.append(compute_var_fitness_with_avg(population, self.avg_fitness_list[-1]))
                     else:
-                        self.var_fitness_list.append(self.__compute_var_fitness_with_avg(population, self.__compute_avg_fitness(population)))
+                        self.var_fitness_list.append(compute_var_fitness_with_avg(population, compute_avg_fitness(population)))
                 if self.best_fitness_list is not None:
                     self.best_fitness_list.append(best_chromosome_in_current_iteration.fitness)
                 if self.pruning_methods is not None:
@@ -472,8 +475,8 @@ class BaseOptimizer(Base):
                 self.avg_fitness_list,
                 self.var_fitness_list,
                 self.best_fitness_list,
-                self.prune_bad_parent_count_list,
-                self.prune_old_chromosome_count_list
+                self.pruning_count_list,
+                self.pruning_methods,
             )
             self._logger.info('Diagrams plotted successfuly.')
         return self.base_directory
