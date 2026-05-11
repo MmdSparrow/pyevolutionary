@@ -17,7 +17,9 @@ class Visualizer:
         if self.statistics is None:
             return
 
-        rows_number = len(self.statistics) - 1 + len(pruning_methods)
+        rows_number = len(self.statistics)
+        if pruning_methods is not None:
+            rows_number= rows_number - 1 + len(pruning_methods)
 
         if rows_number == 0:
             raise Exception()
@@ -56,16 +58,16 @@ class Visualizer:
 
         if StatisticsEnum.PRUNINGS in self.statistics:
             pruning_count_list = np.array(pruning_count_list_in_each_iteration)
-            # pruning_count_list= pruning_count_list.T.tolist()
-            for pruning_method_index in range(len(pruning_count_list)):
+            pruning_count_list= pruning_count_list.T
+            for pruning_method_index in range(len(pruning_methods)):
                 plt.subplot(rows_number, column_index, row_index)
                 plt.plot(
                     [self.statistic_sampling_period * i for i in range(int(iterations_number / self.statistic_sampling_period))],
                     pruning_count_list[pruning_method_index],
                 )
                 plt.xlabel("iteration")
-                plt.ylabel(f"{pruning_methods[pruning_method_index]}")
-                plt.title(f"{pruning_methods[pruning_method_index]} in each iteration")
+                plt.ylabel(f"{pruning_methods[pruning_method_index].replace('_', ' ')}")
+                plt.title(f"{pruning_methods[pruning_method_index].replace('_', ' ')} in each iteration")
 
                 row_index += 1
 

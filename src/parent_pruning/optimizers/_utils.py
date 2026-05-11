@@ -59,5 +59,7 @@ def replace_with_enum(enum_type, values):
                 result.append(value_to_member[v])
             else:
                 raise Exception('')
+    else:
+        raise Exception('')
     return result
     

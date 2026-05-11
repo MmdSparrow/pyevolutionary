@@ -54,12 +54,12 @@ class TerminationCondition:
         if TerminationConditionsEnum.ITERATION_NUMBER in self.termination_conditions:
             output = self.__iterations_number(iteration_number)
             if output:
-                reasons_list.append("Iteration Number!")
+                reasons_list.append("Iteration Number")
             done = done or output
         if TerminationConditionsEnum.EVALUATION_NUMBER in self.termination_conditions:
             output = self.__evaluation_number(iteration_number, generation_size, population_size)
             if output:
-                reasons_list.append("Evaluation Number!")
+                reasons_list.append("Evaluation Number")
             done = done or output
         messege = messege + ", ".join(reasons_list)
         return done, messege

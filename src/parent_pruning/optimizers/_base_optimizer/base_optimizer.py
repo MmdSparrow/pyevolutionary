@@ -10,8 +10,9 @@ import parent_pruning.selection_methods.remaining_selection as remaining_selecti
 import parent_pruning.thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
 
 from .__validator import validation
-from .._utils import init_function_by_name, replace_with_enum
 from parent_pruning._base.base import Base
+from parent_pruning._enums.modes_enum import ModesEnum
+from .._utils import init_function_by_name, replace_with_enum
 from parent_pruning.visualization.visualizer import Visualizer
 from parent_pruning._enums.statistics_enum import StatisticsEnum
 from parent_pruning.individuals.base_individual import Individual
@@ -310,20 +311,20 @@ class BaseOptimizer(Base):
             self.mode = replace_with_enum('modes', mode)
             self.checkpoint_save_period = checkpoint_save_period
             self.visualize = visualize
-            self.visualizer = Visualizer(statistics, statistic_sampling_period, self.result_directory)
+            self.visualizer = Visualizer(self.statistics, statistic_sampling_period, self.result_directory)
 
             self.avg_fitness_list = None
             self.var_fitness_list = None
             self.best_fitness_list = None
             self.pruning_count_list = None  # 2d list
 
-            if StatisticsEnum.AVG_FITNESS in statistics:
+            if StatisticsEnum.AVG_FITNESS in self.statistics:
                 self.avg_fitness_list = []
-            if StatisticsEnum.VAR_FITNESS in statistics:
+            if StatisticsEnum.VAR_FITNESS in self.statistics:
                 self.var_fitness_list = []
-            if StatisticsEnum.BEST_FITNESS in statistics:
+            if StatisticsEnum.BEST_FITNESS in self.statistics:
                 self.best_fitness_list = []
-            if StatisticsEnum.PRUNINGS in statistics:
+            if self.pruning_methods is not None:
                 self.pruning_count_list = []
 
     def __create_individual(self):
@@ -347,9 +348,9 @@ class BaseOptimizer(Base):
         return self.remaining_selection_func(chromosome_list, remaining_size)
 
     def __select_next_generation_basedon_mode(self, population, children):
-        if self.mode == "m,l":
+        if self.mode == ModesEnum.FORGETFUL:
             return children
-        elif self.mode == "m+l":
+        elif self.mode == ModesEnum.AGGREGGATE:
             return [j for i in [population, children] for j in i]
         else:
             raise Exception(f"mode {self.mode} is not supported!")
@@ -398,11 +399,11 @@ class BaseOptimizer(Base):
             json.dump(best_chromosome.to_dict(), file_to_write, indent=4)
 
         with open(os.path.join(self.result_directory, "results.pkl"), "wb") as file_to_write:
-            pickle.dump([self.avg_fitness_list, self.var_fitness_list, self.best_fitness_list, self.prune_old_chromosome_count_list], file_to_write)
+            pickle.dump([self.avg_fitness_list, self.var_fitness_list, self.best_fitness_list, self.pruning_count_list], file_to_write)
             pickle.dump(self.statistics, file_to_write)
             pickle.dump(self.statistic_sampling_period, file_to_write)
-            pickle.dump(self.pruning_count_list, file_to_write)
             pickle.dump(self.pruning_methods, file_to_write)
+            pickle.dump(self.pruning_methods_params, file_to_write)
             pickle.dump(current_iteration_number, file_to_write)
 
     def run(self):
@@ -429,7 +430,6 @@ class BaseOptimizer(Base):
         start_time = time.time()
         while True:
             children = self.__crossover_and_mutation(population)
-            self.__evaluationAll(children)
 
             next_generation_candidates = self.__select_next_generation_basedon_mode(population, children)
 
@@ -505,9 +505,10 @@ class BaseOptimizer(Base):
                     )
 
         end_time = time.time()
+        self._logger.info(f"Best Answer Fitness: {best_chromosome.fitness}")
         self._logger.info(f"Runtime: {end_time - start_time + self.elapsed_time} seconds")
-        self._logger.info("Saving results")
         self.__save_final_result(best_chromosome, current_iteration_number)
+        self._logger.info("Results have been saved")
         if self.visualize:
             self.visualizer.plot_diagrams(
                 current_iteration_number,
@@ -517,6 +518,6 @@ class BaseOptimizer(Base):
                 self.pruning_count_list,
                 self.pruning_methods,
             )
-            self._logger.info("Diagrams plotted successfuly.")
+            self._logger.info("Diagrams plotted successfuly")
         return self.base_directory
 
