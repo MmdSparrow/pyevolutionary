@@ -7,6 +7,7 @@ import random
 import parent_pruning.pruning.pruning_methods as pruning_methods_module
 import parent_pruning.selection_methods.parent_selection as parent_selection_module
 import parent_pruning.selection_methods.remaining_selection as remaining_selection_module
+import parent_pruning.thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
 
 from .__validator import validation
 from .._utils import init_function_by_name
@@ -35,6 +36,12 @@ from parent_pruning.configs.base_optimizer_config import (
     VISUALIZE_DEFAULT_VALUE,
     TERMINATION_CONDITIONS_DEFAULT_VALUE,
 )
+from parent_pruning.configs.directories import (
+    EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE,
+    EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE,
+    EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE,
+    EXTENSION_DIRECTORY_SCHEDULER_METHODS_MODULE,
+)
 
 
 class BaseOptimizer(Base):
@@ -43,20 +50,49 @@ class BaseOptimizer(Base):
         if parent_selection_type.startswith("q_tournoment"):
             self.ps_q = int(parent_selection_type.partition("#")[2])
             func_name = "q_tournoment"
-        self.parent_selection_func = init_function_by_name(parent_selection_module, func_name, "parent selection selection")
+        self.parent_selection_func= init_function_by_name(
+            parent_selection_module,
+            os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE),
+            func_name,
+            "parent selection",
+            self._logger,
+        )
 
     def __remaining_selection_func_determiner(self, remaining_selection_type):
         func_name = remaining_selection_type
         if remaining_selection_type.startswith("q_tournoment"):
             self.ps_q = int(remaining_selection_type.partition("#")[2])
             func_name = "q_tournoment"
-        self.remaining_selection_func = init_function_by_name(remaining_selection_module, func_name, "remaining selection")
+        self.parent_selection_func= init_function_by_name(
+            remaining_selection_module,
+            os.path.join(self.extension_directory, EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE),
+            func_name,
+            "remaining selection",
+            self._logger,
+        )
 
     def __pruning_methods_funcs_determiner(self, pruning_methods):
         self.pruning_methods_functions_list = []
         for method_name in pruning_methods:
-            self.pruning_methods_functions_list.append(init_function_by_name(pruning_methods_module, method_name, f"pruning method {method_name}"))
+            self.pruning_methods_functions_list.append(
+                init_function_by_name(
+                    pruning_methods_module,
+                    os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE),
+                    method_name,
+                    f"pruning method {method_name}",
+                    self._logger,
+                )
+            )
 
+    def __thereshold_scheduler_func_determiner(self, scheduler_methods):
+        return init_function_by_name(
+            thereshold_scheduler_module,
+            os.path.join(self.extension_directory, EXTENSION_DIRECTORY_SCHEDULER_METHODS_MODULE),
+            scheduler_methods,
+            "scheduler method",
+            self._logger,
+        )
+        
     def __save_checkpoint(
         self,
         chromosome_list,
@@ -111,8 +147,10 @@ class BaseOptimizer(Base):
             pickle.dump(self.avg_fitness_list, file_to_write)
             pickle.dump(self.var_fitness_list, file_to_write)
             pickle.dump(self.best_fitness_list, file_to_write)
+            pickle.dump(self.extension_directory, file_to_write)
 
             pickle.dump(elapsed_time, file_to_write)
+            
 
     def __load_checkpoint(self, checkpoint_base_directory):
         with open(os.path.join(checkpoint_base_directory, "checkpoints", "checkpoint.pkl"), "rb") as file_to_read:
@@ -170,6 +208,7 @@ class BaseOptimizer(Base):
             self.avg_fitness_list = pickle.load(file_to_read)
             self.var_fitness_list = pickle.load(file_to_read)
             self.best_fitness_list = pickle.load(file_to_read)
+            self.extension_directory= pickle.load(file_to_read)
 
             self.elapsed_time = pickle.load(file_to_read)
 
@@ -202,7 +241,6 @@ class BaseOptimizer(Base):
         visualize=VISUALIZE_DEFAULT_VALUE,
         checkpoint_save_period=None,
         checkpoint_base_directory=None,
-        extension_directory=None,
         # TODO:
         # source_spots_in_genome=None,
         # destination_spots_in_genome=None,
@@ -233,8 +271,11 @@ class BaseOptimizer(Base):
             self.crossover_probability = crossover_probability
             self.mutation_probability = mutation_probability
             self.pruning_methods = pruning_methods
-            self.__pruning_methods_funcs_determiner(pruning_methods)
             self.pruning_methods_params = pruning_methods_params
+            for pruning_param in self.pruning_methods_params:
+                if 'scheduler_method' in pruning_param:
+                    pruning_param['scheduler_func']= self.__thereshold_scheduler_func_determiner(pruning_param['scheduler_method'])
+            self.__pruning_methods_funcs_determiner(pruning_methods)
             self.__parent_selection_fucn_determiner(parent_selection_method)
             self.__remaining_selection_func_determiner(remaining_selection_method)
             self.termination_condition_handler = TerminationCondition(
@@ -252,7 +293,6 @@ class BaseOptimizer(Base):
             self.mode = mode
             self.checkpoint_save_period = checkpoint_save_period
             self.visualize = visualize
-
             self.visualizer = Visualizer(statistics, statistic_sampling_period, self.result_directory)
 
             self.avg_fitness_list = None
@@ -389,7 +429,7 @@ class BaseOptimizer(Base):
             if self.pruning_methods is not None:
                 for index, pruning_method_function in zip(range(len(self.pruning_methods_functions_list)), self.pruning_methods_functions_list):
                     # pruning_count_list_current_iteration.append(pruning_method_function(population, *self.pruning_methods_params[index])) # for list
-                    pruning_count_list_current_iteration.append(pruning_method_function(population, **self.pruning_methods_params[index]))  # for dict
+                    pruning_count_list_current_iteration.append(pruning_method_function(population, current_iteration_number, **self.pruning_methods_params[index]))  # for dict
 
             avg_fitness = None
             if TerminationConditionsEnum.PHENOTYPIC_DIVERSITY in self.termination_condition_handler.termination_conditions:
@@ -462,3 +502,4 @@ class BaseOptimizer(Base):
             )
             self._logger.info("Diagrams plotted successfuly.")
         return self.base_directory
+

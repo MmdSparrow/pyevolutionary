@@ -2,7 +2,7 @@ import os
 import logging
 
 from datetime import datetime
-from parent_pruning.configs.__directories import RESULT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, CHECKPOINT_DIRECTORY_DEFAULT
+from parent_pruning.configs.directories import RESULT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, CHECKPOINT_DIRECTORY_DEFAULT
 
 
 class Base:

@@ -6,6 +6,7 @@ from parent_pruning.individuals.order_individual import OrderIndividual
 from parent_pruning.optimizers._base_optimizer.base_optimizer import BaseOptimizer
 from parent_pruning.mutation import order_mutation_methods as order_mutation_module
 from parent_pruning.crossover import order_crossover_methods as order_crossover_module
+from parent_pruning._automation_system.automation_system_order import AutomationSystemOrder
 from parent_pruning.configs.order_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
@@ -13,22 +14,36 @@ from parent_pruning.configs.order_optimizer_config import (
     TERMINATION_CONDITIONS_DEFAULT_VALUE,
     VISUALIZE_DEFAULT_VALUE,
 )
-
+from parent_pruning.configs.directories import (
+    EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE,
+    EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE,
+)
 from .__utils import (
     show_all_availables,
     show_available_modes,
     show_available_crossover_methods,
     show_available_mutation_methods,
 )
-from parent_pruning._automation_system.automation_system_order import AutomationSystemOrder
 
 
 class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
     def __mutation_func_determiner(self, mutation_method):
-        self.mutation_func = init_function_by_name(order_mutation_module, mutation_method, "mutation")
+        self.mutation_func = init_function_by_name(
+            order_mutation_module,
+            os.path.join(self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE),
+            mutation_method,
+            "mutation",
+            self._logger,
+        )
 
     def __crossover_func_determiner(self, crossover_method):
-        self.crossover_func = init_function_by_name(order_crossover_module, crossover_method, "crossover")
+        self.crossover_func = init_function_by_name(
+            order_crossover_module,
+            os.path.join(self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE),
+            crossover_method,
+            "crossover",
+            self._logger,
+        )
 
     def __generate_note_file(self):
         self._logger.info("Generate note file")
@@ -85,10 +100,7 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         # source_spots_in_genome= None,
         # destination_spots_in_genome= None,
     ):
-        AutomationSystemOrder.__init__(
-            self,
-            extension_directory,
-        )
+        AutomationSystemOrder.__init__(self, extension_directory)
         BaseOptimizer.__init__(
             self,
             project_name,
@@ -118,7 +130,6 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             visualize,
             checkpoint_save_period,
             checkpoint_base_directory,
-            extension_directory,
             # TODO:
             # source_spots_in_genome,
             # destination_spots_in_genome,

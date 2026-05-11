@@ -1,5 +1,6 @@
 import os
 import pickle
+import numpy as np
 import matplotlib.pyplot as plt
 
 from parent_pruning._enums.statistics_enum import StatisticsEnum
@@ -12,7 +13,7 @@ class Visualizer:
         self.statistic_sampling_period = statistic_sampling_period
         self.results_directory = results_directory
 
-    def plot_diagrams(self, iterations_number, avg_fitness_list, var_fitness_list, best_fitness_list, pruning_count_list, pruning_methods):
+    def plot_diagrams(self, iterations_number, avg_fitness_list, var_fitness_list, best_fitness_list, pruning_count_list_in_each_iteration, pruning_methods):
         if self.statistics is None:
             return
 
@@ -54,6 +55,8 @@ class Visualizer:
             row_index += 1
 
         if StatisticsEnum.PRUNINGS in self.statistics:
+            pruning_count_list = np.array(pruning_count_list_in_each_iteration)
+            # pruning_count_list= pruning_count_list.T.tolist()
             for pruning_method_index in range(len(pruning_count_list)):
                 plt.subplot(rows_number, column_index, row_index)
                 plt.plot(
