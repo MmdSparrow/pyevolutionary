@@ -10,7 +10,7 @@ import parent_pruning.selection_methods.remaining_selection as remaining_selecti
 import parent_pruning.thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
 
 from .__validator import validation
-from .._utils import init_function_by_name
+from .._utils import init_function_by_name, replace_with_enum
 from parent_pruning._base.base import Base
 from parent_pruning.visualization.visualizer import Visualizer
 from parent_pruning._enums.statistics_enum import StatisticsEnum
@@ -22,12 +22,12 @@ from .__utils import (
     compute_var_fitness_with_avg,
     copy_parent_to_child,
     increase_age_of_all_population,
-    show_all_available_functions_and_values_of_project,
-    show_available_mode,
-    show_available_parent_selection_methods,
-    show_available_remaining_selection_methods,
-    show_available_termination_conditions,
-    show_available_statistics,
+    # show_all_available_functions_and_values_of_project,
+    # show_available_mode,
+    # show_available_parent_selection_methods,
+    # show_available_remaining_selection_methods,
+    # show_available_termination_conditions,
+    # show_available_statistics,
 )
 from parent_pruning.configs.base_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
@@ -50,9 +50,12 @@ class BaseOptimizer(Base):
         if parent_selection_type.startswith("q_tournoment"):
             self.ps_q = int(parent_selection_type.partition("#")[2])
             func_name = "q_tournoment"
+        module_path=None
+        if self.extension_directory is not None:
+            module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE)
         self.parent_selection_func= init_function_by_name(
             parent_selection_module,
-            os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE),
+            module_path,
             func_name,
             "parent selection",
             self._logger,
@@ -63,9 +66,12 @@ class BaseOptimizer(Base):
         if remaining_selection_type.startswith("q_tournoment"):
             self.ps_q = int(remaining_selection_type.partition("#")[2])
             func_name = "q_tournoment"
-        self.parent_selection_func= init_function_by_name(
+        module_path=None
+        if self.extension_directory is not None:
+            module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE)
+        self.remaining_selection_func= init_function_by_name(
             remaining_selection_module,
-            os.path.join(self.extension_directory, EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE),
+            module_path,
             func_name,
             "remaining selection",
             self._logger,
@@ -73,21 +79,28 @@ class BaseOptimizer(Base):
 
     def __pruning_methods_funcs_determiner(self, pruning_methods):
         self.pruning_methods_functions_list = []
-        for method_name in pruning_methods:
-            self.pruning_methods_functions_list.append(
-                init_function_by_name(
-                    pruning_methods_module,
-                    os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE),
-                    method_name,
-                    f"pruning method {method_name}",
-                    self._logger,
+        if pruning_methods is not None:
+            module_path=None
+            if self.extension_directory is not None:
+                module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE)
+            for method_name in pruning_methods:
+                self.pruning_methods_functions_list.append(
+                    init_function_by_name(
+                        pruning_methods_module,
+                        module_path,
+                        method_name,
+                        f"pruning method {method_name}",
+                        self._logger,
+                    )
                 )
-            )
 
     def __thereshold_scheduler_func_determiner(self, scheduler_methods):
+        module_path=None
+        if self.extension_directory is not None:
+            module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_SCHEDULER_METHODS_MODULE)
         return init_function_by_name(
             thereshold_scheduler_module,
-            os.path.join(self.extension_directory, EXTENSION_DIRECTORY_SCHEDULER_METHODS_MODULE),
+            module_path,
             scheduler_methods,
             "scheduler method",
             self._logger,
@@ -272,14 +285,16 @@ class BaseOptimizer(Base):
             self.mutation_probability = mutation_probability
             self.pruning_methods = pruning_methods
             self.pruning_methods_params = pruning_methods_params
-            for pruning_param in self.pruning_methods_params:
-                if 'scheduler_method' in pruning_param:
-                    pruning_param['scheduler_func']= self.__thereshold_scheduler_func_determiner(pruning_param['scheduler_method'])
+            if self.pruning_methods_params is not None:
+                for pruning_param in self.pruning_methods_params:
+                    if 'scheduler_method' in pruning_param:
+                        pruning_param['scheduler_func']= self.__thereshold_scheduler_func_determiner(pruning_param['scheduler_method'])
             self.__pruning_methods_funcs_determiner(pruning_methods)
             self.__parent_selection_fucn_determiner(parent_selection_method)
             self.__remaining_selection_func_determiner(remaining_selection_method)
+            ######################### TODO
             self.termination_condition_handler = TerminationCondition(
-                termination_conditions,
+                replace_with_enum('termination_conditions', termination_conditions),
                 phenotypic_diversity_window_size,
                 phenotypic_diversity_error_thereshold,
                 genotypic_diversity_window_size,
@@ -288,9 +303,11 @@ class BaseOptimizer(Base):
                 iterations_number,
                 evaluation_number,
             )
-            self.statistics = statistics
+            ######################### TODO
+            self.statistics = replace_with_enum('statistics', statistics)
             self.statistic_sampling_period = statistic_sampling_period
-            self.mode = mode
+            ######################### TODO
+            self.mode = replace_with_enum('modes', mode)
             self.checkpoint_save_period = checkpoint_save_period
             self.visualize = visualize
             self.visualizer = Visualizer(statistics, statistic_sampling_period, self.result_directory)

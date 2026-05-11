@@ -4,19 +4,17 @@ from parent_pruning.configs.base_optimizer_config import (
     AVAILABLE_MODES,
     AVAILABLE_TERMINATION_CONDITIONS,
     AVAILABLE_STATISTICS,
-    AVAILABLE_PARENT_SELECTION_METHODS,
-    AVAILABLE_REMAINING_SELECTION_METHODS,
 )
 
 
-def compute_avg_fitness(self, individual_list):
+def compute_avg_fitness(individual_list):
     sum_fitness = 0
     for chromosome in individual_list:
         sum_fitness += chromosome.fitness
     return sum_fitness / len(individual_list)
 
 
-def compute_var_fitness_with_avg(self, individual_list, avg_fitness):
+def compute_var_fitness_with_avg(individual_list, avg_fitness):
     sum_var = 0
     for chromosome in individual_list:
         sum_var += pow((chromosome.fitness - avg_fitness), 2)
@@ -24,12 +22,12 @@ def compute_var_fitness_with_avg(self, individual_list, avg_fitness):
     return sum_var / (len(individual_list) - 1)
 
 
-def increase_age_of_all_population(self, population):
+def increase_age_of_all_population(population):
     for chromosome in population:
         chromosome.increase_age()
 
 
-def copy_parent_to_child(self, parent):
+def copy_parent_to_child(parent):
     child = copy.deepcopy(parent)
     child.age = 0
     child.parent_score = 0
@@ -37,49 +35,49 @@ def copy_parent_to_child(self, parent):
     return child
 
 
-def show_available_parent_selection_methods(self, return_instead_of_print=False):
-    if return_instead_of_print:
-        return AVAILABLE_PARENT_SELECTION_METHODS
-    print("Available Parent Selection Methods:")
-    print(AVAILABLE_PARENT_SELECTION_METHODS)
+# def show_available_parent_selection_methods(self, return_instead_of_print=False):
+#     if return_instead_of_print:
+#         return AVAILABLE_PARENT_SELECTION_METHODS
+#     print("Available Parent Selection Methods:")
+#     print(AVAILABLE_PARENT_SELECTION_METHODS)
 
 
-def show_available_remaining_selection_methods(self, return_instead_of_print=False):
-    if return_instead_of_print:
-        return AVAILABLE_REMAINING_SELECTION_METHODS
-    print("Available Remaining Selection Methods:")
-    print(AVAILABLE_REMAINING_SELECTION_METHODS)
+# def show_available_remaining_selection_methods(self, return_instead_of_print=False):
+#     if return_instead_of_print:
+#         return AVAILABLE_REMAINING_SELECTION_METHODS
+#     print("Available Remaining Selection Methods:")
+#     print(AVAILABLE_REMAINING_SELECTION_METHODS)
 
 
-def show_available_termination_conditions(self, return_instead_of_print=False):
+def show_available_termination_conditions(return_instead_of_print=False):
     if return_instead_of_print:
         return AVAILABLE_TERMINATION_CONDITIONS
     print("Available Termination Conditions:")
     print(AVAILABLE_TERMINATION_CONDITIONS)
 
 
-def show_available_statistics(self, return_instead_of_print=False):
+def show_available_statistics(return_instead_of_print=False):
     if return_instead_of_print:
         return AVAILABLE_STATISTICS
     print("Available Plot Types:")
     print(AVAILABLE_STATISTICS)
 
 
-def show_available_mode(self, return_instead_of_print=False):
+def show_available_mode(return_instead_of_print=False):
     if return_instead_of_print:
         return AVAILABLE_MODES
     print("Available Modes:")
     print(AVAILABLE_MODES)
 
 
-def show_all_available_functions_and_values_of_project(self):
-    print("Available Parent Selection Methods:")
-    print(AVAILABLE_PARENT_SELECTION_METHODS)
-    print()
+def show_all_available_functions_and_values_of_project():
+    # print("Available Parent Selection Methods:")
+    # print(AVAILABLE_PARENT_SELECTION_METHODS)
+    # print()
 
-    print("Available Remaining Selection Methods:")
-    print(AVAILABLE_REMAINING_SELECTION_METHODS)
-    print()
+    # print("Available Remaining Selection Methods:")
+    # print(AVAILABLE_REMAINING_SELECTION_METHODS)
+    # print()
 
     print("Available Termination Conditions:")
     print(AVAILABLE_TERMINATION_CONDITIONS)

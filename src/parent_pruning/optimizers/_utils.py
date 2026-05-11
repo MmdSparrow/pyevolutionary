@@ -1,6 +1,9 @@
 import os
 import importlib.util
 
+from parent_pruning._enums.modes_enum import ModesEnum
+from parent_pruning._enums.statistics_enum import StatisticsEnum
+from parent_pruning._enums.termination_conditions_enums import TerminationConditionsEnum
 from parent_pruning._utils.exception_handeling.custom_exceptions.function_not_supported_exception import FunctionNotSupportedException
 
 
@@ -32,3 +35,29 @@ def init_function_by_name(module, extension_module_path, func_name, function_obj
         if not func:
             raise FunctionNotSupportedException(func_name, function_objective, logger)
     return func
+
+def replace_with_enum(enum_type, values):
+    result=[]
+    if enum_type=='modes':
+        if values== ModesEnum.AGGREGGATE.value:
+            return ModesEnum.AGGREGGATE
+        elif values== ModesEnum.FORGETFUL.value:
+            return ModesEnum.FORGETFUL
+        else:
+            raise Exception('')
+    elif enum_type=='statistics':
+        value_to_member= {member.value: member for member in StatisticsEnum}
+        for v in values:
+            if v in value_to_member:
+                result.append(value_to_member[v])
+            else:
+                raise Exception('')
+    elif enum_type=='termination_conditions':
+        value_to_member= {member.value: member for member in TerminationConditionsEnum}
+        for v in values:
+            if v in value_to_member:
+                result.append(value_to_member[v])
+            else:
+                raise Exception('')
+    return result
+    

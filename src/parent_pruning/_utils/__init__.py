@@ -1,5 +1,5 @@
-from .exception_handeling.custom_exceptions.configuration_exception import ConfigurationException
+from .exception_handeling.custom_exceptions.invalid_value_exception import InvalidValueException
 
 __all__ = [
-    "ConfigurationException",
+    "InvalidValueException",
 ]

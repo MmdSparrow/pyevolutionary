@@ -7,6 +7,7 @@ def random_uniform(chromosome_list, with_placement=True):
     if not with_placement:
         chromosome_list.remove(parent_chromosome)
     return parent_chromosome
+    
 
 
 def rank_based(chromosome_list, with_placement=True):
@@ -16,6 +17,7 @@ def rank_based(chromosome_list, with_placement=True):
     if not with_placement:
         chromosome_list.remove(parent_chromosome)
     return parent_chromosome
+    
 
 
 def q_tournoment(chromosome_list, q, with_placement=True):

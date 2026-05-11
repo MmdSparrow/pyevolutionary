@@ -18,28 +18,34 @@ from parent_pruning.configs.directories import (
     EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE,
     EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE,
 )
-from .__utils import (
-    show_all_availables,
-    show_available_modes,
-    show_available_crossover_methods,
-    show_available_mutation_methods,
-)
+# from .__utils import (
+#     show_all_availables,
+#     show_available_modes,
+#     show_available_crossover_methods,
+#     show_available_mutation_methods,
+# )
 
 
 class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
     def __mutation_func_determiner(self, mutation_method):
+        module_path= None
+        if self.extension_directory is not None:
+            module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE)
         self.mutation_func = init_function_by_name(
             order_mutation_module,
-            os.path.join(self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE),
+            module_path,
             mutation_method,
             "mutation",
             self._logger,
         )
 
     def __crossover_func_determiner(self, crossover_method):
+        module_path= None
+        if self.extension_directory is not None:
+            module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE)
         self.crossover_func = init_function_by_name(
             order_crossover_module,
-            os.path.join(self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE),
+            module_path,
             crossover_method,
             "crossover",
             self._logger,
@@ -141,7 +147,7 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             self._logger.info("Load order optimizer")
             self.__load_order_checkpoint()
         else:
-            validation(crossover_method, mutation_method)
+            validation(crossover_method, mutation_method, self._logger)
             self._logger.info("Initialize order optimizer")
             self.__mutation_func_determiner(self.mutation_method)
             self.__crossover_func_determiner(self.crossover_method)
