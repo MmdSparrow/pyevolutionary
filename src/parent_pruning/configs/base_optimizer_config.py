@@ -1,6 +1,6 @@
-from ._enums.modes_enum import ModesEnum
-from ._enums.statistics_enum import StatisticsEnum
-from ._enums.termination_conditions_enums import TerminationConditionsEnum
+from parent_pruning._enums.modes_enum import ModesEnum
+from parent_pruning._enums.statistics_enum import StatisticsEnum
+from parent_pruning._enums.termination_conditions_enums import TerminationConditionsEnum
 
 
 AVAILABLE_MODES = [ModesEnum.AGGREGGATE, ModesEnum.FORGETFUL]

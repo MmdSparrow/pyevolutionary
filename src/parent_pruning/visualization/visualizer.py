@@ -2,12 +2,7 @@ import os
 import pickle
 import matplotlib.pyplot as plt
 
-from parent_pruning.configs._enums.termination_conditions_enums import (
-    STATISTIC_AVG_FITNESS,
-    STATISTIC_VAR_FITNESS,
-    STATISTIC_BEST_FITNESS,
-    STATISTIC_PRUNINGS,
-)
+from parent_pruning._enums.statistics_enum import StatisticsEnum
 
 
 class Visualizer:
@@ -31,7 +26,7 @@ class Visualizer:
         column_index = 1
         row_index = 1
 
-        if STATISTIC_AVG_FITNESS in self.statistics:
+        if StatisticsEnum.AVG_FITNESS in self.statistics:
             plt.subplot(rows_number, column_index, row_index)
             plt.plot([self.statistic_sampling_period * i for i in range(int(iterations_number / self.statistic_sampling_period))], avg_fitness_list)
             plt.xlabel("iteration")
@@ -40,7 +35,7 @@ class Visualizer:
 
             row_index += 1
 
-        if STATISTIC_VAR_FITNESS in self.statistics:
+        if StatisticsEnum.VAR_FITNESS in self.statistics:
             plt.subplot(rows_number, column_index, row_index)
             plt.plot([self.statistic_sampling_period * i for i in range(int(iterations_number / self.statistic_sampling_period))], var_fitness_list)
             plt.xlabel("iteration")
@@ -49,7 +44,7 @@ class Visualizer:
 
             row_index += 1
 
-        if STATISTIC_BEST_FITNESS in self.statistics:
+        if StatisticsEnum.BEST_FITNESS in self.statistics:
             plt.subplot(rows_number, column_index, row_index)
             plt.plot([self.statistic_sampling_period * i for i in range(int(iterations_number / self.statistic_sampling_period))], best_fitness_list)
             plt.xlabel("iteration")
@@ -58,7 +53,7 @@ class Visualizer:
 
             row_index += 1
 
-        if STATISTIC_PRUNINGS in self.statistics:
+        if StatisticsEnum.PRUNINGS in self.statistics:
             for pruning_method_index in range(len(pruning_count_list)):
                 plt.subplot(rows_number, column_index, row_index)
                 plt.plot(

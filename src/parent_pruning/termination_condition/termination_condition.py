@@ -1,11 +1,5 @@
 from parent_pruning.individuals.base_individual import Individual
-from parent_pruning.configs._enums.termination_conditions_enums import (
-    TERMINATION_CONDITION_EVALUATION_NUMBER,
-    TERMINATION_CONDITION_FITNESS_LIMIT,
-    TERMINATION_CONDITION_GENOTYPIC_DIVERSITY,
-    TERMINATION_CONDITION_ITERATION_NUMBER,
-    TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY,
-)
+from parent_pruning._enums.termination_conditions_enums import TerminationConditionsEnum
 
 
 class TerminationCondition:
@@ -42,27 +36,27 @@ class TerminationCondition:
         messege = "Reasons of terminations: "
         reasons_list = []
 
-        if TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY in self.termination_conditions:
+        if TerminationConditionsEnum.PHENOTYPIC_DIVERSITY in self.termination_conditions:
             output = self.__phenotypic_diversity(avg_fitness)
             if output:
                 reasons_list.append("Phenotypic Diversity")
             done = done or output
-        if TERMINATION_CONDITION_GENOTYPIC_DIVERSITY in self.termination_conditions:
+        if TerminationConditionsEnum.GENOTYPIC_DIVERSITY in self.termination_conditions:
             done = done or self.__genotypic_diversity(population)
             if output:
                 reasons_list.append("Genotypic Diversity")
             done = done or output
-        if TERMINATION_CONDITION_FITNESS_LIMIT in self.termination_conditions:
+        if TerminationConditionsEnum.FITNESS_LIMIT in self.termination_conditions:
             output = self.__fitness_limit(best_fitness)
             if output:
                 reasons_list.append("Fitness Limit")
             done = done or output
-        if TERMINATION_CONDITION_ITERATION_NUMBER in self.termination_conditions:
+        if TerminationConditionsEnum.ITERATION_NUMBER in self.termination_conditions:
             output = self.__iterations_number(iteration_number)
             if output:
                 reasons_list.append("Iteration Number!")
             done = done or output
-        if TERMINATION_CONDITION_EVALUATION_NUMBER in self.termination_conditions:
+        if TerminationConditionsEnum.EVALUATION_NUMBER in self.termination_conditions:
             output = self.__evaluation_number(iteration_number, generation_size, population_size)
             if output:
                 reasons_list.append("Evaluation Number!")
