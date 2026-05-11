@@ -1,5 +1,5 @@
 from parent_pruning.individuals.base_individual import Individual
-from parent_pruning.configs.common import (
+from parent_pruning.configs._enums.termination_conditions_enums import (
     TERMINATION_CONDITION_EVALUATION_NUMBER,
     TERMINATION_CONDITION_FITNESS_LIMIT,
     TERMINATION_CONDITION_GENOTYPIC_DIVERSITY,
@@ -18,7 +18,7 @@ class TerminationCondition:
         genotypic_diversityerror_thereshold,
         fitness_limit_threshold,
         iterations_number_threshold,
-        evaluation_number_threshold
+        evaluation_number_threshold,
     ) -> None:
         # TODO: change them to private access (some of them)
         self.termination_conditions = termination_conditions
@@ -37,12 +37,11 @@ class TerminationCondition:
 
         self.evaluation_number_threshold = evaluation_number_threshold
 
-
     def check_termination(self, population, avg_fitness, best_fitness, iteration_number, generation_size, population_size):
         done = False
         messege = "Reasons of terminations: "
-        reasons_list= []
-    
+        reasons_list = []
+
         if TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY in self.termination_conditions:
             output = self.__phenotypic_diversity(avg_fitness)
             if output:
@@ -68,9 +67,9 @@ class TerminationCondition:
             if output:
                 reasons_list.append("Evaluation Number!")
             done = done or output
-        messege= messege + ", ".join(reasons_list)
+        messege = messege + ", ".join(reasons_list)
         return done, messege
-    
+
     def __phenotypic_diversity(
         self,
         current_avg_fitness,
@@ -91,11 +90,11 @@ class TerminationCondition:
         return False
 
     def __fitness_limit(self, best_fitness):
-        #TODO: this is just work because u use best fitness as minus of distance
+        # TODO: this is just work because u use best fitness as minus of distance
         return best_fitness >= self.fitness_limit_threshold
 
     def __iterations_number(self, iterations_number):
         return iterations_number >= self.iterations_number_threshold
-    
+
     def __evaluation_number(self, iteration_number, generation_size, population_size):
-        return iteration_number*generation_size+population_size >= self.evaluation_number_threshold
+        return iteration_number * generation_size + population_size >= self.evaluation_number_threshold

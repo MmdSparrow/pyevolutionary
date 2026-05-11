@@ -7,16 +7,16 @@ import random
 import parent_pruning.pruning.pruning_methods as pruning_methods_module
 import parent_pruning.selection_methods.parent_selection as parent_selection_module
 import parent_pruning.selection_methods.remaining_selection as remaining_selection_module
-import parent_pruning.thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
-
 
 from .__validator import validation
-from parent_pruning.base.base import Base
+from .._utils import init_function_by_name
+from parent_pruning._base.base import Base
 from parent_pruning.visualization.visualizer import Visualizer
-from parent_pruning.optimizers._utils import init_function_by_name
+from parent_pruning._enums.statistics_enum import StatisticsEnum
 from parent_pruning.individuals.base_individual import Individual
+from parent_pruning._enums.termination_conditions_enums import TerminationConditionsEnum
 from parent_pruning.termination_condition.termination_condition import TerminationCondition
-from .__utils import(
+from .__utils import (
     compute_avg_fitness,
     compute_var_fitness_with_avg,
     copy_parent_to_child,
@@ -28,20 +28,10 @@ from .__utils import(
     show_available_termination_conditions,
     show_available_statistics,
 )
-from parent_pruning.configs.common import (
-    STATISTIC_AVG_FITNESS,
-    STATISTIC_VAR_FITNESS,
-    STATISTIC_BEST_FITNESS,
-    STATISTIC_PRUNINGS,
-    TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY,
-)
 from parent_pruning.configs.base_optimizer_config import (
-    AVAILABLE_PRUNING_METHODS,
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
     MUTATION_PROBABILITY_DEFAULT_VALUE,
-    AVAILABLE_PARENT_SELECTION_METHODS,
-    AVAILABLE_REMAINING_SELECTION_METHODS,
     VISUALIZE_DEFAULT_VALUE,
     TERMINATION_CONDITIONS_DEFAULT_VALUE,
 )
@@ -53,51 +43,44 @@ class BaseOptimizer(Base):
         if parent_selection_type.startswith("q_tournoment"):
             self.ps_q = int(parent_selection_type.partition("#")[2])
             func_name = "q_tournoment"
-        self.parent_selection_func = init_function_by_name(
-            parent_selection_module, func_name, "parent selection selection"
-        )
+        self.parent_selection_func = init_function_by_name(parent_selection_module, func_name, "parent selection selection")
 
     def __remaining_selection_func_determiner(self, remaining_selection_type):
         func_name = remaining_selection_type
         if remaining_selection_type.startswith("q_tournoment"):
             self.ps_q = int(remaining_selection_type.partition("#")[2])
             func_name = "q_tournoment"
-        self.remaining_selection_func = init_function_by_name(
-            remaining_selection_module, func_name, "remaining selection"
-        )
+        self.remaining_selection_func = init_function_by_name(remaining_selection_module, func_name, "remaining selection")
 
     def __pruning_methods_funcs_determiner(self, pruning_methods):
-        self.pruning_methods_functions_list= []
+        self.pruning_methods_functions_list = []
         for method_name in pruning_methods:
-            self.pruning_methods_functions_list.append(init_function_by_name(
-                pruning_methods_module,
-                method_name,
-                f'pruning method {method_name}'
-            ))
-    
-    def __save_checkpoint(self,
-            chromosome_list,
-            current_iteration_number,
-            bset_chromosome,
-            termination_conditions,
-            phenotypic_diversity_window_size,
-            phenotypic_diversity_error_thereshold,
-            genotypic_diversity_window_size,
-            genotypic_diversity_error_thereshold,
-            fitness_limit_threshold,
-            iterations_number,
-            evaluation_number,
-            elapsed_time,
-        ):
-        with open(os.path.join(self.checkpoint_directory, 'checkpoint.pkl'), 'wb') as file_to_write:
+            self.pruning_methods_functions_list.append(init_function_by_name(pruning_methods_module, method_name, f"pruning method {method_name}"))
+
+    def __save_checkpoint(
+        self,
+        chromosome_list,
+        current_iteration_number,
+        bset_chromosome,
+        termination_conditions,
+        phenotypic_diversity_window_size,
+        phenotypic_diversity_error_thereshold,
+        genotypic_diversity_window_size,
+        genotypic_diversity_error_thereshold,
+        fitness_limit_threshold,
+        iterations_number,
+        evaluation_number,
+        elapsed_time,
+    ):
+        with open(os.path.join(self.checkpoint_directory, "checkpoint.pkl"), "wb") as file_to_write:
             pickle.dump(chromosome_list, file_to_write)
-            
+
             pickle.dump(current_iteration_number, file_to_write)
             pickle.dump(bset_chromosome, file_to_write)
-            
+
             pickle.dump(self.project_name, file_to_write)
             pickle.dump(self.base_directory, file_to_write)
-            
+
             pickle.dump(self.genome_size, file_to_write)
             pickle.dump(self.population_size, file_to_write)
             pickle.dump(self.generation_size, file_to_write)
@@ -124,50 +107,50 @@ class BaseOptimizer(Base):
             pickle.dump(self.statistic_sampling_period, file_to_write)
             pickle.dump(self.checkpoint_save_period, file_to_write)
             pickle.dump(self.visualize, file_to_write)
-            
+
             pickle.dump(self.avg_fitness_list, file_to_write)
             pickle.dump(self.var_fitness_list, file_to_write)
             pickle.dump(self.best_fitness_list, file_to_write)
-            
+
             pickle.dump(elapsed_time, file_to_write)
-        
+
     def __load_checkpoint(self, checkpoint_base_directory):
-        with open(os.path.join(checkpoint_base_directory, 'checkpoints', 'checkpoint.pkl'), 'rb') as file_to_read:
-            self.__temp_chromosome_list= pickle.load(file_to_read)
-            
-            self.__temp_current_iteration_number= pickle.load(file_to_read)
-            self.__temp_best_chromosome= pickle.load(file_to_read)
-            
-            self.project_name= pickle.load(file_to_read)
-            self.base_directory= pickle.load(file_to_read)
-            
-            self.genome_size= pickle.load(file_to_read)
-            self.population_size= pickle.load(file_to_read)
-            self.generation_size= pickle.load(file_to_read)
-            self.parent_selection_method= pickle.load(file_to_read)
-            self.remaining_selection_method= pickle.load(file_to_read)
-            self.crossover_method= pickle.load(file_to_read)
-            self.mutation_method= pickle.load(file_to_read)
-            self.crossover_probability= pickle.load(file_to_read)
-            self.mutation_probability= pickle.load(file_to_read)
-            termination_conditions= pickle.load(file_to_read)
-            self.statistics= pickle.load(file_to_read)
-            self.mode= pickle.load(file_to_read)
-            self.pruning_methods=  pickle.load(file_to_read)
+        with open(os.path.join(checkpoint_base_directory, "checkpoints", "checkpoint.pkl"), "rb") as file_to_read:
+            self.__temp_chromosome_list = pickle.load(file_to_read)
+
+            self.__temp_current_iteration_number = pickle.load(file_to_read)
+            self.__temp_best_chromosome = pickle.load(file_to_read)
+
+            self.project_name = pickle.load(file_to_read)
+            self.base_directory = pickle.load(file_to_read)
+
+            self.genome_size = pickle.load(file_to_read)
+            self.population_size = pickle.load(file_to_read)
+            self.generation_size = pickle.load(file_to_read)
+            self.parent_selection_method = pickle.load(file_to_read)
+            self.remaining_selection_method = pickle.load(file_to_read)
+            self.crossover_method = pickle.load(file_to_read)
+            self.mutation_method = pickle.load(file_to_read)
+            self.crossover_probability = pickle.load(file_to_read)
+            self.mutation_probability = pickle.load(file_to_read)
+            termination_conditions = pickle.load(file_to_read)
+            self.statistics = pickle.load(file_to_read)
+            self.mode = pickle.load(file_to_read)
+            self.pruning_methods = pickle.load(file_to_read)
             self.__pruning_methods_funcs_determiner(self.pruning_methods)
-            self.pruning_methods_params= pickle.load(file_to_read)
-            self.pruning_count_list= pickle.load(file_to_read)
+            self.pruning_methods_params = pickle.load(file_to_read)
+            self.pruning_count_list = pickle.load(file_to_read)
             validation(self.parent_selection_method, self.remaining_selection_method, termination_conditions, self.statistics, self.mode, self._logger)
             self.__parent_selection_fucn_determiner(self.parent_selection_method)
             self.__remaining_selection_func_determiner(self.remaining_selection_method)
-            phenotypic_diversity_window_size= pickle.load(file_to_read)
-            phenotypic_diversity_error_thereshold= pickle.load(file_to_read)
-            genotypic_diversity_window_size= pickle.load(file_to_read)
-            genotypic_diversity_error_thereshold= pickle.load(file_to_read)
-            fitness_limit_threshold= pickle.load(file_to_read)
-            iterations_number= pickle.load(file_to_read)
-            evaluation_number= pickle.load(file_to_read)
-            self.termination_condition_handler= TerminationCondition(
+            phenotypic_diversity_window_size = pickle.load(file_to_read)
+            phenotypic_diversity_error_thereshold = pickle.load(file_to_read)
+            genotypic_diversity_window_size = pickle.load(file_to_read)
+            genotypic_diversity_error_thereshold = pickle.load(file_to_read)
+            fitness_limit_threshold = pickle.load(file_to_read)
+            iterations_number = pickle.load(file_to_read)
+            evaluation_number = pickle.load(file_to_read)
+            self.termination_condition_handler = TerminationCondition(
                 termination_conditions,
                 phenotypic_diversity_window_size,
                 phenotypic_diversity_error_thereshold,
@@ -177,19 +160,19 @@ class BaseOptimizer(Base):
                 iterations_number,
                 evaluation_number,
             )
-            self.statistic_sampling_period= pickle.load(file_to_read)
-            self.checkpoint_save_period= pickle.load(file_to_read)
-            self.visualize= pickle.load(file_to_read)
-            
+            self.statistic_sampling_period = pickle.load(file_to_read)
+            self.checkpoint_save_period = pickle.load(file_to_read)
+            self.visualize = pickle.load(file_to_read)
+
             # for visualizer
-            self.visualizer= Visualizer(self.statistics, self.statistic_sampling_period, self.result_directory)
-            
-            self.avg_fitness_list= pickle.load(file_to_read)
-            self.var_fitness_list= pickle.load(file_to_read)
-            self.best_fitness_list= pickle.load(file_to_read)
-            
-            self.elapsed_time= pickle.load(file_to_read)
-        
+            self.visualizer = Visualizer(self.statistics, self.statistic_sampling_period, self.result_directory)
+
+            self.avg_fitness_list = pickle.load(file_to_read)
+            self.var_fitness_list = pickle.load(file_to_read)
+            self.best_fitness_list = pickle.load(file_to_read)
+
+            self.elapsed_time = pickle.load(file_to_read)
+
     def __init__(
         self,
         project_name,
@@ -216,42 +199,42 @@ class BaseOptimizer(Base):
         phenotypic_diversity_error_thereshold=None,
         genotypic_diversity_window_size=None,
         genotypic_diversity_error_thereshold=None,
-        visualize= VISUALIZE_DEFAULT_VALUE,
+        visualize=VISUALIZE_DEFAULT_VALUE,
         checkpoint_save_period=None,
         checkpoint_base_directory=None,
-        extension_directory= None,
+        extension_directory=None,
         # TODO:
         # source_spots_in_genome=None,
         # destination_spots_in_genome=None,
     ) -> None:
         super().__init__(project_name, checkpoint_base_directory)
         self.input_data = input_data
-        self.individual_class= None
-        
-        self._logger.info(f'List of available `Parent Selection Methods` functions:{AVAILABLE_PARENT_SELECTION_METHODS}')
-        self._logger.info(f'List of available `Remaining Selection Methods` functions:{AVAILABLE_REMAINING_SELECTION_METHODS}')
-        self._logger.info(f'List of available `Pruning Methods` functions: {AVAILABLE_PRUNING_METHODS}')
-        
-        self.checkpoint_base_directory= checkpoint_base_directory
+        self.individual_class = None
+
+        self._logger.info(f"List of available `Parent Selection Methods` functions:{self.AVAILABLE_PARENT_SELECTION_METHODS}")
+        self._logger.info(f"List of available `Remaining Selection Methods` functions:{self.AVAILABLE_REMAINING_SELECTION_METHODS}")
+        self._logger.info(f"List of available `Pruning Methods` functions: {self.AVAILABLE_PRUNING_METHODS}")
+
+        self.checkpoint_base_directory = checkpoint_base_directory
         if checkpoint_base_directory is not None:
-            self._logger.info(f'Load checkpoint \"{self.checkpoint_base_directory}\"')
+            self._logger.info(f'Load checkpoint "{self.checkpoint_base_directory}"')
             self.__load_checkpoint(checkpoint_base_directory)
         else:
-            validation(parent_selection_method, remaining_selection_method, pruning_methods,termination_conditions, statistics, mode, self._logger)
-            self._logger.info('Initialize optimzier')
-            self.elapsed_time= 0
+            validation(parent_selection_method, remaining_selection_method, pruning_methods, termination_conditions, statistics, mode, self._logger)
+            self._logger.info("Initialize optimzier")
+            self.elapsed_time = 0
             self.genome_size = genome_size
             self.population_size = population_size
             self.generation_size = generation_size
-            self.parent_selection_method= parent_selection_method
-            self.remaining_selection_method= remaining_selection_method
-            self.crossover_method= crossover_method
-            self.mutation_method= mutation_method
+            self.parent_selection_method = parent_selection_method
+            self.remaining_selection_method = remaining_selection_method
+            self.crossover_method = crossover_method
+            self.mutation_method = mutation_method
             self.crossover_probability = crossover_probability
             self.mutation_probability = mutation_probability
             self.pruning_methods = pruning_methods
             self.__pruning_methods_funcs_determiner(pruning_methods)
-            self.pruning_methods_params= pruning_methods_params
+            self.pruning_methods_params = pruning_methods_params
             self.__parent_selection_fucn_determiner(parent_selection_method)
             self.__remaining_selection_func_determiner(remaining_selection_method)
             self.termination_condition_handler = TerminationCondition(
@@ -267,25 +250,25 @@ class BaseOptimizer(Base):
             self.statistics = statistics
             self.statistic_sampling_period = statistic_sampling_period
             self.mode = mode
-            self.checkpoint_save_period= checkpoint_save_period
-            self.visualize= visualize
-            
-            self.visualizer= Visualizer(statistics, statistic_sampling_period, self.result_directory)
-            
-            self.avg_fitness_list=None
-            self.var_fitness_list=None
-            self.best_fitness_list=None
-            self.pruning_count_list=None #2d list
-            
-            if STATISTIC_AVG_FITNESS in statistics:
-                self.avg_fitness_list= []
-            if STATISTIC_VAR_FITNESS in statistics:
-                self.var_fitness_list= []
-            if STATISTIC_BEST_FITNESS in statistics:
-                self.best_fitness_list= []
-            if STATISTIC_PRUNINGS in statistics:
-                self.pruning_count_list= []
-    
+            self.checkpoint_save_period = checkpoint_save_period
+            self.visualize = visualize
+
+            self.visualizer = Visualizer(statistics, statistic_sampling_period, self.result_directory)
+
+            self.avg_fitness_list = None
+            self.var_fitness_list = None
+            self.best_fitness_list = None
+            self.pruning_count_list = None  # 2d list
+
+            if StatisticsEnum.AVG_FITNESS in statistics:
+                self.avg_fitness_list = []
+            if StatisticsEnum.VAR_FITNESS in statistics:
+                self.var_fitness_list = []
+            if StatisticsEnum.BEST_FITNESS in statistics:
+                self.best_fitness_list = []
+            if StatisticsEnum.PRUNINGS in statistics:
+                self.pruning_count_list = []
+
     def __create_individual(self):
         return self.individual_class(genome_size=self.genome_size)
 
@@ -305,7 +288,7 @@ class BaseOptimizer(Base):
         if hasattr(self, "rs_q"):
             return self.remaining_selection_func(chromosome_list, self.rs_q, remaining_size)
         return self.remaining_selection_func(chromosome_list, remaining_size)
-    
+
     def __select_next_generation_basedon_mode(self, population, children):
         if self.mode == "m,l":
             return children
@@ -313,8 +296,7 @@ class BaseOptimizer(Base):
             return [j for i in [population, children] for j in i]
         else:
             raise Exception(f"mode {self.mode} is not supported!")
-        
-        
+
     def __crossover_and_mutation(self, population):
         children_list = []
         for _ in range(int(self.generation_size / 2)):
@@ -353,28 +335,29 @@ class BaseOptimizer(Base):
             children_list.append(child2)
 
         return children_list
-    
+
     def __save_final_result(self, best_chromosome, current_iteration_number):
-        with open(os.path.join(self.result_directory, 'final_answer.json'), 'w') as file_to_write:
+        with open(os.path.join(self.result_directory, "final_answer.json"), "w") as file_to_write:
             json.dump(best_chromosome.to_dict(), file_to_write, indent=4)
-            
-        with open(os.path.join(self.result_directory, 'results.pkl'), 'wb') as file_to_write:
-            pickle.dump([self.avg_fitness_list,
-                         self.var_fitness_list,
-                         self.best_fitness_list,
-                         self.prune_old_chromosome_count_list], file_to_write)
+
+        with open(os.path.join(self.result_directory, "results.pkl"), "wb") as file_to_write:
+            pickle.dump([self.avg_fitness_list, self.var_fitness_list, self.best_fitness_list, self.prune_old_chromosome_count_list], file_to_write)
             pickle.dump(self.statistics, file_to_write)
             pickle.dump(self.statistic_sampling_period, file_to_write)
             pickle.dump(self.pruning_count_list, file_to_write)
             pickle.dump(self.pruning_methods, file_to_write)
             pickle.dump(current_iteration_number, file_to_write)
-            
+
     def run(self):
-        population= None
-        current_iteration_number= None
-        best_chromosome= None
+        population = None
+        current_iteration_number = None
+        best_chromosome = None
         if self.checkpoint_base_directory is not None:
-            population, current_iteration_number, best_chromosome= self.__temp_chromosome_list, self.__temp_current_iteration_number, self.__temp_best_chromosome
+            population, current_iteration_number, best_chromosome = (
+                self.__temp_chromosome_list,
+                self.__temp_current_iteration_number,
+                self.__temp_best_chromosome,
+            )
         else:
             best_chromosome = self.individual_class(
                 genome_size=self.genome_size,
@@ -383,37 +366,36 @@ class BaseOptimizer(Base):
             self.evaluation_func(best_chromosome)
             population = self.__create_population()
             self.__evaluationAll(population)
-            
-            current_iteration_number = 1            
-        
-        start_time= time.time()
-        while(True):
+
+            current_iteration_number = 1
+
+        start_time = time.time()
+        while True:
             children = self.__crossover_and_mutation(population)
             self.__evaluationAll(children)
-            
+
             next_generation_candidates = self.__select_next_generation_basedon_mode(population, children)
 
             best_chromosome_in_current_iteration = max(next_generation_candidates, key=lambda x: x.fitness)
-            
+
             if best_chromosome.fitness < best_chromosome_in_current_iteration.fitness:
                 best_chromosome = copy.deepcopy(best_chromosome_in_current_iteration)
 
             population = self.__remaining_selection(next_generation_candidates, self.population_size)
 
-            
             increase_age_of_all_population(population)
-            
-            pruning_count_list_current_iteration=[]
+
+            pruning_count_list_current_iteration = []
             if self.pruning_methods is not None:
                 for index, pruning_method_function in zip(range(len(self.pruning_methods_functions_list)), self.pruning_methods_functions_list):
                     # pruning_count_list_current_iteration.append(pruning_method_function(population, *self.pruning_methods_params[index])) # for list
-                    pruning_count_list_current_iteration.append(pruning_method_function(population, **self.pruning_methods_params[index])) # for dict
-                    
-            avg_fitness= None
-            if TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY in self.termination_condition_handler.termination_conditions:
-                avg_fitness= compute_avg_fitness(population)
-               
-            if current_iteration_number % self.statistic_sampling_period==0:
+                    pruning_count_list_current_iteration.append(pruning_method_function(population, **self.pruning_methods_params[index]))  # for dict
+
+            avg_fitness = None
+            if TerminationConditionsEnum.PHENOTYPIC_DIVERSITY in self.termination_condition_handler.termination_conditions:
+                avg_fitness = compute_avg_fitness(population)
+
+            if current_iteration_number % self.statistic_sampling_period == 0:
                 if self.avg_fitness_list is not None:
                     if avg_fitness is not None:
                         self.avg_fitness_list.append(avg_fitness)
@@ -430,26 +412,26 @@ class BaseOptimizer(Base):
                     self.best_fitness_list.append(best_chromosome_in_current_iteration.fitness)
                 if self.pruning_methods is not None:
                     self.pruning_count_list.append(pruning_count_list_current_iteration)
-                    
+
             terminate, message = self.termination_condition_handler.check_termination(
-                population= population,
-                avg_fitness= avg_fitness,
-                best_fitness= best_chromosome_in_current_iteration.fitness,
-                iteration_number= current_iteration_number,
-                population_size= self.population_size,
-                generation_size= self.generation_size,
+                population=population,
+                avg_fitness=avg_fitness,
+                best_fitness=best_chromosome_in_current_iteration.fitness,
+                iteration_number=current_iteration_number,
+                population_size=self.population_size,
+                generation_size=self.generation_size,
             )
-            
+
             if terminate:
                 self._logger.info(message)
                 break
 
-            current_iteration_number+=1
-        
+            current_iteration_number += 1
+
             if self.checkpoint_save_period is not None:
-                if current_iteration_number%self.checkpoint_save_period==0:
-                    end_time=time.time()
-                    self._logger.info(f'Save checkpoint at iteration {current_iteration_number}')
+                if current_iteration_number % self.checkpoint_save_period == 0:
+                    end_time = time.time()
+                    self._logger.info(f"Save checkpoint at iteration {current_iteration_number}")
                     self.__save_checkpoint(
                         population,
                         current_iteration_number,
@@ -462,12 +444,12 @@ class BaseOptimizer(Base):
                         self.termination_condition_handler.fitness_limit_threshold,
                         self.termination_condition_handler.iterations_number_threshold,
                         self.termination_condition_handler.evaluation_number_threshold,
-                        end_time-start_time,
+                        end_time - start_time,
                     )
-                    
-        end_time= time.time()
-        self._logger.info(f'Runtime: {end_time-start_time+self.elapsed_time} seconds')
-        self._logger.info('Saving results')
+
+        end_time = time.time()
+        self._logger.info(f"Runtime: {end_time - start_time + self.elapsed_time} seconds")
+        self._logger.info("Saving results")
         self.__save_final_result(best_chromosome, current_iteration_number)
         if self.visualize:
             self.visualizer.plot_diagrams(
@@ -478,5 +460,5 @@ class BaseOptimizer(Base):
                 self.pruning_count_list,
                 self.pruning_methods,
             )
-            self._logger.info('Diagrams plotted successfuly.')
+            self._logger.info("Diagrams plotted successfuly.")
         return self.base_directory

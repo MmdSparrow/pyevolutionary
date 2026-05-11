@@ -1,5 +1,5 @@
-from .invalid_condition_value_exception import InvalidConditionValueException
+from .configuration_exception import ConfigurationException
 
-__all__=[
-    'InvalidConditionValueException',
+__all__ = [
+    "ConfigurationException",
 ]

@@ -1,36 +1,22 @@
-import parent_pruning.pruning.pruning_methods as pruning_methods_module
-import parent_pruning.selection_methods.parent_selection as parent_selection_module
-import parent_pruning.selection_methods.remaining_selection as remaining_selection_module
-import parent_pruning.thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
+from ._enums.modes_enum import ModesEnum
+from ._enums.statistics_enum import StatisticsEnum
+from ._enums.termination_conditions_enums import TerminationConditionsEnum
 
-from .__utils import get_list_of_the_not_private_functions_in_module
-from .common import (
-    STATISTIC_AVG_FITNESS,
-    STATISTIC_VAR_FITNESS,
-    STATISTIC_BEST_FITNESS,
-    STATISTIC_PRUNINGS,
-    TERMINATION_CONDITION_FITNESS_LIMIT,
-    TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY,
-    TERMINATION_CONDITION_EVALUATION_NUMBER,
-    TERMINATION_CONDITION_GENOTYPIC_DIVERSITY,
-    TERMINATION_CONDITION_ITERATION_NUMBER,
-    MODE_AGGREGGATE,
-    MODE_FORGETFUL,
-)
 
-TERMINATION_CONDITIONS_DEFAULT_VALUE=["iteration number"]
+AVAILABLE_MODES = [ModesEnum.AGGREGGATE, ModesEnum.FORGETFUL]
+AVAILABLE_TERMINATION_CONDITIONS = [
+    TerminationConditionsEnum.PHENOTYPIC_DIVERSITY,
+    TerminationConditionsEnum.GENOTYPIC_DIVERSITY,
+    TerminationConditionsEnum.FITNESS_LIMIT,
+    TerminationConditionsEnum.ITERATION_NUMBER,
+    TerminationConditionsEnum.EVALUATION_NUMBER,
+]
+AVAILABLE_STATISTICS = [StatisticsEnum.AVG_FITNESS, StatisticsEnum.BEST_FITNESS, StatisticsEnum.VAR_FITNESS, StatisticsEnum.PRUNINGS]
 
-CROSSOVER_PROBABILITY_DEFAULT_VALUE=0.8
-MUTATION_PROBABILITY_DEFAULT_VALUE=0.4
-MODE_DEFAULT_VALUE= MODE_AGGREGGATE
 
-AVAILABLE_MODES= [MODE_AGGREGGATE, MODE_FORGETFUL]
-AVAILABLE_TERMINATION_CONDITIONS= [TERMINATION_CONDITION_PHENOTYPIC_DIVERSITY, TERMINATION_CONDITION_GENOTYPIC_DIVERSITY, TERMINATION_CONDITION_FITNESS_LIMIT, TERMINATION_CONDITION_ITERATION_NUMBER, TERMINATION_CONDITION_EVALUATION_NUMBER]
-AVAILABLE_STATISTICS= [STATISTIC_AVG_FITNESS, STATISTIC_BEST_FITNESS, STATISTIC_VAR_FITNESS, STATISTIC_PRUNINGS]
-
-VISUALIZE_DEFAULT_VALUE= False
-
-AVAILABLE_SCHEDULER_METHODS= get_list_of_the_not_private_functions_in_module(thereshold_scheduler_module) + get
-AVAILABLE_PARENT_SELECTION_METHODS= get_list_of_the_not_private_functions_in_module(parent_selection_module)
-AVAILABLE_REMAINING_SELECTION_METHODS= get_list_of_the_not_private_functions_in_module(remaining_selection_module)
-AVAILABLE_PRUNING_METHODS= get_list_of_the_not_private_functions_in_module(pruning_methods_module)
+############################################################################################3
+TERMINATION_CONDITIONS_DEFAULT_VALUE = [TerminationConditionsEnum.ITERATION_NUMBER]
+CROSSOVER_PROBABILITY_DEFAULT_VALUE = 0.8
+MUTATION_PROBABILITY_DEFAULT_VALUE = 0.4
+MODE_DEFAULT_VALUE = ModesEnum.AGGREGGATE
+VISUALIZE_DEFAULT_VALUE = False

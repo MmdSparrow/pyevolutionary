@@ -4,9 +4,9 @@ from . import individuals
 from . import visualization
 
 
-__all__= [
-    'analyzers',
-    'optimizers',
-    'visualization',
-    'individuals',
+__all__ = [
+    "analyzers",
+    "optimizers",
+    "visualization",
+    "individuals",
 ]
