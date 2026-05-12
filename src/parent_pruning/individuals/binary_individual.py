@@ -2,7 +2,7 @@ import copy
 import random
 
 from parent_pruning.individuals.base_individual import Individual
-from parent_pruning._utils.custom_exceptions.value_conflict_exception import ValueConflictExceptoin
+from parent_pruning._utils.custom_exceptions import ValueConflictExceptoin
 
 
 class BinaryIndividual(Individual):

@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-from parent_pruning._enums.statistics_enum import StatisticsEnum
+from parent_pruning._enums import StatisticsEnum
 
 
 class Visualizer:

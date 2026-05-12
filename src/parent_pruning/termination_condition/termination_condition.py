@@ -1,5 +1,5 @@
+from parent_pruning._enums import TerminationConditionsEnum
 from parent_pruning.individuals.base_individual import Individual
-from parent_pruning._enums.termination_conditions_enums import TerminationConditionsEnum
 
 
 class TerminationCondition:

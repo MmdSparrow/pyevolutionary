@@ -10,15 +10,13 @@ import parent_pruning.selection_methods.remaining_selection as remaining_selecti
 import parent_pruning.thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
 
 from .__validator import validation
-from parent_pruning._base.base import Base
-from parent_pruning._enums.modes_enum import ModesEnum
+from parent_pruning._base import Base
+from parent_pruning.visualization import Visualizer
 from .._utils import init_function_by_name, replace_with_enum
 from parent_pruning._automation_system import AutomationSystem
-from parent_pruning.visualization.visualizer import Visualizer
-from parent_pruning._enums.statistics_enum import StatisticsEnum
 from parent_pruning.individuals.base_individual import Individual
-from parent_pruning._enums.termination_conditions_enums import TerminationConditionsEnum
-from parent_pruning.termination_condition.termination_condition import TerminationCondition
+from parent_pruning._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
+from parent_pruning.termination_condition import TerminationCondition
 from .__utils import (
     compute_avg_fitness,
     compute_var_fitness_with_avg,

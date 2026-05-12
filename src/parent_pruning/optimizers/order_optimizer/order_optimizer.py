@@ -1,12 +1,12 @@
 import os
+import  parent_pruning.mutation.order_mutation_methods as order_mutation_module
+import  parent_pruning.crossover.order_crossover_methods as order_crossover_module
 
 from .__validator import validation
 from parent_pruning.optimizers._utils import init_function_by_name
+from parent_pruning._automation_system import AutomationSystemOrder
 from parent_pruning.individuals.order_individual import OrderIndividual
 from parent_pruning.optimizers._base_optimizer.base_optimizer import BaseOptimizer
-from parent_pruning.mutation import order_mutation_methods as order_mutation_module
-from parent_pruning.crossover import order_crossover_methods as order_crossover_module
-from parent_pruning._automation_system.automation_system_order import AutomationSystemOrder
 from parent_pruning.configs.order_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
