@@ -51,10 +51,10 @@ class BaseOptimizer(Base):
         if parent_selection_type.startswith("q_tournoment"):
             self.ps_q = int(parent_selection_type.partition("#")[2])
             func_name = "q_tournoment"
-        module_path=None
+        module_path = None
         if self.extension_directory is not None:
-            module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE)
-        self.parent_selection_func= init_function_by_name(
+            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE)
+        self.parent_selection_func = init_function_by_name(
             parent_selection_module,
             module_path,
             func_name,
@@ -67,10 +67,10 @@ class BaseOptimizer(Base):
         if remaining_selection_type.startswith("q_tournoment"):
             self.ps_q = int(remaining_selection_type.partition("#")[2])
             func_name = "q_tournoment"
-        module_path=None
+        module_path = None
         if self.extension_directory is not None:
-            module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE)
-        self.remaining_selection_func= init_function_by_name(
+            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE)
+        self.remaining_selection_func = init_function_by_name(
             remaining_selection_module,
             module_path,
             func_name,
@@ -81,9 +81,9 @@ class BaseOptimizer(Base):
     def __pruning_methods_funcs_determiner(self, pruning_methods):
         self.pruning_methods_functions_list = []
         if pruning_methods is not None:
-            module_path=None
+            module_path = None
             if self.extension_directory is not None:
-                module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE)
+                module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE)
             for method_name in pruning_methods:
                 self.pruning_methods_functions_list.append(
                     init_function_by_name(
@@ -96,9 +96,9 @@ class BaseOptimizer(Base):
                 )
 
     def __thereshold_scheduler_func_determiner(self, scheduler_methods):
-        module_path=None
+        module_path = None
         if self.extension_directory is not None:
-            module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_SCHEDULER_METHODS_MODULE)
+            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_SCHEDULER_METHODS_MODULE)
         return init_function_by_name(
             thereshold_scheduler_module,
             module_path,
@@ -106,7 +106,7 @@ class BaseOptimizer(Base):
             "scheduler method",
             self._logger,
         )
-        
+
     def __save_checkpoint(
         self,
         chromosome_list,
@@ -144,7 +144,8 @@ class BaseOptimizer(Base):
             pickle.dump(self.statistics, file_to_write)
             pickle.dump(self.mode, file_to_write)
             pickle.dump(self.pruning_methods, file_to_write)
-            pickle.dump(self.pruning_methods_params, file_to_write)
+            filtered_pruning_methods_param = [{k: v for k, v in d.items() if k != "scheduler_method"} for d in self.pruning_methods_params]
+            pickle.dump(filtered_pruning_methods_param, file_to_write)
             pickle.dump(self.pruning_count_list, file_to_write)
 
             pickle.dump(phenotypic_diversity_window_size, file_to_write)
@@ -164,7 +165,6 @@ class BaseOptimizer(Base):
             pickle.dump(self.extension_directory, file_to_write)
 
             pickle.dump(elapsed_time, file_to_write)
-            
 
     def __load_checkpoint(self, checkpoint_base_directory):
         with open(os.path.join(checkpoint_base_directory, "checkpoints", "checkpoint.pkl"), "rb") as file_to_read:
@@ -191,8 +191,20 @@ class BaseOptimizer(Base):
             self.pruning_methods = pickle.load(file_to_read)
             self.__pruning_methods_funcs_determiner(self.pruning_methods)
             self.pruning_methods_params = pickle.load(file_to_read)
+            if self.pruning_methods_params is not None:
+                for pruning_param in self.pruning_methods_params:
+                    if "scheduler_method" in pruning_param:
+                        pruning_param["scheduler_func"] = self.__thereshold_scheduler_func_determiner(pruning_param["scheduler_method"])
             self.pruning_count_list = pickle.load(file_to_read)
-            validation(self.parent_selection_method, self.remaining_selection_method, termination_conditions, self.statistics, self.mode, self._logger)
+            validation(
+                self.parent_selection_method,
+                self.remaining_selection_method,
+                self.pruning_methods,
+                termination_conditions,
+                self.statistics,
+                self.mode,
+                self._logger,
+            )
             self.__parent_selection_fucn_determiner(self.parent_selection_method)
             self.__remaining_selection_func_determiner(self.remaining_selection_method)
             phenotypic_diversity_window_size = pickle.load(file_to_read)
@@ -222,7 +234,7 @@ class BaseOptimizer(Base):
             self.avg_fitness_list = pickle.load(file_to_read)
             self.var_fitness_list = pickle.load(file_to_read)
             self.best_fitness_list = pickle.load(file_to_read)
-            self.extension_directory= pickle.load(file_to_read)
+            self.extension_directory = pickle.load(file_to_read)
 
             self.elapsed_time = pickle.load(file_to_read)
 
@@ -255,11 +267,13 @@ class BaseOptimizer(Base):
         visualize=VISUALIZE_DEFAULT_VALUE,
         checkpoint_save_period=None,
         checkpoint_base_directory=None,
+        #####
+        debug_mode=False,
         # TODO:
         # source_spots_in_genome=None,
         # destination_spots_in_genome=None,
     ) -> None:
-        super().__init__(project_name, checkpoint_base_directory)
+        super().__init__(project_name, checkpoint_base_directory, debug_mode)
         self.input_data = input_data
         self.individual_class = None
 
@@ -288,14 +302,14 @@ class BaseOptimizer(Base):
             self.pruning_methods_params = pruning_methods_params
             if self.pruning_methods_params is not None:
                 for pruning_param in self.pruning_methods_params:
-                    if 'scheduler_method' in pruning_param:
-                        pruning_param['scheduler_func']= self.__thereshold_scheduler_func_determiner(pruning_param['scheduler_method'])
+                    if "scheduler_method" in pruning_param:
+                        pruning_param["scheduler_func"] = self.__thereshold_scheduler_func_determiner(pruning_param["scheduler_method"])
             self.__pruning_methods_funcs_determiner(pruning_methods)
             self.__parent_selection_fucn_determiner(parent_selection_method)
             self.__remaining_selection_func_determiner(remaining_selection_method)
             ######################### TODO
             self.termination_condition_handler = TerminationCondition(
-                replace_with_enum('termination_conditions', termination_conditions),
+                replace_with_enum("termination_conditions", termination_conditions),
                 phenotypic_diversity_window_size,
                 phenotypic_diversity_error_thereshold,
                 genotypic_diversity_window_size,
@@ -305,10 +319,10 @@ class BaseOptimizer(Base):
                 evaluation_number,
             )
             ######################### TODO
-            self.statistics = replace_with_enum('statistics', statistics)
+            self.statistics = replace_with_enum("statistics", statistics)
             self.statistic_sampling_period = statistic_sampling_period
             ######################### TODO
-            self.mode = replace_with_enum('modes', mode)
+            self.mode = replace_with_enum("modes", mode)
             self.checkpoint_save_period = checkpoint_save_period
             self.visualize = visualize
             self.visualizer = Visualizer(self.statistics, statistic_sampling_period, self.result_directory)
@@ -394,7 +408,7 @@ class BaseOptimizer(Base):
 
         return children_list
 
-    def __save_final_result(self, best_chromosome, current_iteration_number):
+    def __save_final_result(self, best_chromosome, current_iteration_number, final_population):
         with open(os.path.join(self.result_directory, "final_answer.json"), "w") as file_to_write:
             json.dump(best_chromosome.to_dict(), file_to_write, indent=4)
 
@@ -405,6 +419,9 @@ class BaseOptimizer(Base):
             pickle.dump(self.pruning_methods, file_to_write)
             pickle.dump(self.pruning_methods_params, file_to_write)
             pickle.dump(current_iteration_number, file_to_write)
+
+        with open(os.path.join(self.result_directory, "final_population.pkl"), "wb") as file_to_write:
+            pickle.dump(final_population, file_to_write)
 
     def run(self):
         population = None
@@ -444,9 +461,11 @@ class BaseOptimizer(Base):
 
             pruning_count_list_current_iteration = []
             if self.pruning_methods is not None:
-                for index, pruning_method_function in zip(range(len(self.pruning_methods_functions_list)), self.pruning_methods_functions_list):
+                for index, pruning_method_function in enumerate(self.pruning_methods_functions_list):
                     # pruning_count_list_current_iteration.append(pruning_method_function(population, *self.pruning_methods_params[index])) # for list
-                    pruning_count_list_current_iteration.append(pruning_method_function(population, current_iteration_number, **self.pruning_methods_params[index]))  # for dict
+                    pruning_count_list_current_iteration.append(
+                        pruning_method_function(population, current_iteration_number, **self.pruning_methods_params[index])
+                    )  # for dict
 
             avg_fitness = None
             if TerminationConditionsEnum.PHENOTYPIC_DIVERSITY in self.termination_condition_handler.termination_conditions:
@@ -507,7 +526,7 @@ class BaseOptimizer(Base):
         end_time = time.time()
         self._logger.info(f"Best Answer Fitness: {best_chromosome.fitness}")
         self._logger.info(f"Runtime: {end_time - start_time + self.elapsed_time} seconds")
-        self.__save_final_result(best_chromosome, current_iteration_number)
+        self.__save_final_result(best_chromosome, current_iteration_number, population)
         self._logger.info("Results have been saved")
         if self.visualize:
             self.visualizer.plot_diagrams(
@@ -520,4 +539,3 @@ class BaseOptimizer(Base):
             )
             self._logger.info("Diagrams plotted successfuly")
         return self.base_directory
-

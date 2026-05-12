@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 
 from datetime import datetime
@@ -22,15 +23,19 @@ class Base:
         self.checkpoint_directory = os.path.join(self.base_directory, CHECKPOINT_DIRECTORY_DEFAULT)
         os.makedirs(self.checkpoint_directory, exist_ok=True)
 
-    def __init_logger(self):
+    def __init_logger(self, debug_mode):
         self._logger = logging.getLogger("core_logger")
         self._logger.setLevel(logging.INFO)
-        val_handler = logging.FileHandler(os.path.join(self.log_directory, "optimizer.log"))
-        val_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        val_handler.setFormatter(val_formatter)
-        self._logger.addHandler(val_handler)
+        handler = logging.FileHandler(os.path.join(self.log_directory, "runtime.log"))
+        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        handler.setFormatter(formatter)
+        self._logger.addHandler(handler)
+        if debug_mode:
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_handler.setFormatter(formatter)
+            self._logger.addHandler(console_handler)
 
-    def __init__(self, project_name, base_directory):
+    def __init__(self, project_name, base_directory, debug_mode):
         self.project_name = project_name
         self.__create_folders(base_directory)
-        self.__init_logger()
+        self.__init_logger(debug_mode)

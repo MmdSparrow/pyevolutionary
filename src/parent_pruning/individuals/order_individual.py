@@ -2,6 +2,7 @@ import copy
 import random
 
 from parent_pruning.individuals.base_individual import Individual
+from parent_pruning._utils.custom_exceptions.value_conflict_exception import ValueConflictExceptoin
 
 
 class OrderIndividual(Individual):
@@ -10,11 +11,11 @@ class OrderIndividual(Individual):
         random.shuffle(sequence)
         return sequence
 
-    def __init__(self, genome_size, input_genome=None, init_with_random_genome=True):
+    def __init__(self, genome_size, input_genome=None, init_with_random_genome=True, logger=None):
         super().__init__()
 
         if input_genome is not None and init_with_random_genome:
-            raise Exception("")
+            raise ValueConflictExceptoin(logger, input_message= "Both `input_genome` and `init_with_random_genome` can't be apply at the same time")
 
         if input_genome is not None:
             self.genome = copy.copy(input_genome)

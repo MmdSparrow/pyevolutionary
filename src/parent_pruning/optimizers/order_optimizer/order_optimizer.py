@@ -101,7 +101,10 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         visualize=VISUALIZE_DEFAULT_VALUE,
         checkpoint_save_period=None,
         checkpoint_base_directory=None,
+        #######
         extension_directory=None,
+        #######
+        debug_mode=False,
         # TODO:
         # source_spots_in_genome= None,
         # destination_spots_in_genome= None,
@@ -136,6 +139,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             visualize,
             checkpoint_save_period,
             checkpoint_base_directory,
+            ####
+            debug_mode
             # TODO:
             # source_spots_in_genome,
             # destination_spots_in_genome,

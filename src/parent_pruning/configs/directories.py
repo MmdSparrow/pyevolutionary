@@ -1,6 +1,7 @@
 RESULT_DIRECTORY_DEFAULT = "results"
 LOG_DIRECTORY_DEFAULT = "logs"
 CHECKPOINT_DIRECTORY_DEFAULT = "checkpoints"
+ANALYZE_DIRECOTRY_DEFAULT= "analyze"
 
 ################################## extension directories ##################################
 EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE = "mutation_methods.py"

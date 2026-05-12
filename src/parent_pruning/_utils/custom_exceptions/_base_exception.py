@@ -1,8 +1,8 @@
 class BaseException(Exception):
-    def __init__(self, message=None, logger=None):
+    def __init__(self, logger, message=None):
         if message is None:
             self.message = "Unknow exception was happened in `Parent Pruning` library!"
         self.message = message
-        if logger:
+        if logger is not None:
             logger.error(self.message)
         super(BaseException, self).__init__(f"{self.message}")
