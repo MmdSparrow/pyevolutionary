@@ -13,6 +13,7 @@ from .__validator import validation
 from parent_pruning._base.base import Base
 from parent_pruning._enums.modes_enum import ModesEnum
 from .._utils import init_function_by_name, replace_with_enum
+from parent_pruning._automation_system import AutomationSystem
 from parent_pruning.visualization.visualizer import Visualizer
 from parent_pruning._enums.statistics_enum import StatisticsEnum
 from parent_pruning.individuals.base_individual import Individual
@@ -23,12 +24,6 @@ from .__utils import (
     compute_var_fitness_with_avg,
     copy_parent_to_child,
     increase_age_of_all_population,
-    # show_all_available_functions_and_values_of_project,
-    # show_available_mode,
-    # show_available_parent_selection_methods,
-    # show_available_remaining_selection_methods,
-    # show_available_termination_conditions,
-    # show_available_statistics,
 )
 from parent_pruning.configs.base_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
@@ -36,6 +31,9 @@ from parent_pruning.configs.base_optimizer_config import (
     MUTATION_PROBABILITY_DEFAULT_VALUE,
     VISUALIZE_DEFAULT_VALUE,
     TERMINATION_CONDITIONS_DEFAULT_VALUE,
+    AVAILABLE_MODES,
+    AVAILABLE_TERMINATION_CONDITIONS,
+    AVAILABLE_STATISTICS,
 )
 from parent_pruning.configs.directories import (
     EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE,
@@ -45,7 +43,7 @@ from parent_pruning.configs.directories import (
 )
 
 
-class BaseOptimizer(Base):
+class BaseOptimizer(Base, AutomationSystem):
     def __parent_selection_fucn_determiner(self, parent_selection_type):
         func_name = parent_selection_type
         if parent_selection_type.startswith("q_tournoment"):
@@ -268,12 +266,15 @@ class BaseOptimizer(Base):
         checkpoint_save_period=None,
         checkpoint_base_directory=None,
         #####
+        extension_directory=None,
+        #####
         debug_mode=False,
         # TODO:
         # source_spots_in_genome=None,
         # destination_spots_in_genome=None,
-    ) -> None:
-        super().__init__(project_name, checkpoint_base_directory, debug_mode)
+    ):
+        Base.__init__(self, project_name, checkpoint_base_directory, debug_mode)
+        AutomationSystem.__init__(self, extension_directory)
         self.input_data = input_data
         self.individual_class = None
 
@@ -539,3 +540,54 @@ class BaseOptimizer(Base):
             )
             self._logger.info("Diagrams plotted successfuly")
         return self.base_directory
+
+    def show_available_parent_selection_methods(self, return_instead_of_print=False):
+        if return_instead_of_print:
+            return self.AVAILABLE_PARENT_SELECTION_METHODS
+        print("Available Parent Selection Methods:")
+        print(self.AVAILABLE_PARENT_SELECTION_METHODS)
+
+    def show_available_remaining_selection_methods(self, return_instead_of_print=False):
+        if return_instead_of_print:
+            return self.AVAILABLE_REMAINING_SELECTION_METHODS
+        print("Available Remaining Selection Methods:")
+        print(self.AVAILABLE_REMAINING_SELECTION_METHODS)
+
+    def show_available_termination_conditions(self, return_instead_of_print=False):
+        if return_instead_of_print:
+            return AVAILABLE_TERMINATION_CONDITIONS
+        print("Available Termination Conditions:")
+        print(AVAILABLE_TERMINATION_CONDITIONS)
+
+    def show_available_statistics(self, return_instead_of_print=False):
+        if return_instead_of_print:
+            return AVAILABLE_STATISTICS
+        print("Available Plot Types:")
+        print(AVAILABLE_STATISTICS)
+
+    def show_available_mode(self, return_instead_of_print=False):
+        if return_instead_of_print:
+            return AVAILABLE_MODES
+        print("Available Modes:")
+        print(AVAILABLE_MODES)
+
+    def show_all_available_functions_and_values_of_project(self):
+        print("Available Parent Selection Methods:")
+        print(self.AVAILABLE_PARENT_SELECTION_METHODS)
+        print()
+
+        print("Available Remaining Selection Methods:")
+        print(self.AVAILABLE_REMAINING_SELECTION_METHODS)
+        print()
+
+        print("Available Termination Conditions:")
+        print(AVAILABLE_TERMINATION_CONDITIONS)
+        print()
+
+        print("Available Plot Types:")
+        print(AVAILABLE_STATISTICS)
+        print()
+
+        print("Available Modes:")
+        print(AVAILABLE_MODES)
+        print()

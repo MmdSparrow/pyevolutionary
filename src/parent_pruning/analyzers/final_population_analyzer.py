@@ -1,6 +1,5 @@
 import os
 import sys
-import json
 import pickle
 import logging
 import numpy as np

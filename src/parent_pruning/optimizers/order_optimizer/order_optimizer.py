@@ -18,19 +18,18 @@ from parent_pruning.configs.directories import (
     EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE,
     EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE,
 )
-# from .__utils import (
-#     show_all_availables,
-#     show_available_modes,
-#     show_available_crossover_methods,
-#     show_available_mutation_methods,
-# )
+from parent_pruning.configs.base_optimizer_config import (
+    AVAILABLE_MODES,
+    AVAILABLE_TERMINATION_CONDITIONS,
+    AVAILABLE_STATISTICS,
+)
 
 
 class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
     def __mutation_func_determiner(self, mutation_method):
-        module_path= None
+        module_path = None
         if self.extension_directory is not None:
-            module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE)
+            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE)
         self.mutation_func = init_function_by_name(
             order_mutation_module,
             module_path,
@@ -40,9 +39,9 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         )
 
     def __crossover_func_determiner(self, crossover_method):
-        module_path= None
+        module_path = None
         if self.extension_directory is not None:
-            module_path= os.path.join(self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE)
+            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE)
         self.crossover_func = init_function_by_name(
             order_crossover_module,
             module_path,
@@ -140,7 +139,9 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             checkpoint_save_period,
             checkpoint_base_directory,
             ####
-            debug_mode
+            extension_directory,
+            ####
+            debug_mode,
             # TODO:
             # source_spots_in_genome,
             # destination_spots_in_genome,
@@ -159,3 +160,47 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             self.__generate_note_file()
 
         self.individual_class = OrderIndividual
+
+    def show_available_crossover_methods(self, return_instead_of_print=False):
+        if return_instead_of_print:
+            return self.AVAILABLE_CROSSOVER_METHODS
+        print("Available Crossover types:")
+        print(self.AVAILABLE_CROSSOVER_METHODS)
+
+    def show_available_mutation_methods(self, return_instead_of_print=False):
+        if return_instead_of_print:
+            return self.AVAILABLE_MUTATION_METHODS
+        print("Available Mutation types:")
+        print(self.AVAILABLE_MUTATION_METHODS)
+
+    def show_all_availables(self):
+        print("Available Termination Conditions:")
+        print(AVAILABLE_TERMINATION_CONDITIONS)
+        print()
+
+        print("Available Plot Types:")
+        print(AVAILABLE_STATISTICS)
+        print()
+
+        print("Available Modes:")
+        print(AVAILABLE_MODES)
+        print()
+
+        print("Available Thereshold Scheduler Methods:")
+        print(self.AVAILABLE_SCHEDULER_METHODS)
+        print()
+
+        print("Available Parent Selection Methods:")
+        print(self.AVAILABLE_PARENT_SELECTION_METHODS)
+        print()
+
+        print("Available Remaining Selection Methods:")
+        print(self.AVAILABLE_REMAINING_SELECTION_METHODS)
+        print()
+
+        print("Available Mutation types:")
+        print(self.AVAILABLE_MUTATION_METHODS)
+        print()
+
+        print("Available Crossover types:")
+        print(self.AVAILABLE_CROSSOVER_METHODS)
