@@ -42,6 +42,10 @@ from parent_pruning.configs.directories import (
 
 
 class BaseOptimizer(Base, AutomationSystem):
+    
+ 
+        
+                
     def __parent_selection_fucn_determiner(self, parent_selection_type):
         func_name = parent_selection_type
         if parent_selection_type.startswith("q_tournoment"):
@@ -111,8 +115,8 @@ class BaseOptimizer(Base, AutomationSystem):
         termination_conditions,
         phenotypic_diversity_window_size,
         phenotypic_diversity_error_thereshold,
-        genotypic_diversity_window_size,
-        genotypic_diversity_error_thereshold,
+        # genotypic_diversity_window_size,
+        # genotypic_diversity_error_thereshold,
         fitness_limit_threshold,
         iterations_number,
         evaluation_number,
@@ -140,14 +144,16 @@ class BaseOptimizer(Base, AutomationSystem):
             pickle.dump(self.statistics, file_to_write)
             pickle.dump(self.mode, file_to_write)
             pickle.dump(self.pruning_methods, file_to_write)
-            filtered_pruning_methods_param = [{k: v for k, v in d.items() if k != "scheduler_method"} for d in self.pruning_methods_params]
+            filtered_pruning_methods_param= None
+            if self.pruning_methods is not None:
+                filtered_pruning_methods_param = [{k: v for k, v in d.items() if k != "scheduler_method"} for d in self.pruning_methods_params]
             pickle.dump(filtered_pruning_methods_param, file_to_write)
             pickle.dump(self.pruning_count_list, file_to_write)
 
             pickle.dump(phenotypic_diversity_window_size, file_to_write)
             pickle.dump(phenotypic_diversity_error_thereshold, file_to_write)
-            pickle.dump(genotypic_diversity_window_size, file_to_write)
-            pickle.dump(genotypic_diversity_error_thereshold, file_to_write)
+            # pickle.dump(genotypic_diversity_window_size, file_to_write)
+            # pickle.dump(genotypic_diversity_error_thereshold, file_to_write)
             pickle.dump(fitness_limit_threshold, file_to_write)
             pickle.dump(iterations_number, file_to_write)
             pickle.dump(evaluation_number, file_to_write)
@@ -192,21 +198,12 @@ class BaseOptimizer(Base, AutomationSystem):
                     if "scheduler_method" in pruning_param:
                         pruning_param["scheduler_func"] = self.__thereshold_scheduler_func_determiner(pruning_param["scheduler_method"])
             self.pruning_count_list = pickle.load(file_to_read)
-            validation(
-                self.parent_selection_method,
-                self.remaining_selection_method,
-                self.pruning_methods,
-                termination_conditions,
-                self.statistics,
-                self.mode,
-                self._logger,
-            )
             self.__parent_selection_fucn_determiner(self.parent_selection_method)
             self.__remaining_selection_func_determiner(self.remaining_selection_method)
             phenotypic_diversity_window_size = pickle.load(file_to_read)
             phenotypic_diversity_error_thereshold = pickle.load(file_to_read)
-            genotypic_diversity_window_size = pickle.load(file_to_read)
-            genotypic_diversity_error_thereshold = pickle.load(file_to_read)
+            # genotypic_diversity_window_size = pickle.load(file_to_read)
+            # genotypic_diversity_error_thereshold = pickle.load(file_to_read)
             fitness_limit_threshold = pickle.load(file_to_read)
             iterations_number = pickle.load(file_to_read)
             evaluation_number = pickle.load(file_to_read)
@@ -214,8 +211,8 @@ class BaseOptimizer(Base, AutomationSystem):
                 termination_conditions,
                 phenotypic_diversity_window_size,
                 phenotypic_diversity_error_thereshold,
-                genotypic_diversity_window_size,
-                genotypic_diversity_error_thereshold,
+                # genotypic_diversity_window_size,
+                # genotypic_diversity_error_thereshold,
                 fitness_limit_threshold,
                 iterations_number,
                 evaluation_number,
@@ -223,6 +220,31 @@ class BaseOptimizer(Base, AutomationSystem):
             self.statistic_sampling_period = pickle.load(file_to_read)
             self.checkpoint_save_period = pickle.load(file_to_read)
             self.visualize = pickle.load(file_to_read)
+            validation(
+                self._logger,
+                self.AVAILABLE_PARENT_SELECTION_METHODS,
+                self.AVAILABLE_REMAINING_SELECTION_METHODS,
+                self.AVAILABLE_PRUNING_METHODS,
+                #########################
+                self.project_name,
+                self.genome_size,
+                self.population_size,
+                self.generation_size,
+                self.parent_selection_method,
+                self.remaining_selection_method,
+                termination_conditions,
+                self.crossover_probability,
+                self.mutation_probability,
+                self.mode,
+                self.pruning_methods,
+                iterations_number,
+                self.statistics,
+                self.statistic_sampling_period,
+                evaluation_number,
+                phenotypic_diversity_window_size,
+                phenotypic_diversity_error_thereshold,
+                self.checkpoint_save_period,
+            )
 
             # for visualizer
             self.visualizer = Visualizer(self.statistics, self.statistic_sampling_period, self.result_directory)
@@ -258,8 +280,8 @@ class BaseOptimizer(Base, AutomationSystem):
         fitness_limit_threshold=None,
         phenotypic_diversity_window_size=None,
         phenotypic_diversity_error_thereshold=None,
-        genotypic_diversity_window_size=None,
-        genotypic_diversity_error_thereshold=None,
+        # genotypic_diversity_window_size=None,
+        # genotypic_diversity_error_thereshold=None,
         visualize=VISUALIZE_DEFAULT_VALUE,
         checkpoint_save_period=None,
         checkpoint_base_directory=None,
@@ -285,7 +307,32 @@ class BaseOptimizer(Base, AutomationSystem):
             self._logger.info(f'Load checkpoint "{self.checkpoint_base_directory}"')
             self.__load_checkpoint(checkpoint_base_directory)
         else:
-            validation(parent_selection_method, remaining_selection_method, pruning_methods, termination_conditions, statistics, mode, self._logger)
+            validation(
+                self._logger,
+                self.AVAILABLE_PARENT_SELECTION_METHODS,
+                self.AVAILABLE_REMAINING_SELECTION_METHODS,
+                self.AVAILABLE_PRUNING_METHODS,
+                #########################
+                project_name,
+                genome_size,
+                population_size,
+                generation_size,
+                parent_selection_method,
+                remaining_selection_method,
+                termination_conditions,
+                crossover_probability,
+                mutation_probability,
+                mode,
+                pruning_methods,
+                iterations_number,
+                statistics,
+                statistic_sampling_period,
+                evaluation_number,
+                phenotypic_diversity_window_size,
+                phenotypic_diversity_error_thereshold,
+                checkpoint_save_period,
+            )
+            self._logger.info("Vlidation is passed successfuly")
             self._logger.info("Initialize optimzier")
             self.elapsed_time = 0
             self.genome_size = genome_size
@@ -301,7 +348,9 @@ class BaseOptimizer(Base, AutomationSystem):
             self.pruning_methods_params = pruning_methods_params
             if self.pruning_methods_params is not None:
                 for pruning_param in self.pruning_methods_params:
-                    if "scheduler_method" in pruning_param:
+                    if pruning_param is None:
+                        pruning_param={}
+                    elif "scheduler_method" in pruning_param:
                         pruning_param["scheduler_func"] = self.__thereshold_scheduler_func_determiner(pruning_param["scheduler_method"])
             self.__pruning_methods_funcs_determiner(pruning_methods)
             self.__parent_selection_fucn_determiner(parent_selection_method)
@@ -311,8 +360,8 @@ class BaseOptimizer(Base, AutomationSystem):
                 replace_with_enum("termination_conditions", termination_conditions),
                 phenotypic_diversity_window_size,
                 phenotypic_diversity_error_thereshold,
-                genotypic_diversity_window_size,
-                genotypic_diversity_error_thereshold,
+                # genotypic_diversity_window_size,
+                # genotypic_diversity_error_thereshold,
                 fitness_limit_threshold,
                 iterations_number,
                 evaluation_number,
@@ -461,11 +510,15 @@ class BaseOptimizer(Base, AutomationSystem):
             pruning_count_list_current_iteration = []
             if self.pruning_methods is not None:
                 for index, pruning_method_function in enumerate(self.pruning_methods_functions_list):
-                    # pruning_count_list_current_iteration.append(pruning_method_function(population, *self.pruning_methods_params[index])) # for list
-                    pruning_count_list_current_iteration.append(
-                        pruning_method_function(population, current_iteration_number, **self.pruning_methods_params[index])
-                    )  # for dict
-
+                    if self.pruning_methods_params is None or self.pruning_methods_params[index] is None:
+                        pruning_count_list_current_iteration.append(
+                            pruning_method_function(population, current_iteration_number)
+                        )
+                    else:
+                        pruning_count_list_current_iteration.append(
+                            pruning_method_function(population, current_iteration_number, **self.pruning_methods_params[index])
+                        )
+                    
             avg_fitness = None
             if TerminationConditionsEnum.PHENOTYPIC_DIVERSITY in self.termination_condition_handler.termination_conditions:
                 avg_fitness = compute_avg_fitness(population)
@@ -514,8 +567,8 @@ class BaseOptimizer(Base, AutomationSystem):
                         self.termination_condition_handler.termination_conditions,
                         self.termination_condition_handler.phenotypic_diversity_window_size,
                         self.termination_condition_handler.phenotypic_diversity_error_thereshold,
-                        self.termination_condition_handler.genotypic_diversity_window_size,
-                        self.termination_condition_handler.genotypic_diversity_error_thereshold,
+                        # self.termination_condition_handler.genotypic_diversity_window_size,
+                        # self.termination_condition_handler.genotypic_diversity_error_thereshold,
                         self.termination_condition_handler.fitness_limit_threshold,
                         self.termination_condition_handler.iterations_number_threshold,
                         self.termination_condition_handler.evaluation_number_threshold,

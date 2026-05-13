@@ -54,7 +54,6 @@ def reverse_subsequence(parent1, parent2):
     return child1, child2
 
 
-# TODO: write this function without for/while loop and by use of mask in numpy
 def PMX(parent1, parent2):
     size = len(parent1.genome)
 

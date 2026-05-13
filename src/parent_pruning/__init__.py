@@ -7,6 +7,6 @@ from . import visualization
 __all__ = [
     "analyzers",
     "optimizers",
-    "visualization",
     "individuals",
+    "visualization",
 ]

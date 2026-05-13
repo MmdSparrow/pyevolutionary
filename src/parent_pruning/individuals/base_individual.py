@@ -1,10 +1,10 @@
 class Individual:
     def __init__(self):
-        self.genome = None
-        self.fitness = None
-        self.age = 0
-        self.crossover_attendance = 0
-        self.parent_score = 0
+        self.genome: list = None
+        self.fitness: float = None
+        self.age: int = 0
+        self.crossover_attendance:int = 0
+        self.parent_score:int = 0
 
     def __len__(self):
         return len(self.genome)
@@ -17,19 +17,19 @@ class Individual:
         \nParent Score: {self.parent_score}\
         "
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Individual(genome={self.genome!r}, fitness={self.fitness!r}, age={self.age!r}, crossover_attendance={self.crossover_attendance!r}, parent_score={self.parent_score!r})"
 
     def __eq__(self, value: object) -> bool:
         return self.genome == value.genome
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {
             "genome": self.genome,
             "fitness": self.fitness,
         }
 
-    def to_dict_full_details(self):
+    def to_dict_full_details(self)-> dict:
         return {
             "genome": self.genome,
             "fitness": self.fitness,

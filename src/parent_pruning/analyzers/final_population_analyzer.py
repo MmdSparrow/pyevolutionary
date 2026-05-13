@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from collections import Counter
+from parent_pruning.individuals.base_individual import Individual
 from parent_pruning.configs.directories import LOG_DIRECTORY_DEFAULT, ANALYZE_DIRECOTRY_DEFAULT
 
 
@@ -29,14 +30,14 @@ class FinalPopulationAnalyzer:
             console_handler.setFormatter(formatter)
             self._logger.addHandler(console_handler)
 
-    def __init__(self, base_directory, chromosome_list=None, debug_mode=False):
+    def __init__(self, base_directory:str, chromosome_list:list[Individual]=None, debug_mode:bool=False):
         self.chromosome_list = chromosome_list
         self.base_directory = base_directory
         self.genome_dict = {}
         self.__create_log_folders(self.base_directory)
         self.__init_logger(debug_mode)
 
-    def load_chromosome_list(self, chromosome_list_pkl_path):
+    def load_chromosome_list(self, chromosome_list_pkl_path:str):
         with open(chromosome_list_pkl_path, "rb") as file_to_read:
             self.chromosome_list = pickle.load(file_to_read)
 

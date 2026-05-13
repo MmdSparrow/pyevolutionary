@@ -1,5 +1,6 @@
 import copy
 import random
+import logging
 
 from parent_pruning.individuals.base_individual import Individual
 from parent_pruning._utils.custom_exceptions.value_conflict_exception import ValueConflictExceptoin
@@ -11,7 +12,7 @@ class OrderIndividual(Individual):
         random.shuffle(sequence)
         return sequence
 
-    def __init__(self, genome_size, input_genome=None, init_with_random_genome=True, logger=None):
+    def __init__(self, genome_size: int, input_genome:list=None, init_with_random_genome:bool=True, logger:logging.Logger=None):
         super().__init__()
 
         if input_genome is not None and init_with_random_genome:
@@ -41,8 +42,8 @@ class OrderIndividual(Individual):
                 return True
         return False
 
-    def __eq__(self, value):
+    def __eq__(self, value) -> bool:
         return self.__circular_equivalence(self.genome, value)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"OrderIndividual(genome={self.genome!r}, fitness={self.fitness!r}, age={self.age!r}, crossover_attendance={self.crossover_attendance!r}, parent_score={self.parent_score!r})"

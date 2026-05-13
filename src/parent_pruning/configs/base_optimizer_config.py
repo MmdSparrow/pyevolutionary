@@ -6,7 +6,7 @@ from parent_pruning._enums.termination_conditions_enums import TerminationCondit
 AVAILABLE_MODES = [ModesEnum.AGGREGGATE, ModesEnum.FORGETFUL]
 AVAILABLE_TERMINATION_CONDITIONS = [
     TerminationConditionsEnum.PHENOTYPIC_DIVERSITY,
-    TerminationConditionsEnum.GENOTYPIC_DIVERSITY,
+    # TerminationConditionsEnum.GENOTYPIC_DIVERSITY,
     TerminationConditionsEnum.FITNESS_LIMIT,
     TerminationConditionsEnum.ITERATION_NUMBER,
     TerminationConditionsEnum.EVALUATION_NUMBER,
