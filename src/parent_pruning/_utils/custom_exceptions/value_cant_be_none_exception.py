@@ -7,4 +7,4 @@ class ValueCantBeNoneException(BaseException):
             message = f"Variable {variable} can't be None"
         else:
             message= input_message
-        super(ValueCantBeNoneException, self).__init__(message, logger)
+        super(ValueCantBeNoneException, self).__init__(logger, message)

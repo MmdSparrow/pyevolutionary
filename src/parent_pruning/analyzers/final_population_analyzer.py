@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from collections import Counter
 from parent_pruning.individuals.base_individual import Individual
-from parent_pruning.configs.directories import LOG_DIRECTORY_DEFAULT, ANALYZE_DIRECOTRY_DEFAULT
+from parent_pruning._configs.directories import LOG_DIRECTORY_DEFAULT, ANALYZE_DIRECOTRY_DEFAULT
 
 
 class FinalPopulationAnalyzer:
@@ -18,24 +18,24 @@ class FinalPopulationAnalyzer:
         self.analyze_directory = os.path.join(base_directory, ANALYZE_DIRECOTRY_DEFAULT)
         os.makedirs(self.analyze_directory, exist_ok=True)
 
-    def __init_logger(self, debug_mode):
+    def __init_logger(self, show_in_console):
         self._logger = logging.getLogger("analyzer_logger")
         self._logger.setLevel(logging.INFO)
         handler = logging.FileHandler(os.path.join(self.log_directory, "analyze.log"))
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)
-        if debug_mode:
+        if show_in_console:
             console_handler = logging.StreamHandler(sys.stdout)
             console_handler.setFormatter(formatter)
             self._logger.addHandler(console_handler)
 
-    def __init__(self, base_directory:str, chromosome_list:list[Individual]=None, debug_mode:bool=False):
+    def __init__(self, base_directory:str, chromosome_list:list[Individual]=None, show_in_console:bool=False):
         self.chromosome_list = chromosome_list
         self.base_directory = base_directory
         self.genome_dict = {}
         self.__create_log_folders(self.base_directory)
-        self.__init_logger(debug_mode)
+        self.__init_logger(show_in_console)
 
     def load_chromosome_list(self, chromosome_list_pkl_path:str):
         with open(chromosome_list_pkl_path, "rb") as file_to_read:

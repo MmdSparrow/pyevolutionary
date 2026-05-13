@@ -1,0 +1,10 @@
+from parent_pruning._enums import ModesEnum, TerminationConditionsEnum
+
+
+TERMINATION_CONDITIONS_DEFAULT_VALUE = [TerminationConditionsEnum.ITERATION_NUMBER]
+CROSSOVER_PROBABILITY_DEFAULT_VALUE = 0.8
+MUTATION_PROBABILITY_DEFAULT_VALUE = 0.4
+MODE_DEFAULT_VALUE = ModesEnum.AGGREGGATE
+VISUALIZE_DEFAULT_VALUE = False
+
+del ModesEnum, TerminationConditionsEnum

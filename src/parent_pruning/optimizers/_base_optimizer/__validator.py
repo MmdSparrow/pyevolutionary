@@ -1,6 +1,6 @@
 from parent_pruning._validations import is_presented, is_bigger, is_probability
 from parent_pruning._utils.custom_exceptions import InvalidValueException, FunctionNotSupportedException, ValueCantBeNoneException, ValueConflictExceptoin
-from parent_pruning.configs.base_optimizer_config import (
+from parent_pruning._configs.base_optimizer_config import (
     AVAILABLE_MODES,
     AVAILABLE_TERMINATION_CONDITIONS,
     AVAILABLE_STATISTICS,
@@ -32,7 +32,7 @@ def validation(
     phenotypic_diversity_error_thereshold,
     checkpoint_save_period,
 ):
-    if not is_presented(project_name, True):
+    if not is_presented(project_name):
         raise ValueCantBeNoneException(logger, "project name")
     if not is_presented(genome_size):
         raise ValueCantBeNoneException(logger, input_message="genome size")

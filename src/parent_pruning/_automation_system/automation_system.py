@@ -1,12 +1,12 @@
 import os
-import parent_pruning.pruning.pruning_methods as pruning_methods_module
-import parent_pruning.selection_methods.parent_selection as parent_selection_module
-import parent_pruning.selection_methods.remaining_selection as remaining_selection_module
-import parent_pruning.thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
+import parent_pruning._pruning.pruning_methods as pruning_methods_module
+import parent_pruning._selection_methods.parent_selection as parent_selection_module
+import parent_pruning._selection_methods.remaining_selection as remaining_selection_module
+import parent_pruning._thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
 
 from typing import Final, List
 from .__utils import get_non_private_functions_in_module, get_non_private_functions_from_module_path
-from parent_pruning.configs.directories import (
+from parent_pruning._configs.directories import (
     EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE,
     EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE,
     EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE,

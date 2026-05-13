@@ -4,26 +4,26 @@ import json
 import copy
 import pickle
 import random
-import parent_pruning.pruning.pruning_methods as pruning_methods_module
-import parent_pruning.selection_methods.parent_selection as parent_selection_module
-import parent_pruning.selection_methods.remaining_selection as remaining_selection_module
-import parent_pruning.thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
+import parent_pruning._pruning.pruning_methods as pruning_methods_module
+import parent_pruning._selection_methods.parent_selection as parent_selection_module
+import parent_pruning._selection_methods.remaining_selection as remaining_selection_module
+import parent_pruning._thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
 
 from .__validator import validation
-from parent_pruning._base import Base
+from parent_pruning._base import Base as _Base
 from parent_pruning.visualization import Visualizer
 from .._utils import init_function_by_name, replace_with_enum
 from parent_pruning._automation_system import AutomationSystem
 from parent_pruning.individuals.base_individual import Individual
 from parent_pruning._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
-from parent_pruning.termination_condition import TerminationCondition
+from parent_pruning._termination_condition import TerminationCondition
 from .__utils import (
     compute_avg_fitness,
     compute_var_fitness_with_avg,
     copy_parent_to_child,
     increase_age_of_all_population,
 )
-from parent_pruning.configs.base_optimizer_config import (
+from parent_pruning._configs.base_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
     MUTATION_PROBABILITY_DEFAULT_VALUE,
@@ -33,7 +33,7 @@ from parent_pruning.configs.base_optimizer_config import (
     AVAILABLE_TERMINATION_CONDITIONS,
     AVAILABLE_STATISTICS,
 )
-from parent_pruning.configs.directories import (
+from parent_pruning._configs.directories import (
     EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE,
     EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE,
     EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE,
@@ -41,11 +41,7 @@ from parent_pruning.configs.directories import (
 )
 
 
-class BaseOptimizer(Base, AutomationSystem):
-    
- 
-        
-                
+class BaseOptimizer(_Base, AutomationSystem):
     def __parent_selection_fucn_determiner(self, parent_selection_type):
         func_name = parent_selection_type
         if parent_selection_type.startswith("q_tournoment"):
@@ -144,7 +140,7 @@ class BaseOptimizer(Base, AutomationSystem):
             pickle.dump(self.statistics, file_to_write)
             pickle.dump(self.mode, file_to_write)
             pickle.dump(self.pruning_methods, file_to_write)
-            filtered_pruning_methods_param= None
+            filtered_pruning_methods_param = None
             if self.pruning_methods is not None:
                 filtered_pruning_methods_param = [{k: v for k, v in d.items() if k != "scheduler_method"} for d in self.pruning_methods_params]
             pickle.dump(filtered_pruning_methods_param, file_to_write)
@@ -288,12 +284,12 @@ class BaseOptimizer(Base, AutomationSystem):
         #####
         extension_directory=None,
         #####
-        debug_mode=False,
+        show_in_console=False,
         # TODO:
         # source_spots_in_genome=None,
         # destination_spots_in_genome=None,
     ):
-        Base.__init__(self, project_name, checkpoint_base_directory, debug_mode)
+        _Base.__init__(self, project_name, checkpoint_base_directory, show_in_console)
         AutomationSystem.__init__(self, extension_directory)
         self.input_data = input_data
         self.individual_class = None
@@ -349,7 +345,7 @@ class BaseOptimizer(Base, AutomationSystem):
             if self.pruning_methods_params is not None:
                 for pruning_param in self.pruning_methods_params:
                     if pruning_param is None:
-                        pruning_param={}
+                        pruning_param = {}
                     elif "scheduler_method" in pruning_param:
                         pruning_param["scheduler_func"] = self.__thereshold_scheduler_func_determiner(pruning_param["scheduler_method"])
             self.__pruning_methods_funcs_determiner(pruning_methods)
@@ -357,7 +353,7 @@ class BaseOptimizer(Base, AutomationSystem):
             self.__remaining_selection_func_determiner(remaining_selection_method)
             ######################### TODO
             self.termination_condition_handler = TerminationCondition(
-                replace_with_enum("termination_conditions", termination_conditions),
+                replace_with_enum("termination_conditions", termination_conditions, self._logger),
                 phenotypic_diversity_window_size,
                 phenotypic_diversity_error_thereshold,
                 # genotypic_diversity_window_size,
@@ -367,10 +363,10 @@ class BaseOptimizer(Base, AutomationSystem):
                 evaluation_number,
             )
             ######################### TODO
-            self.statistics = replace_with_enum("statistics", statistics)
+            self.statistics = replace_with_enum("statistics", statistics, self._logger)
             self.statistic_sampling_period = statistic_sampling_period
             ######################### TODO
-            self.mode = replace_with_enum("modes", mode)
+            self.mode = replace_with_enum("modes", mode, self._logger)
             self.checkpoint_save_period = checkpoint_save_period
             self.visualize = visualize
             self.visualizer = Visualizer(self.statistics, statistic_sampling_period, self.result_directory)
@@ -511,14 +507,12 @@ class BaseOptimizer(Base, AutomationSystem):
             if self.pruning_methods is not None:
                 for index, pruning_method_function in enumerate(self.pruning_methods_functions_list):
                     if self.pruning_methods_params is None or self.pruning_methods_params[index] is None:
-                        pruning_count_list_current_iteration.append(
-                            pruning_method_function(population, current_iteration_number)
-                        )
+                        pruning_count_list_current_iteration.append(pruning_method_function(population, current_iteration_number))
                     else:
                         pruning_count_list_current_iteration.append(
                             pruning_method_function(population, current_iteration_number, **self.pruning_methods_params[index])
                         )
-                    
+
             avg_fitness = None
             if TerminationConditionsEnum.PHENOTYPIC_DIVERSITY in self.termination_condition_handler.termination_conditions:
                 avg_fitness = compute_avg_fitness(population)

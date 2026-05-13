@@ -3,7 +3,7 @@ import sys
 import logging
 
 from datetime import datetime
-from parent_pruning.configs.directories import RESULT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, CHECKPOINT_DIRECTORY_DEFAULT
+from parent_pruning._configs.directories import RESULT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, CHECKPOINT_DIRECTORY_DEFAULT
 
 
 class Base:
@@ -23,19 +23,19 @@ class Base:
         self.checkpoint_directory = os.path.join(self.base_directory, CHECKPOINT_DIRECTORY_DEFAULT)
         os.makedirs(self.checkpoint_directory, exist_ok=True)
 
-    def __init_logger(self, debug_mode):
+    def __init_logger(self, show_in_console):
         self._logger = logging.getLogger("core_logger")
         self._logger.setLevel(logging.INFO)
         handler = logging.FileHandler(os.path.join(self.log_directory, "runtime.log"))
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)
-        if debug_mode:
+        if show_in_console:
             console_handler = logging.StreamHandler(sys.stdout)
             console_handler.setFormatter(formatter)
             self._logger.addHandler(console_handler)
 
-    def __init__(self, project_name, base_directory, debug_mode):
+    def __init__(self, project_name, base_directory, show_in_console):
         self.project_name = project_name
         self.__create_folders(base_directory)
-        self.__init_logger(debug_mode)
+        self.__init_logger(show_in_console)

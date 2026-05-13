@@ -7,4 +7,4 @@ class FunctionNotSupportedException(BaseException):
             message= (f"{function_objective} function with name {func_name} is not supported!")
         else:
             message= input_message
-        super(FunctionNotSupportedException, self).__init__(message, logger)
+        super(FunctionNotSupportedException, self).__init__(logger, message)

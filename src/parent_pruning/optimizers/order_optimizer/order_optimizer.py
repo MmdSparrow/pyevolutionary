@@ -1,24 +1,24 @@
 import os
-import  parent_pruning.mutation.order_mutation_methods as order_mutation_module
-import  parent_pruning.crossover.order_crossover_methods as order_crossover_module
+import parent_pruning._mutation.order_mutation_methods as _order_mutation_module
+import parent_pruning._crossover.order_crossover_methods as _order_crossover_module
 
 from .__validator import validation
 from parent_pruning.optimizers._utils import init_function_by_name
 from parent_pruning._automation_system import AutomationSystemOrder
 from parent_pruning.individuals.order_individual import OrderIndividual
 from parent_pruning.optimizers._base_optimizer.base_optimizer import BaseOptimizer
-from parent_pruning.configs.order_optimizer_config import (
+from parent_pruning._configs.order_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
     MUTATION_PROBABILITY_DEFAULT_VALUE,
     TERMINATION_CONDITIONS_DEFAULT_VALUE,
     VISUALIZE_DEFAULT_VALUE,
 )
-from parent_pruning.configs.directories import (
+from parent_pruning._configs.directories import (
     EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE,
     EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE,
 )
-from parent_pruning.configs.base_optimizer_config import (
+from parent_pruning._configs.base_optimizer_config import (
     AVAILABLE_MODES,
     AVAILABLE_TERMINATION_CONDITIONS,
     AVAILABLE_STATISTICS,
@@ -31,7 +31,7 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         if self.extension_directory is not None:
             module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE)
         self.mutation_func = init_function_by_name(
-            order_mutation_module,
+            _order_mutation_module,
             module_path,
             mutation_method,
             "mutation",
@@ -43,7 +43,7 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         if self.extension_directory is not None:
             module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE)
         self.crossover_func = init_function_by_name(
-            order_crossover_module,
+            _order_crossover_module,
             module_path,
             crossover_method,
             "crossover",
@@ -103,7 +103,7 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         #######
         extension_directory:str=None,
         #######
-        debug_mode:bool=False,
+        show_in_console:bool=False,
         # TODO:
         # source_spots_in_genome= None,
         # destination_spots_in_genome= None,
@@ -141,7 +141,7 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             ####
             extension_directory,
             ####
-            debug_mode,
+            show_in_console,
             # TODO:
             # source_spots_in_genome,
             # destination_spots_in_genome,

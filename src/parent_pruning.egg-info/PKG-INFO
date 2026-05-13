@@ -1,0 +1,24 @@
+Metadata-Version: 2.4
+Name: parent_pruning
+Version: 0.2.0
+Summary: This Python framework provides a comprehensive implementation of evolutionary algorithms, supporting both binary and ordinal individuals, as well as their crossover and mutation operations. The framework includes features such as automated result analysis and diagram plotting for better visualization. It is specifically designed to facilitate the `Parent Pruning Algorithm`, which evaluates the contribution of parents involved in crossover operations and prunes those deemed less effective based on their performance scores.
+Author-email: Sayed Mohammad Ali Mirkazemi <esmirk.137@gmail.com>
+Maintainer-email: Sayed Mohammad Ali Mirkazemi <esmirk.137@gmail.com>
+Project-URL: Homepage, https://github.com/MmdSparrow/parent_pruning_framework
+Project-URL: Documentation, https://readthedocs.org
+Project-URL: Repository, https://github.com/MmdSparrow/parent_pruning_framework.git
+Project-URL: Bug Tracker, https://github.com/MmdSparrow/parent_pruning_framework/issues
+Keywords: parent pruning,algorithm,optimization,Evalutionary Algorithm
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: matplotlib==3.9.1
+Requires-Dist: matplotlib-inline==0.1.7
+Requires-Dist: numpy==2.0.0
+Requires-Dist: tqdm==4.66.4
+Dynamic: license-file
