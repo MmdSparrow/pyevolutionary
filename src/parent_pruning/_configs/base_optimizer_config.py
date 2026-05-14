@@ -13,10 +13,10 @@ AVAILABLE_STATISTICS = [StatisticsEnum.AVG_FITNESS.value, StatisticsEnum.BEST_FI
 
 
 ############################################################################################3
-TERMINATION_CONDITIONS_DEFAULT_VALUE = [TerminationConditionsEnum.ITERATION_NUMBER]
+TERMINATION_CONDITIONS_DEFAULT_VALUE = [TerminationConditionsEnum.ITERATION_NUMBER.value]
 CROSSOVER_PROBABILITY_DEFAULT_VALUE = 0.8
 MUTATION_PROBABILITY_DEFAULT_VALUE = 0.4
-MODE_DEFAULT_VALUE = ModesEnum.AGGREGGATE
+MODE_DEFAULT_VALUE = ModesEnum.AGGREGGATE.value
 VISUALIZE_DEFAULT_VALUE = False
 
 

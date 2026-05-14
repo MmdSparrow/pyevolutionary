@@ -136,9 +136,9 @@ class BaseOptimizer(_Base, AutomationSystem):
             pickle.dump(self.mutation_method, file_to_write)
             pickle.dump(self.crossover_probability, file_to_write)
             pickle.dump(self.mutation_probability, file_to_write)
-            pickle.dump(termination_conditions, file_to_write)
-            pickle.dump(self.statistics, file_to_write)
-            pickle.dump(self.mode, file_to_write)
+            pickle.dump([condition_enum.value for condition_enum in termination_conditions], file_to_write)
+            pickle.dump([statistic_enum.value for statistic_enum in self.statistics], file_to_write)
+            pickle.dump(self.mode.value, file_to_write)
             pickle.dump(self.pruning_methods, file_to_write)
             filtered_pruning_methods_param = None
             if self.pruning_methods is not None:
@@ -184,7 +184,7 @@ class BaseOptimizer(_Base, AutomationSystem):
             self.crossover_probability = pickle.load(file_to_read)
             self.mutation_probability = pickle.load(file_to_read)
             termination_conditions = pickle.load(file_to_read)
-            self.statistics = pickle.load(file_to_read)
+            self.statistics= pickle.load(file_to_read)
             self.mode = pickle.load(file_to_read)
             self.pruning_methods = pickle.load(file_to_read)
             self.__pruning_methods_funcs_determiner(self.pruning_methods)
@@ -203,19 +203,8 @@ class BaseOptimizer(_Base, AutomationSystem):
             fitness_limit_threshold = pickle.load(file_to_read)
             iterations_number = pickle.load(file_to_read)
             evaluation_number = pickle.load(file_to_read)
-            self.termination_condition_handler = TerminationCondition(
-                termination_conditions,
-                phenotypic_diversity_window_size,
-                phenotypic_diversity_error_thereshold,
-                # genotypic_diversity_window_size,
-                # genotypic_diversity_error_thereshold,
-                fitness_limit_threshold,
-                iterations_number,
-                evaluation_number,
-            )
             self.statistic_sampling_period = pickle.load(file_to_read)
             self.checkpoint_save_period = pickle.load(file_to_read)
-            self.visualize = pickle.load(file_to_read)
             validation(
                 self._logger,
                 self.AVAILABLE_PARENT_SELECTION_METHODS,
@@ -241,16 +230,25 @@ class BaseOptimizer(_Base, AutomationSystem):
                 phenotypic_diversity_error_thereshold,
                 self.checkpoint_save_period,
             )
-
-            # for visualizer
-            self.visualizer = Visualizer(self.statistics, self.statistic_sampling_period, self.result_directory)
-
+            self.visualize = pickle.load(file_to_read)
             self.avg_fitness_list = pickle.load(file_to_read)
             self.var_fitness_list = pickle.load(file_to_read)
             self.best_fitness_list = pickle.load(file_to_read)
             self.extension_directory = pickle.load(file_to_read)
-
             self.elapsed_time = pickle.load(file_to_read)
+            self.termination_condition_handler = TerminationCondition(
+                replace_with_enum("termination_conditions", termination_conditions, self._logger),
+                phenotypic_diversity_window_size,
+                phenotypic_diversity_error_thereshold,
+                # genotypic_diversity_window_size,
+                # genotypic_diversity_error_thereshold,
+                fitness_limit_threshold,
+                iterations_number,
+                evaluation_number,
+            )
+            self.statistics = replace_with_enum("statistics", self.statistics, self._logger)
+            self.mode = replace_with_enum("modes", self.mode, self._logger)
+            self.visualizer = Visualizer(self.statistics, self.statistic_sampling_period, self.result_directory)
 
     def __init__(
         self,

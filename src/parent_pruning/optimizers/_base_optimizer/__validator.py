@@ -70,7 +70,7 @@ def validation(
                 raise InvalidValueException(logger, statistic, "statistic", AVAILABLE_STATISTICS)
     if not is_bigger(statistic_sampling_period):
         raise InvalidValueException(logger, "Statistic sampling period must be bigger than 0")
-    if statistic is not None and len(statistic) != 0:
+    if statistics is not None and len(statistics) != 0:
         if statistic_sampling_period is None:
             raise ValueConflictExceptoin(logger, input_message="Statistics set but its sampling peiord not set")
     if not is_bigger(evaluation_number):
