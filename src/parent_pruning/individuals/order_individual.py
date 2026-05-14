@@ -2,11 +2,11 @@ import copy
 import random
 import logging
 
-from parent_pruning.individuals._base_individual import BaseIndividual
+from parent_pruning.individuals._individual_structure import IndividualStructure
 from parent_pruning._utils.custom_exceptions.value_conflict_error import ValueConflictError
 
 
-class OrderIndividual(BaseIndividual):
+class OrderIndividual(IndividualStructure):
     def __generate_uniform_random_permutation(self, genome_size):
         sequence = list(range(genome_size))
         random.shuffle(sequence)
@@ -47,3 +47,6 @@ class OrderIndividual(BaseIndividual):
 
     def __repr__(self) -> str:
         return f"OrderIndividual(genome={self.genome!r}, fitness={self.fitness!r}, age={self.age!r}, crossover_attendance={self.crossover_attendance!r}, parent_score={self.parent_score!r})"
+
+
+del IndividualStructure, logging

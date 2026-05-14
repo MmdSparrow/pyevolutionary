@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from collections import Counter
-from parent_pruning.individuals._base_individual import BaseIndividual
+from parent_pruning.individuals._individual_structure import IndividualStructure
 from parent_pruning._configs.directories import LOG_DIRECTORY_DEFAULT, ANALYZE_DIRECOTRY_DEFAULT
 
 
@@ -30,7 +30,7 @@ class FinalPopulationAnalyzer:
             console_handler.setFormatter(formatter)
             self._logger.addHandler(console_handler)
 
-    def __init__(self, base_directory:str, chromosome_list:list[BaseIndividual]=None, show_in_console:bool=False):
+    def __init__(self, base_directory:str, chromosome_list:list[IndividualStructure]=None, show_in_console:bool=False):
         self.chromosome_list = chromosome_list
         self.base_directory = base_directory
         self.genome_dict = {}

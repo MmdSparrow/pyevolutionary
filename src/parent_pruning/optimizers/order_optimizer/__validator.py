@@ -1,6 +1,14 @@
-def validation(crossover_type, mutation_type, logger):
-    # if crossover_type not in AVAILABLE_CROSSOVER_METHODS:
-    #     raise Exception("")
-    # if mutation_type not in AVAILABLE_MUTATION_METHODS:
-    #     raise Exception("")
-    pass
+from parent_pruning._utils.custom_exceptions import InvalidValueError
+
+
+def validation(
+    logger,
+    AVAILABLE_CROSSOVER_METHODS,
+    AVAILABLE_MUTATION_METHODS,
+    crossover_method,
+    mutation_method,
+):
+    if crossover_method not in AVAILABLE_CROSSOVER_METHODS:
+        raise InvalidValueError(logger, crossover_method, "crossover_method", AVAILABLE_CROSSOVER_METHODS)
+    if mutation_method not in AVAILABLE_MUTATION_METHODS:
+        raise InvalidValueError(logger, mutation_method, "mutation_method", AVAILABLE_MUTATION_METHODS)

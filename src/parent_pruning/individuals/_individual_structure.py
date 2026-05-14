@@ -1,4 +1,4 @@
-class BaseIndividual:
+class IndividualStructure:
     def __init__(self):
         self.genome: list = None
         self.fitness: float = None
@@ -18,7 +18,7 @@ class BaseIndividual:
         "
 
     def __repr__(self) -> str:
-        return f"Individual(genome={self.genome!r}, fitness={self.fitness!r}, age={self.age!r}, crossover_attendance={self.crossover_attendance!r}, parent_score={self.parent_score!r})"
+        return f"IndividualStructure(genome={self.genome!r}, fitness={self.fitness!r}, age={self.age!r}, crossover_attendance={self.crossover_attendance!r}, parent_score={self.parent_score!r})"
 
     def __eq__(self, value: object) -> bool:
         return self.genome == value.genome

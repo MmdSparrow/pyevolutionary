@@ -3,9 +3,9 @@ import parent_pruning._mutation.order_mutation_methods as _order_mutation_module
 import parent_pruning._crossover.order_crossover_methods as _order_crossover_module
 
 from .__validator import validation
+from parent_pruning.individuals import OrderIndividual
 from parent_pruning.optimizers._utils import init_function_by_name
 from parent_pruning._automation_system import AutomationSystemOrder
-from parent_pruning.individuals.order_individual import OrderIndividual
 from parent_pruning.optimizers._base_optimizer.base_optimizer import BaseOptimizer
 from parent_pruning._configs.order_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
@@ -51,9 +51,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         )
 
     def __generate_note_file(self):
-        self._logger.info("Generate note file")
-        text = f"Project Name: {self.project_name}\
-            \nGenome_size: {self.genome_size}\
+        self._logger.info("Generate Note File")
+        text = f"Genome_size: {self.genome_size}\
             \nPopulation_size: {self.population_size}\
             \nGeneration_size: {self.generation_size}\
             \nParent selection Method: {self.parent_selection_method}\
@@ -67,14 +66,29 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         with open(os.path.join(self.base_directory, "note.txt"), "w") as file_to_write:
             file_to_write.write(text)
 
-    def __load_order_checkpoint(self):
-        self.__mutation_func_determiner(self.mutation_method)
-        self.__crossover_func_determiner(self.crossover_method)
-
     def __init__(
         self,
-        project_name: str,
-        input_data:object,
+        input_data,
+        evaluation_function,
+        extension_directory: str = None,
+        show_in_console: bool = False,
+        visualize: bool = VISUALIZE_DEFAULT_VALUE,
+    ):
+        AutomationSystemOrder.__init__(self, extension_directory)
+        BaseOptimizer.__init__(
+            self,
+            input_data,
+            evaluation_function,
+            extension_directory,
+            show_in_console,
+            visualize,
+        )
+        self._logger.info(f"List of available `Order Crossover Methods` functions:{self.AVAILABLE_CROSSOVER_METHODS}")
+        self._logger.info(f"List of available `Order Mutation Methods` functions:{self.AVAILABLE_MUTATION_METHODS}")
+        self.individual_class = OrderIndividual
+
+    def run(
+        self,
         genome_size: int,
         population_size: int,
         generation_size: int,
@@ -82,44 +96,30 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         remaining_selection_method: str,
         crossover_method: str,
         mutation_method: str,
-        termination_conditions:list=TERMINATION_CONDITIONS_DEFAULT_VALUE,
-        crossover_probability:float=CROSSOVER_PROBABILITY_DEFAULT_VALUE,
-        mutation_probability:float=MUTATION_PROBABILITY_DEFAULT_VALUE,
-        mode:str=MODE_DEFAULT_VALUE,
-        pruning_methods: str=None,
-        pruning_methods_params:list[dict]=None,
-        iterations_number: int=None,
-        statistics:list=None,
-        statistic_sampling_period:int=None,
-        evaluation_number:int=None,
-        fitness_limit_threshold:float=None,
-        phenotypic_diversity_window_size:int=None,
-        phenotypic_diversity_error_thereshold:float=None,
-        # genotypic_diversity_window_size:int=None,
-        # genotypic_diversity_error_thereshold:float=None,
-        visualize:bool=VISUALIZE_DEFAULT_VALUE,
-        checkpoint_save_period:int=None,
-        checkpoint_base_directory:str=None,
-        #######
-        extension_directory:str=None,
-        #######
-        show_in_console:bool=False,
-        # TODO:
-        # source_spots_in_genome= None,
-        # destination_spots_in_genome= None,
+        termination_conditions: list[str] = TERMINATION_CONDITIONS_DEFAULT_VALUE,
+        crossover_probability: float = CROSSOVER_PROBABILITY_DEFAULT_VALUE,
+        mutation_probability: float = MUTATION_PROBABILITY_DEFAULT_VALUE,
+        mode: str = MODE_DEFAULT_VALUE,
+        pruning_methods: list[str] = None,
+        pruning_methods_params: list[dict] = None,
+        iterations_number: int = None,
+        statistics: list[str] = None,
+        statistic_sampling_period: int = None,
+        evaluation_number: int = None,
+        fitness_limit_threshold: float = None,
+        phenotypic_diversity_window_size: int = None,
+        phenotypic_diversity_error_thereshold: float = None,
+        checkpoint_save_period: int = None,
     ):
-        AutomationSystemOrder.__init__(self, extension_directory)
-        BaseOptimizer.__init__(
-            self,
-            project_name,
-            input_data,
+        validation(self._logger, self.AVAILABLE_CROSSOVER_METHODS, self.AVAILABLE_MUTATION_METHODS, crossover_method, mutation_method)
+        self.crossover_method = crossover_method
+        self.mutation_method = mutation_method
+        self._run(
             genome_size,
             population_size,
             generation_size,
             parent_selection_method,
             remaining_selection_method,
-            crossover_method,
-            mutation_method,
             termination_conditions,
             crossover_probability,
             mutation_probability,
@@ -133,33 +133,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             fitness_limit_threshold,
             phenotypic_diversity_window_size,
             phenotypic_diversity_error_thereshold,
-            # genotypic_diversity_window_size,
-            # genotypic_diversity_error_thereshold,
-            visualize,
             checkpoint_save_period,
-            checkpoint_base_directory,
-            ####
-            extension_directory,
-            ####
-            show_in_console,
-            # TODO:
-            # source_spots_in_genome,
-            # destination_spots_in_genome,
         )
-        self._logger.info(f"List of available `Order Crossover Methods` functions:{self.AVAILABLE_CROSSOVER_METHODS}")
-        self._logger.info(f"List of available `Order Mutation Methods` functions:{self.AVAILABLE_MUTATION_METHODS}")
-
-        if checkpoint_base_directory is not None:
-            self._logger.info("Load order optimizer")
-            self.__load_order_checkpoint()
-        else:
-            validation(crossover_method, mutation_method, self._logger)
-            self._logger.info("Initialize order optimizer")
-            self.__mutation_func_determiner(self.mutation_method)
-            self.__crossover_func_determiner(self.crossover_method)
-            self.__generate_note_file()
-
-        self.individual_class = OrderIndividual
 
     def show_available_crossover_methods(self, return_instead_of_print=False):
         if return_instead_of_print:

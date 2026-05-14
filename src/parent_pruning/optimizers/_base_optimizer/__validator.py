@@ -12,8 +12,6 @@ def validation(
     AVAILABLE_PARENT_SELECTION_METHODS,
     AVAILABLE_REMAINING_SELECTION_METHODS,
     AVAILABLE_PRUNING_METHODS,
-    #########################
-    project_name,
     genome_size,
     population_size,
     generation_size,
@@ -32,8 +30,6 @@ def validation(
     phenotypic_diversity_error_thereshold,
     checkpoint_save_period,
 ):
-    if not is_presented(project_name):
-        raise ValueCantBeNoneError(logger, "project name")
     if not is_presented(genome_size):
         raise ValueCantBeNoneError(logger, input_message="genome size")
     if not is_bigger(genome_size, 1, is_required=True):
