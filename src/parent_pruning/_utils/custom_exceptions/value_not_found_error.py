@@ -1,10 +1,10 @@
-from ._base_exception import BaseException
+from ._base_error import BaseError
 
 
-class ValueNotFoundException(BaseException):
+class ValueNotFoundError(BaseError):
     def __init__(self, logger, value="?", input_message=None):
         if input_message is None:
             message = f"Value {value} not found"
         else:
             message= input_message
-        super(ValueNotFoundException, self).__init__(logger, message)
+        super(ValueNotFoundError, self).__init__(logger, message)

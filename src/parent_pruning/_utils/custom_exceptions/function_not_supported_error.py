@@ -1,10 +1,10 @@
-from ._base_exception import BaseException
+from ._base_error import BaseError
 
 
-class FunctionNotSupportedException(BaseException):
+class FunctionNotSupportedError(BaseError):
     def __init__(self, logger, func_name="?", function_objective="?", input_message=None):
         if input_message is None:
             message= (f"{function_objective} function with name {func_name} is not supported!")
         else:
             message= input_message
-        super(FunctionNotSupportedException, self).__init__(logger, message)
+        super(FunctionNotSupportedError, self).__init__(logger, message)

@@ -2,11 +2,11 @@ import copy
 import random
 import logging
 
-from parent_pruning.individuals.base_individual import Individual
-from parent_pruning._utils.custom_exceptions.value_conflict_exception import ValueConflictExceptoin
+from parent_pruning.individuals._base_individual import BaseIndividual
+from parent_pruning._utils.custom_exceptions.value_conflict_error import ValueConflictError
 
 
-class OrderIndividual(Individual):
+class OrderIndividual(BaseIndividual):
     def __generate_uniform_random_permutation(self, genome_size):
         sequence = list(range(genome_size))
         random.shuffle(sequence)
@@ -16,7 +16,7 @@ class OrderIndividual(Individual):
         super().__init__()
 
         if input_genome is not None and init_with_random_genome:
-            raise ValueConflictExceptoin(logger, input_message= "Both `input_genome` and `init_with_random_genome` can't be apply at the same time")
+            raise ValueConflictError(logger, input_message= "Both `input_genome` and `init_with_random_genome` can't be apply at the same time")
 
         if input_genome is not None:
             self.genome = copy.copy(input_genome)

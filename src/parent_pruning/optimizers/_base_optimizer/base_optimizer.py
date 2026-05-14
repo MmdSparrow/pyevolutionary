@@ -14,9 +14,10 @@ from parent_pruning._base import Base as _Base
 from parent_pruning.visualization import Visualizer
 from .._utils import init_function_by_name, replace_with_enum
 from parent_pruning._automation_system import AutomationSystem
-from parent_pruning.individuals.base_individual import Individual
-from parent_pruning._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
+from parent_pruning.individuals._base_individual import BaseIndividual
 from parent_pruning._termination_condition import TerminationCondition
+from parent_pruning._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
+from parent_pruning._utils.custom_exceptions import FileNotExistError, InvalidValueError
 from .__utils import (
     compute_avg_fitness,
     compute_var_fitness_with_avg,
@@ -166,10 +167,9 @@ class BaseOptimizer(_Base, AutomationSystem):
 
     def __load_checkpoint(self, checkpoint_base_directory):
         with open(os.path.join(checkpoint_base_directory, "checkpoints", "checkpoint.pkl"), "rb") as file_to_read:
-            self.__temp_chromosome_list = pickle.load(file_to_read)
-
-            self.__temp_current_iteration_number = pickle.load(file_to_read)
-            self.__temp_best_chromosome = pickle.load(file_to_read)
+            chromosome_list = pickle.load(file_to_read)
+            current_iteration_number = pickle.load(file_to_read)
+            best_chromosome = pickle.load(file_to_read)
 
             self.project_name = pickle.load(file_to_read)
             self.base_directory = pickle.load(file_to_read)
@@ -184,7 +184,7 @@ class BaseOptimizer(_Base, AutomationSystem):
             self.crossover_probability = pickle.load(file_to_read)
             self.mutation_probability = pickle.load(file_to_read)
             termination_conditions = pickle.load(file_to_read)
-            self.statistics= pickle.load(file_to_read)
+            self.statistics = pickle.load(file_to_read)
             self.mode = pickle.load(file_to_read)
             self.pruning_methods = pickle.load(file_to_read)
             self.__pruning_methods_funcs_determiner(self.pruning_methods)
@@ -249,6 +249,7 @@ class BaseOptimizer(_Base, AutomationSystem):
             self.statistics = replace_with_enum("statistics", self.statistics, self._logger)
             self.mode = replace_with_enum("modes", self.mode, self._logger)
             self.visualizer = Visualizer(self.statistics, self.statistic_sampling_period, self.result_directory)
+            return chromosome_list, current_iteration_number, best_chromosome
 
     def __init__(
         self,
@@ -278,7 +279,6 @@ class BaseOptimizer(_Base, AutomationSystem):
         # genotypic_diversity_error_thereshold=None,
         visualize=VISUALIZE_DEFAULT_VALUE,
         checkpoint_save_period=None,
-        checkpoint_base_directory=None,
         #####
         extension_directory=None,
         #####
@@ -287,7 +287,7 @@ class BaseOptimizer(_Base, AutomationSystem):
         # source_spots_in_genome=None,
         # destination_spots_in_genome=None,
     ):
-        _Base.__init__(self, project_name, checkpoint_base_directory, show_in_console)
+        _Base.__init__(self, project_name, show_in_console)
         AutomationSystem.__init__(self, extension_directory)
         self.input_data = input_data
         self.individual_class = None
@@ -296,92 +296,87 @@ class BaseOptimizer(_Base, AutomationSystem):
         self._logger.info(f"List of available `Remaining Selection Methods` functions:{self.AVAILABLE_REMAINING_SELECTION_METHODS}")
         self._logger.info(f"List of available `Pruning Methods` functions: {self.AVAILABLE_PRUNING_METHODS}")
 
-        self.checkpoint_base_directory = checkpoint_base_directory
-        if checkpoint_base_directory is not None:
-            self._logger.info(f'Load checkpoint "{self.checkpoint_base_directory}"')
-            self.__load_checkpoint(checkpoint_base_directory)
-        else:
-            validation(
-                self._logger,
-                self.AVAILABLE_PARENT_SELECTION_METHODS,
-                self.AVAILABLE_REMAINING_SELECTION_METHODS,
-                self.AVAILABLE_PRUNING_METHODS,
-                #########################
-                project_name,
-                genome_size,
-                population_size,
-                generation_size,
-                parent_selection_method,
-                remaining_selection_method,
-                termination_conditions,
-                crossover_probability,
-                mutation_probability,
-                mode,
-                pruning_methods,
-                iterations_number,
-                statistics,
-                statistic_sampling_period,
-                evaluation_number,
-                phenotypic_diversity_window_size,
-                phenotypic_diversity_error_thereshold,
-                checkpoint_save_period,
-            )
-            self._logger.info("Vlidation is passed successfuly")
-            self._logger.info("Initialize optimzier")
-            self.elapsed_time = 0
-            self.genome_size = genome_size
-            self.population_size = population_size
-            self.generation_size = generation_size
-            self.parent_selection_method = parent_selection_method
-            self.remaining_selection_method = remaining_selection_method
-            self.crossover_method = crossover_method
-            self.mutation_method = mutation_method
-            self.crossover_probability = crossover_probability
-            self.mutation_probability = mutation_probability
-            self.pruning_methods = pruning_methods
-            self.pruning_methods_params = pruning_methods_params
-            if self.pruning_methods_params is not None:
-                for pruning_param in self.pruning_methods_params:
-                    if pruning_param is None:
-                        pruning_param = {}
-                    elif "scheduler_method" in pruning_param:
-                        pruning_param["scheduler_func"] = self.__thereshold_scheduler_func_determiner(pruning_param["scheduler_method"])
-            self.__pruning_methods_funcs_determiner(pruning_methods)
-            self.__parent_selection_fucn_determiner(parent_selection_method)
-            self.__remaining_selection_func_determiner(remaining_selection_method)
-            ######################### TODO
-            self.termination_condition_handler = TerminationCondition(
-                replace_with_enum("termination_conditions", termination_conditions, self._logger),
-                phenotypic_diversity_window_size,
-                phenotypic_diversity_error_thereshold,
-                # genotypic_diversity_window_size,
-                # genotypic_diversity_error_thereshold,
-                fitness_limit_threshold,
-                iterations_number,
-                evaluation_number,
-            )
-            ######################### TODO
-            self.statistics = replace_with_enum("statistics", statistics, self._logger)
-            self.statistic_sampling_period = statistic_sampling_period
-            ######################### TODO
-            self.mode = replace_with_enum("modes", mode, self._logger)
-            self.checkpoint_save_period = checkpoint_save_period
-            self.visualize = visualize
-            self.visualizer = Visualizer(self.statistics, statistic_sampling_period, self.result_directory)
+        validation(
+            self._logger,
+            self.AVAILABLE_PARENT_SELECTION_METHODS,
+            self.AVAILABLE_REMAINING_SELECTION_METHODS,
+            self.AVAILABLE_PRUNING_METHODS,
+            #########################
+            project_name,
+            genome_size,
+            population_size,
+            generation_size,
+            parent_selection_method,
+            remaining_selection_method,
+            termination_conditions,
+            crossover_probability,
+            mutation_probability,
+            mode,
+            pruning_methods,
+            iterations_number,
+            statistics,
+            statistic_sampling_period,
+            evaluation_number,
+            phenotypic_diversity_window_size,
+            phenotypic_diversity_error_thereshold,
+            checkpoint_save_period,
+        )
+        self._logger.info("Vlidation is passed successfuly")
+        self._logger.info("Initialize optimzier")
+        self.elapsed_time = 0
+        self.genome_size = genome_size
+        self.population_size = population_size
+        self.generation_size = generation_size
+        self.parent_selection_method = parent_selection_method
+        self.remaining_selection_method = remaining_selection_method
+        self.crossover_method = crossover_method
+        self.mutation_method = mutation_method
+        self.crossover_probability = crossover_probability
+        self.mutation_probability = mutation_probability
+        self.pruning_methods = pruning_methods
+        self.pruning_methods_params = pruning_methods_params
+        if self.pruning_methods_params is not None:
+            for pruning_param in self.pruning_methods_params:
+                if pruning_param is None:
+                    pruning_param = {}
+                elif "scheduler_method" in pruning_param:
+                    pruning_param["scheduler_func"] = self.__thereshold_scheduler_func_determiner(pruning_param["scheduler_method"])
+        self.__pruning_methods_funcs_determiner(pruning_methods)
+        self.__parent_selection_fucn_determiner(parent_selection_method)
+        self.__remaining_selection_func_determiner(remaining_selection_method)
+        ######################### TODO
+        self.termination_condition_handler = TerminationCondition(
+            replace_with_enum("termination_conditions", termination_conditions, self._logger),
+            phenotypic_diversity_window_size,
+            phenotypic_diversity_error_thereshold,
+            # genotypic_diversity_window_size,
+            # genotypic_diversity_error_thereshold,
+            fitness_limit_threshold,
+            iterations_number,
+            evaluation_number,
+        )
+        ######################### TODO
+        self.statistics = replace_with_enum("statistics", statistics, self._logger)
+        self.statistic_sampling_period = statistic_sampling_period
+        ######################### TODO
+        self.mode = replace_with_enum("modes", mode, self._logger)
+        self.checkpoint_save_period = checkpoint_save_period
+        self.visualize = visualize
+        self.visualizer = Visualizer(self.statistics, statistic_sampling_period, self.result_directory)
 
-            self.avg_fitness_list = None
-            self.var_fitness_list = None
-            self.best_fitness_list = None
-            self.pruning_count_list = None  # 2d list
+        self.avg_fitness_list = None
+        self.var_fitness_list = None
+        self.best_fitness_list = None
+        self.pruning_count_list = None  # 2d list
 
-            if StatisticsEnum.AVG_FITNESS in self.statistics:
-                self.avg_fitness_list = []
-            if StatisticsEnum.VAR_FITNESS in self.statistics:
-                self.var_fitness_list = []
-            if StatisticsEnum.BEST_FITNESS in self.statistics:
-                self.best_fitness_list = []
-            if self.pruning_methods is not None:
-                self.pruning_count_list = []
+        if StatisticsEnum.AVG_FITNESS in self.statistics:
+            self.avg_fitness_list = []
+        if StatisticsEnum.VAR_FITNESS in self.statistics:
+            self.var_fitness_list = []
+        if StatisticsEnum.BEST_FITNESS in self.statistics:
+            self.best_fitness_list = []
+        if self.pruning_methods is not None:
+            self.pruning_count_list = []
 
     def __create_individual(self):
         return self.individual_class(genome_size=self.genome_size)
@@ -389,7 +384,7 @@ class BaseOptimizer(_Base, AutomationSystem):
     def __create_population(self):
         return [self.__create_individual() for _ in range(self.population_size)]
 
-    def __evaluationAll(self, population: list[Individual]) -> None:
+    def __evaluationAll(self, population: list[BaseIndividual]) -> None:
         for choromosome in population:
             self.evaluation_func(choromosome)
 
@@ -465,27 +460,7 @@ class BaseOptimizer(_Base, AutomationSystem):
         with open(os.path.join(self.result_directory, "final_population.pkl"), "wb") as file_to_write:
             pickle.dump(final_population, file_to_write)
 
-    def run(self):
-        population = None
-        current_iteration_number = None
-        best_chromosome = None
-        if self.checkpoint_base_directory is not None:
-            population, current_iteration_number, best_chromosome = (
-                self.__temp_chromosome_list,
-                self.__temp_current_iteration_number,
-                self.__temp_best_chromosome,
-            )
-        else:
-            best_chromosome = self.individual_class(
-                genome_size=self.genome_size,
-                init_with_random_genome=True,
-            )
-            self.evaluation_func(best_chromosome)
-            population = self.__create_population()
-            self.__evaluationAll(population)
-
-            current_iteration_number = 1
-
+    def __algorithm(self, population: list[BaseIndividual], current_iteration_number: int, best_chromosome: BaseIndividual) -> str:
         start_time = time.time()
         while True:
             children = self.__crossover_and_mutation(population)
@@ -583,6 +558,31 @@ class BaseOptimizer(_Base, AutomationSystem):
             )
             self._logger.info("Diagrams plotted successfuly")
         return self.base_directory
+
+    def run(self) -> str:
+        self._logger.info('Run algorithm from scratch')
+        self._create_base()
+        best_chromosome = self.individual_class(
+            genome_size=self.genome_size,
+            init_with_random_genome=True,
+        )
+        self.evaluation_func(best_chromosome)
+        population = self.__create_population()
+        self.__evaluationAll(population)
+
+        current_iteration_number = 1
+        return self.__algorithm(population, current_iteration_number, best_chromosome)
+
+    def continue_previous_run(self, checkpoint_base_directory: str) -> str:
+        if checkpoint_base_directory is None:
+            raise InvalidValueError(self._logger, input_message="Checkpoint base directory is none")
+        if not os.path.exists(checkpoint_base_directory):
+            raise FileNotExistError(self._logger, checkpoint_base_directory)
+        self.checkpoint_base_directory = checkpoint_base_directory
+        self._logger.info(f'Load checkpoint "{checkpoint_base_directory}"')
+        population, current_iteration_number, best_chromosome = self.__load_checkpoint(checkpoint_base_directory)
+        self._create_base(checkpoint_base_directory)
+        return self.__algorithm(population, current_iteration_number, best_chromosome)
 
     def show_available_parent_selection_methods(self, return_instead_of_print=False):
         if return_instead_of_print:

@@ -2,7 +2,7 @@ import os
 import importlib.util
 
 from parent_pruning._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
-from parent_pruning._utils.custom_exceptions import ImplementationException, FunctionNotSupportedException, InvalidValueException
+from parent_pruning._utils.custom_exceptions import ImplementationError, FunctionNotSupportedError, InvalidValueError
 
 
 def __get_module_by_name(module_path):
@@ -35,7 +35,7 @@ def init_function_by_name(module, extension_module_path, func_name, function_obj
         # read from default module
         func = getattr(module, func_name, None)
         if not func:
-            raise FunctionNotSupportedException(logger, func_name=func_name, function_objective=function_objective)
+            raise FunctionNotSupportedError(logger, func_name=func_name, function_objective=function_objective)
         logger.info(f"Function {func_name} is loaded from library")
     return func
 
@@ -48,21 +48,21 @@ def replace_with_enum(enum_type, values, logger):
         elif values == ModesEnum.FORGETFUL.value:
             return ModesEnum.FORGETFUL
         else:
-            raise InvalidValueException(logger, value_for_condition=values, variable="mode", valid_values=[ModesEnum.AGGREGGATE.value, ModesEnum.FORGETFUL.value])
+            raise InvalidValueError(logger, value_for_condition=values, variable="mode", valid_values=[ModesEnum.AGGREGGATE.value, ModesEnum.FORGETFUL.value])
     elif enum_type == "statistics":
         value_to_member = {member.value: member for member in StatisticsEnum}
         for v in values:
             if v in value_to_member:
                 result.append(value_to_member[v])
             else:
-                raise InvalidValueException(logger, value_for_condition=v, variable="statistics", valid_values=value_to_member)
+                raise InvalidValueError(logger, value_for_condition=v, variable="statistics", valid_values=value_to_member)
     elif enum_type == "termination_conditions":
         value_to_member = {member.value: member for member in TerminationConditionsEnum}
         for v in values:
             if v in value_to_member:
                 result.append(value_to_member[v])
             else:
-                raise InvalidValueException(logger, value_for_condition=v, variable="termination_conditions", valid_values=value_to_member)
+                raise InvalidValueError(logger, value_for_condition=v, variable="termination_conditions", valid_values=value_to_member)
     else:
-        raise ImplementationException("enum_type must have one of these values; [modes, statistics, termination_conditions]")
+        raise ImplementationError("enum_type must have one of these values; [modes, statistics, termination_conditions]")
     return result

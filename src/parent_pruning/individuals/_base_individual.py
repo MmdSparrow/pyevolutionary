@@ -1,4 +1,4 @@
-class Individual:
+class BaseIndividual:
     def __init__(self):
         self.genome: list = None
         self.fitness: float = None
