@@ -13,9 +13,9 @@ from .__validator import validation
 from parent_pruning._base import Base as _Base
 from parent_pruning.visualization import Visualizer
 from .._utils import init_function_by_name, replace_with_enum
-from parent_pruning._automation_system import AutomationSystem
-from parent_pruning.individuals._individual_structure import IndividualStructure
 from parent_pruning._termination_condition import TerminationCondition
+from parent_pruning.individuals._individual_structure import IndividualStructure
+from parent_pruning._automation_system import AutomationSystem as _AutomationSystem
 from parent_pruning._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
 from parent_pruning._utils.custom_exceptions import FileNotExistError, InvalidValueError
 from .__utils import (
@@ -42,7 +42,7 @@ from parent_pruning._configs.directories import (
 )
 
 
-class BaseOptimizer(_Base, AutomationSystem):
+class BaseOptimizer(_Base, _AutomationSystem):
     def __parent_selection_fucn_determiner(self, parent_selection_type):
         func_name = parent_selection_type
         ps_q = None
@@ -173,8 +173,8 @@ class BaseOptimizer(_Base, AutomationSystem):
             pickle.dump(pruning_count_list, file_to_write)
             pickle.dump(elapsed_time, file_to_write)
 
-    def __load_checkpoint(self):
-        with open(os.path.join(self.base_directory, "checkpoints", "checkpoint.pkl"), "rb") as file_to_read:
+    def __load_checkpoint(self, checkpoint_path):
+        with open(os.path.join(), "rb") as file_to_read:
             population = pickle.load(file_to_read)
             current_iteration_number = pickle.load(file_to_read)
             best_chromosome = pickle.load(file_to_read)
@@ -238,12 +238,12 @@ class BaseOptimizer(_Base, AutomationSystem):
         self,
         input_data,
         evaluation_function,
+        show_logs_in_console: bool= True,
         extension_directory: str = None,
-        show_in_console: bool = False,
         visualize: bool = VISUALIZE_DEFAULT_VALUE,
     ):
-        _Base.__init__(self, show_in_console)
-        AutomationSystem.__init__(self, extension_directory)
+        _Base.__init__(self, show_logs_in_console)
+        _AutomationSystem.__init__(self, extension_directory)
         self.individual_class = None
         self.visualize = visualize
 
@@ -252,7 +252,7 @@ class BaseOptimizer(_Base, AutomationSystem):
         self._logger.info(f"List of available `Pruning Methods` functions: {self.AVAILABLE_PRUNING_METHODS}")
 
         self.input_data = input_data
-        self.evaluation_function = evaluation_function
+        self.evaluation_func = evaluation_function
 
     def __create_individual(self, genome_size):
         return self.individual_class(genome_size)
@@ -262,7 +262,7 @@ class BaseOptimizer(_Base, AutomationSystem):
 
     def __evaluationAll(self, population: list[IndividualStructure]) -> None:
         for choromosome in population:
-            self.evaluation_func(choromosome)
+            self.evaluation_func(choromosome, self.input_data)
 
     def __parent_selection(self, parent_selection_func, q_tornument_param, population):
         if q_tornument_param is None:
@@ -308,8 +308,8 @@ class BaseOptimizer(_Base, AutomationSystem):
                 self.mutation_func(child1)
             if random.random() < mutation_probability:
                 self.mutation_func(child2)
-            self.evaluation_func(child1)
-            self.evaluation_func(child2)
+            self.evaluation_func(child1, self.input_data)
+            self.evaluation_func(child2, self.input_data)
             if child1.fitness <= parent1.fitness and child2.fitness <= parent1.fitness:
                 parent1.decrease_parent_score()
             else:
@@ -392,8 +392,8 @@ class BaseOptimizer(_Base, AutomationSystem):
         pruning_methods_functions_list = self.__pruning_methods_funcs_determiner(pruning_methods)
         parent_selection_func, parent_selection_q_tornument_param = self.__parent_selection_fucn_determiner(parent_selection_method)
         remaining_selection_func, remaining_selection_q_tornument_param = self.__remaining_selection_func_determiner(remaining_selection_method)
-        self.__mutation_func_determiner(self.mutation_method)
-        self.__crossover_func_determiner(self.crossover_method)
+        self._mutation_func_determiner(self.mutation_method)
+        self._crossover_func_determiner(self.crossover_method)
         termination_conditions = replace_with_enum("termination_conditions", termination_conditions, self._logger)
         termination_condition_handler = TerminationCondition(
             termination_conditions,
@@ -577,11 +577,22 @@ class BaseOptimizer(_Base, AutomationSystem):
             checkpoint_save_period,
         )
         self._logger.info("Vlidation is passed successfuly")
-        self.__generate_note_file()
+        self._generate_note_file(
+            genome_size,
+            population_size,
+            generation_size,
+            parent_selection_method,
+            remaining_selection_method,
+            self.crossover_method,
+            self.mutation_method,
+            termination_conditions,
+            crossover_probability,
+            mutation_probability,
+            mode,
+        )
         self._logger.info("Run algorithm from scratch")
-        self._create_base()
         best_chromosome = self.__create_individual(genome_size)
-        self.evaluation_func(best_chromosome)
+        self.evaluation_func(best_chromosome, self.input_data)
         population = self.__create_population(genome_size, population_size)
         self.__evaluationAll(population)
 
@@ -591,11 +602,11 @@ class BaseOptimizer(_Base, AutomationSystem):
         best_fitness_list = None
         pruning_count_list = None  # 2d list
 
-        if StatisticsEnum.AVG_FITNESS in statistics:
+        if StatisticsEnum.AVG_FITNESS.value in statistics:
             avg_fitness_list = []
-        if StatisticsEnum.VAR_FITNESS in statistics:
+        if StatisticsEnum.VAR_FITNESS.value in statistics:
             var_fitness_list = []
-        if StatisticsEnum.BEST_FITNESS in statistics:
+        if StatisticsEnum.BEST_FITNESS.value in statistics:
             best_fitness_list = []
         if pruning_methods is not None:
             pruning_count_list = []
@@ -629,12 +640,12 @@ class BaseOptimizer(_Base, AutomationSystem):
             elapsed_time=0,
         )
 
-    def continue_checkpoint(self, checkpoint_base_directory: str) -> str:
-        if checkpoint_base_directory is None:
+    def continue_checkpoint(self, checkpoint_path: str) -> str:
+        if checkpoint_path is None:
             raise InvalidValueError(self._logger, input_message="Checkpoint base directory is none")
-        if not os.path.exists(checkpoint_base_directory):
-            raise FileNotExistError(self._logger, checkpoint_base_directory)
-        self._logger.info(f'Load checkpoint "{checkpoint_base_directory}"')
+        if not os.path.exists(checkpoint_path):
+            raise FileNotExistError(self._logger, checkpoint_path)
+        self._logger.info(f'Load checkpoint "{checkpoint_path}"')
         (
             population,
             current_iteration_number,
@@ -665,7 +676,6 @@ class BaseOptimizer(_Base, AutomationSystem):
             pruning_count_list,
             elapsed_time,
         ) = self.__load_checkpoint()
-        self._create_base(checkpoint_base_directory)
         return self.__algorithm(
             population_size,
             generation_size,

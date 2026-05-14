@@ -7,6 +7,19 @@ from parent_pruning._configs.directories import RESULT_DIRECTORY_DEFAULT, LOG_DI
 
 
 class Base:
+    def __create_folders(self):
+        folder_name = datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
+        self.base_directory = os.path.join("outputs", folder_name)
+
+        self.result_directory = os.path.join(self.base_directory, RESULT_DIRECTORY_DEFAULT)
+        os.makedirs(self.result_directory, exist_ok=True)
+
+        self.log_directory = os.path.join(self.base_directory, LOG_DIRECTORY_DEFAULT)
+        os.makedirs(self.log_directory, exist_ok=True)
+
+        self.checkpoint_directory = os.path.join(self.base_directory, CHECKPOINT_DIRECTORY_DEFAULT)
+        os.makedirs(self.checkpoint_directory, exist_ok=True)
+
     def __init_logger(self, show_in_console):
         self._logger = logging.getLogger("core_logger")
         self._logger.setLevel(logging.INFO)
@@ -20,23 +33,5 @@ class Base:
             self._logger.addHandler(console_handler)
 
     def __init__(self, show_in_console):
+        self.__create_folders()
         self.__init_logger(show_in_console)
-
-    def __create_folders(self, base_directory=None):
-        if base_directory is None:
-            folder_name = datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
-            self.base_directory = os.path.join("outputs", folder_name)
-        else:
-            self.base_directory = base_directory
-
-        self.result_directory = os.path.join(self.base_directory, RESULT_DIRECTORY_DEFAULT)
-        os.makedirs(self.result_directory, exist_ok=True)
-
-        self.log_directory = os.path.join(self.base_directory, LOG_DIRECTORY_DEFAULT)
-        os.makedirs(self.log_directory, exist_ok=True)
-
-        self.checkpoint_directory = os.path.join(self.base_directory, CHECKPOINT_DIRECTORY_DEFAULT)
-        os.makedirs(self.checkpoint_directory, exist_ok=True)
-
-    def _create_base(self, base_directory=None):
-        self.__create_folders(base_directory)

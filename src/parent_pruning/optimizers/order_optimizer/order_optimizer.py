@@ -26,10 +26,12 @@ from parent_pruning._configs.base_optimizer_config import (
 
 
 class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
-    def __mutation_func_determiner(self, mutation_method):
+    def _mutation_func_determiner(self, mutation_method):
         module_path = None
         if self.extension_directory is not None:
-            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE)
+            module_path = os.path.join(
+                self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE
+            )
         self.mutation_func = init_function_by_name(
             _order_mutation_module,
             module_path,
@@ -38,10 +40,12 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             self._logger,
         )
 
-    def __crossover_func_determiner(self, crossover_method):
+    def _crossover_func_determiner(self, crossover_method):
         module_path = None
         if self.extension_directory is not None:
-            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE)
+            module_path = os.path.join(
+                self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE
+            )
         self.crossover_func = init_function_by_name(
             _order_crossover_module,
             module_path,
@@ -50,19 +54,32 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             self._logger,
         )
 
-    def __generate_note_file(self):
+    def _generate_note_file(
+        self,
+        genome_size,
+        population_size,
+        generation_size,
+        parent_selection_method,
+        remaining_selection_method,
+        crossover_method,
+        mutation_method,
+        termination_conditions,
+        crossover_probability,
+        mutation_probability,
+        mode,
+    ):
         self._logger.info("Generate Note File")
-        text = f"Genome_size: {self.genome_size}\
-            \nPopulation_size: {self.population_size}\
-            \nGeneration_size: {self.generation_size}\
-            \nParent selection Method: {self.parent_selection_method}\
-            \nRemaining Selection Method: {self.remaining_selection_method}\
-            \nCrossover Method: {self.crossover_method}\
-            \nMutation Method: {self.mutation_method}\
-            \nTermination Conditions: {self.termination_condition_handler.termination_conditions}\
-            \nCrossover Probability: {self.crossover_probability}\
-            \nMutation Probability: {self.mutation_probability}\
-            \nMode: {self.mode}"
+        text = f"Genome_size: {genome_size}\
+            \nPopulation_size: {population_size}\
+            \nGeneration_size: {generation_size}\
+            \nParent selection Method: {parent_selection_method}\
+            \nRemaining Selection Method: {remaining_selection_method}\
+            \nCrossover Method: {crossover_method}\
+            \nMutation Method: {mutation_method}\
+            \nTermination Conditions: {termination_conditions}\
+            \nCrossover Probability: {crossover_probability}\
+            \nMutation Probability: {mutation_probability}\
+            \nMode: {mode}"
         with open(os.path.join(self.base_directory, "note.txt"), "w") as file_to_write:
             file_to_write.write(text)
 
@@ -70,8 +87,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         self,
         input_data,
         evaluation_function,
+        show_logs_in_console: bool = True,
         extension_directory: str = None,
-        show_in_console: bool = False,
         visualize: bool = VISUALIZE_DEFAULT_VALUE,
     ):
         AutomationSystemOrder.__init__(self, extension_directory)
@@ -79,12 +96,16 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             self,
             input_data,
             evaluation_function,
+            show_logs_in_console,
             extension_directory,
-            show_in_console,
             visualize,
         )
-        self._logger.info(f"List of available `Order Crossover Methods` functions:{self.AVAILABLE_CROSSOVER_METHODS}")
-        self._logger.info(f"List of available `Order Mutation Methods` functions:{self.AVAILABLE_MUTATION_METHODS}")
+        self._logger.info(
+            f"List of available `Order Crossover Methods` functions:{self.AVAILABLE_CROSSOVER_METHODS}"
+        )
+        self._logger.info(
+            f"List of available `Order Mutation Methods` functions:{self.AVAILABLE_MUTATION_METHODS}"
+        )
         self.individual_class = OrderIndividual
 
     def run(
@@ -111,7 +132,13 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         phenotypic_diversity_error_thereshold: float = None,
         checkpoint_save_period: int = None,
     ):
-        validation(self._logger, self.AVAILABLE_CROSSOVER_METHODS, self.AVAILABLE_MUTATION_METHODS, crossover_method, mutation_method)
+        validation(
+            self._logger,
+            self.AVAILABLE_CROSSOVER_METHODS,
+            self.AVAILABLE_MUTATION_METHODS,
+            crossover_method,
+            mutation_method,
+        )
         self.crossover_method = crossover_method
         self.mutation_method = mutation_method
         self._run(
