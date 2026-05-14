@@ -174,7 +174,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             pickle.dump(elapsed_time, file_to_write)
 
     def __load_checkpoint(self, checkpoint_path):
-        with open(os.path.join(), "rb") as file_to_read:
+        with open(os.path.join(checkpoint_path), "rb") as file_to_read:
             population = pickle.load(file_to_read)
             current_iteration_number = pickle.load(file_to_read)
             best_chromosome = pickle.load(file_to_read)
@@ -238,7 +238,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         self,
         input_data,
         evaluation_function,
-        show_logs_in_console: bool= True,
+        show_logs_in_console: bool = True,
         extension_directory: str = None,
         visualize: bool = VISUALIZE_DEFAULT_VALUE,
     ):
@@ -502,8 +502,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
                     )
 
         end_time = time.time()
-        self._logger.info(f"Best Answer Fitness: {best_chromosome.fitness}")
-        self._logger.info(f"Runtime: {end_time - start_time + elapsed_time} seconds")
+        self._logger.info(f"Best answer fitness: {best_chromosome.fitness}")
+        self._logger.info(f"Algorithm runtime: {end_time - start_time + elapsed_time} seconds")
         self.__save_final_result(
             best_chromosome,
             avg_fitness_list,
@@ -654,8 +654,6 @@ class BaseOptimizer(_Base, _AutomationSystem):
             generation_size,
             parent_selection_method,
             remaining_selection_method,
-            self.crossover_method,
-            self.mutation_method,
             termination_conditions,
             crossover_probability,
             mutation_probability,
@@ -675,7 +673,21 @@ class BaseOptimizer(_Base, _AutomationSystem):
             best_fitness_list,
             pruning_count_list,
             elapsed_time,
-        ) = self.__load_checkpoint()
+        ) = self.__load_checkpoint(checkpoint_path)
+        self._generate_note_file(
+            len(best_chromosome.genome),
+            population_size,
+            generation_size,
+            parent_selection_method,
+            remaining_selection_method,
+            self.crossover_method,
+            self.mutation_method,
+            termination_conditions,
+            crossover_probability,
+            mutation_probability,
+            mode,
+            checkpoint_path,
+        )
         return self.__algorithm(
             population_size,
             generation_size,

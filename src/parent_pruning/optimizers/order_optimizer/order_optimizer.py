@@ -29,9 +29,7 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
     def _mutation_func_determiner(self, mutation_method):
         module_path = None
         if self.extension_directory is not None:
-            module_path = os.path.join(
-                self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE
-            )
+            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE)
         self.mutation_func = init_function_by_name(
             _order_mutation_module,
             module_path,
@@ -43,9 +41,7 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
     def _crossover_func_determiner(self, crossover_method):
         module_path = None
         if self.extension_directory is not None:
-            module_path = os.path.join(
-                self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE
-            )
+            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE)
         self.crossover_func = init_function_by_name(
             _order_crossover_module,
             module_path,
@@ -67,6 +63,7 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         crossover_probability,
         mutation_probability,
         mode,
+        checkpoint_path=None,
     ):
         self._logger.info("Generate Note File")
         text = f"Genome_size: {genome_size}\
@@ -80,6 +77,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             \nCrossover Probability: {crossover_probability}\
             \nMutation Probability: {mutation_probability}\
             \nMode: {mode}"
+        if checkpoint_path:
+            text = text + f"\nContinue from checkpoint {checkpoint_path}"
         with open(os.path.join(self.base_directory, "note.txt"), "w") as file_to_write:
             file_to_write.write(text)
 
@@ -100,12 +99,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             extension_directory,
             visualize,
         )
-        self._logger.info(
-            f"List of available `Order Crossover Methods` functions:{self.AVAILABLE_CROSSOVER_METHODS}"
-        )
-        self._logger.info(
-            f"List of available `Order Mutation Methods` functions:{self.AVAILABLE_MUTATION_METHODS}"
-        )
+        self._logger.info(f"List of available `Order Crossover Methods` functions:{self.AVAILABLE_CROSSOVER_METHODS}")
+        self._logger.info(f"List of available `Order Mutation Methods` functions:{self.AVAILABLE_MUTATION_METHODS}")
         self.individual_class = OrderIndividual
 
     def run(
