@@ -8,6 +8,7 @@ import parent_pruning._pruning.pruning_methods as pruning_methods_module
 import parent_pruning._selection_methods.parent_selection as parent_selection_module
 import parent_pruning._selection_methods.remaining_selection as remaining_selection_module
 import parent_pruning._thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
+from parent_pruning.analyzers.final_population_analyzer import FinalPopulationAnalyzer
 
 from .__validator import validation
 from parent_pruning._base import Base as _Base
@@ -378,11 +379,16 @@ class BaseOptimizer(_Base, _AutomationSystem):
         best_fitness_list,
         pruning_count_list,
         elapsed_time,
+        visualize,
+        analyze,
     ) -> str:
         self._logger.info("Prepare algorithm parameters")
         statistics = replace_with_enum("statistics", statistics, self._logger)
         mode = replace_with_enum("modes", mode, self._logger)
-        visualizer = Visualizer(statistics, statistic_sampling_period, self.result_directory)
+        if visualize:
+            visualizer = Visualizer(statistics, statistic_sampling_period, self.result_directory)
+        if analyze:
+            analyzer= FinalPopulationAnalyzer(self.base_directory, self.show_logs_in_console)
         if pruning_methods_params is not None:
             for pruning_param in pruning_methods_params:
                 if pruning_param is None:
@@ -518,7 +524,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             population,
         )
         self._logger.info("Results have been saved")
-        if self.visualize:
+        if visualize:
             visualizer.plot_diagrams(
                 current_iteration_number,
                 avg_fitness_list,
@@ -528,6 +534,9 @@ class BaseOptimizer(_Base, _AutomationSystem):
                 pruning_methods,
             )
             self._logger.info("Diagrams plotted successfuly")
+        if analyze:
+            analyzer.load_final_population_from_result_directory()
+            analyzer.run_full_analyzer()
         return self.base_directory
 
     def _run(
@@ -551,6 +560,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
         phenotypic_diversity_window_size: int = None,
         phenotypic_diversity_error_thereshold: float = None,
         checkpoint_save_period: int = None,
+        visualize:bool= False,
+        analyze:bool=False,
     ) -> str:
         validation(
             self._logger,
@@ -637,10 +648,12 @@ class BaseOptimizer(_Base, _AutomationSystem):
             var_fitness_list,
             best_fitness_list,
             pruning_count_list,
-            elapsed_time=0,
+            0,
+            visualize,
+            analyze,
         )
 
-    def continue_checkpoint(self, checkpoint_path: str) -> str:
+    def continue_checkpoint(self, checkpoint_path: str, visualize: bool, analyze: bool) -> str:
         if checkpoint_path is None:
             raise InvalidValueError(self._logger, input_message="Checkpoint base directory is none")
         if not os.path.exists(checkpoint_path):
@@ -715,6 +728,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
             best_fitness_list,
             pruning_count_list,
             elapsed_time,
+            visualize,
+            analyze,
         )
 
     def show_available_parent_selection_methods(self, return_instead_of_print=False):

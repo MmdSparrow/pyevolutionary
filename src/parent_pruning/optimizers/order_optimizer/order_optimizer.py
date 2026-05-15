@@ -88,7 +88,6 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         evaluation_function,
         show_logs_in_console: bool = True,
         extension_directory: str = None,
-        visualize: bool = VISUALIZE_DEFAULT_VALUE,
     ):
         AutomationSystemOrder.__init__(self, extension_directory)
         BaseOptimizer.__init__(
@@ -97,7 +96,6 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             evaluation_function,
             show_logs_in_console,
             extension_directory,
-            visualize,
         )
         self._logger.info(f"List of available `Order Crossover Methods` functions:{self.AVAILABLE_CROSSOVER_METHODS}")
         self._logger.info(f"List of available `Order Mutation Methods` functions:{self.AVAILABLE_MUTATION_METHODS}")
@@ -126,6 +124,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         phenotypic_diversity_window_size: int = None,
         phenotypic_diversity_error_thereshold: float = None,
         checkpoint_save_period: int = None,
+        visualize:bool= False,
+        analyze:bool=False,
     ):
         validation(
             self._logger,
@@ -156,6 +156,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             phenotypic_diversity_window_size,
             phenotypic_diversity_error_thereshold,
             checkpoint_save_period,
+            visualize,
+            analyze,
         )
 
     def show_available_crossover_methods(self, return_instead_of_print=False):

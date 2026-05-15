@@ -18,24 +18,22 @@ class FinalPopulationAnalyzer:
         self.analyze_directory = os.path.join(base_directory, ANALYZE_DIRECOTRY_DEFAULT)
         os.makedirs(self.analyze_directory, exist_ok=True)
 
-    def __init_logger(self, show_in_console):
+    def __init_logger(self, show_logs_in_console):
         self._logger = logging.getLogger("analyzer_logger")
         self._logger.setLevel(logging.INFO)
         handler = logging.FileHandler(os.path.join(self.log_directory, "analyze.log"))
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)
-        if show_in_console:
+        if show_logs_in_console:
             console_handler = logging.StreamHandler(sys.stdout)
             console_handler.setFormatter(formatter)
             self._logger.addHandler(console_handler)
 
-    def __init__(self, base_directory:str, chromosome_list:list[IndividualStructure]=None, show_in_console:bool=False):
-        self.chromosome_list = chromosome_list
+    def __init__(self, base_directory:str, show_logs_in_console:bool=False):
         self.base_directory = base_directory
-        self.genome_dict = {}
         self.__create_log_folders(self.base_directory)
-        self.__init_logger(show_in_console)
+        self.__init_logger(show_logs_in_console)
 
     def load_chromosome_list(self, chromosome_list_pkl_path:str):
         with open(chromosome_list_pkl_path, "rb") as file_to_read:
@@ -90,38 +88,58 @@ class FinalPopulationAnalyzer:
         counts= np.array(unique_genome_count)
         probs = counts / counts.sum()
         final_answer=-np.sum(probs * np.log2(probs))
-        self._logger.info("Hamming diversity entropy")
+        self._logger.info("entropy diversity calculated")
         return final_answer
     
     def __gini(self, unique_genome_count):
         counts= np.array(unique_genome_count)
         probs = counts / counts.sum()
         final_answer= 1 - np.sum(probs ** 2)
-        self._logger.info("Hamming diversity gini")
+        self._logger.info("gini diversity calculated")
         return final_answer
     
+    def __convert_genome_list_to_string(self, genome):
+        return ", ".join(map(str, genome))
+    
+    def __convert_string_genome_to_list(self, genome_str):
+        return [int(x) for x in genome_str.split(", ")]
+    
     def genotypic_diversity_equivalence(self):
+        genome_dict={}
         for chromosome in self.chromosome_list:
-            if chromosome.genome in self.genome_dict:
-                self.genome_dict[chromosome.genome] += 1
+            genome_str= self.__convert_genome_list_to_string(chromosome.genome)
+            if genome_str in genome_dict:
+                genome_dict[genome_str] = (genome_dict[genome_str][0]+1, genome_dict[genome_str][1])
             else:
-                self.genome_dict[chromosome.genome] = 1
+                genome_dict[genome_str] = (1, chromosome.fitness)
         
-        unique_genome_list = self.genome_dict.keys()
-        unique_genome_count = self.genome_dict.values()
+        unique_genome_list = [self.__convert_string_genome_to_list(x) for x in genome_dict.keys()]
+        unique_genome_count, unique_genome_fitness = zip(*list(genome_dict.values()))
+        unique_genome_count= list(unique_genome_count)
+        unique_genome_fitness= list(unique_genome_fitness)
+        self._logger.info("Number of unique genoume counted")
+        
+        sorted_list = sorted(zip(unique_genome_list, unique_genome_count, unique_genome_fitness), key=lambda x: x[1])
+
+        unique_genome_list, unique_genome_count, unique_genome_fitness= zip(*sorted_list)
+
+        unique_genome_list = list(unique_genome_list)
+        unique_genome_count = list(unique_genome_count)
+        unique_genome_fitness = list(unique_genome_fitness)
         
         self._logger.info("Number of unique genoume counted")
         
+        with open(os.path.join(self.analyze_directory, "unique_genome.txt"), "a", encoding="utf-8") as file_to_write:
+            for index in range(len(unique_genome_list)):
+                file_to_write.write(f"[{unique_genome_list[index]}] - count: {unique_genome_count[index]}, fitness: {unique_genome_fitness[index]}\n")
+        
         with open(os.path.join(self.analyze_directory, "analyze_result.txt"), "a", encoding="utf-8") as file_to_write:
-            file_to_write.write("##########################")
-            file_to_write.write("Genotypic Diversity")
-            file_to_write.write("##########################")
-            for key, value in self.genome_dict.items():
-                file_to_write.write(f"{key}: {value}\n")
-            file_to_write.write(f"Genotypic Diversity Rate - genome scale: {len(self.genome_dict) / self.chromosome_list}")
-            file_to_write.write(f"Genotypic Diversity Entropy - genome scale: {self.__entropy(unique_genome_count)}")
-            file_to_write.write(f"Genotypic Diversity GINI - genome scale: {self.__gini(unique_genome_count)}")
-            file_to_write.write(f"Genotypic Diversity Hamming (Circular) - gen scale: {self.__hamming(unique_genome_list, unique_genome_count)}")
+            file_to_write.write("########################## Genotypic Diversity ##########################\n")
+            file_to_write.write(f"Genotypic Diversity Rate - genome scale: {len(genome_dict) / len(self.chromosome_list)}\n")
+            file_to_write.write(f"Genotypic Diversity Entropy - genome scale: {self.__entropy(unique_genome_count)}\n")
+            file_to_write.write(f"Genotypic Diversity GINI - genome scale: {self.__gini(unique_genome_count)}\n")
+            file_to_write.write(f"Genotypic Diversity Hamming (Circular) - gen scale: {self.__hamming(unique_genome_list, unique_genome_count)}\n")
+            file_to_write.write("\n")
 
     def __attribute_analyzer(self, attribute_name):
         att_value_list = [getattr(chromosome, attribute_name) for chromosome in self.chromosome_list]
@@ -132,15 +150,14 @@ class FinalPopulationAnalyzer:
         att_value_counts = Counter(att_value_list)
 
         with open(os.path.join(self.analyze_directory, "analyze_result.txt"), "a", encoding="utf-8") as file_to_write:
-            file_to_write.write("##########################")
-            file_to_write.write(f"Analyze {attribute_name.capitalize()}")
-            file_to_write.write("##########################")
-            file_to_write.write(f"Max Value: {att_value_max}")
-            file_to_write.write(f"Min Value: {att_value_min}")
-            file_to_write.write(f"Avg Value: {att_value_avg}")
-            file_to_write.write(f"Count by {attribute_name}:")
+            file_to_write.write(f"########################## Analyze {attribute_name.capitalize()} ##########################\n")
+            file_to_write.write(f"Max Value: {att_value_max}\n")
+            file_to_write.write(f"Min Value: {att_value_min}\n")
+            file_to_write.write(f"Avg Value: {att_value_avg}\n")
+            file_to_write.write(f"Count by {attribute_name}:\n")
             for key, count in sorted(att_value_counts.items()):
-                file_to_write.write(f"{attribute_name}={key}: {count}")
+                file_to_write.write(f"{attribute_name}={key}: {count}\n")
+            file_to_write.write("\n")
 
         # 2) Plot the score distribution (histogram / empirical distribution)
         plt.figure(figsize=(8, 5))
