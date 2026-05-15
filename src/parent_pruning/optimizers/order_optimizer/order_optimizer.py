@@ -13,6 +13,7 @@ from parent_pruning._configs.order_optimizer_config import (
     MUTATION_PROBABILITY_DEFAULT_VALUE,
     TERMINATION_CONDITIONS_DEFAULT_VALUE,
     VISUALIZE_DEFAULT_VALUE,
+    ANALYZE_DEFAULT_VALUE,
 )
 from parent_pruning._configs.directories import (
     EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE,
@@ -128,8 +129,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         phenotypic_diversity_window_size: int = None,
         phenotypic_diversity_error_thereshold: float = None,
         checkpoint_save_period: int = None,
-        visualize:bool= False,
-        analyze:bool=False,
+        visualize: bool = VISUALIZE_DEFAULT_VALUE,
+        analyze: bool = ANALYZE_DEFAULT_VALUE,
     ):
         validation(
             self._logger,

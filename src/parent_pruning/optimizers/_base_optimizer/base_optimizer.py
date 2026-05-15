@@ -30,6 +30,7 @@ from parent_pruning._configs.base_optimizer_config import (
     MODE_DEFAULT_VALUE,
     MUTATION_PROBABILITY_DEFAULT_VALUE,
     VISUALIZE_DEFAULT_VALUE,
+    ANALYZE_DEFAULT_VALUE,
     TERMINATION_CONDITIONS_DEFAULT_VALUE,
     AVAILABLE_MODES,
     AVAILABLE_TERMINATION_CONDITIONS,
@@ -239,12 +240,10 @@ class BaseOptimizer(_Base, _AutomationSystem):
         evaluation_function,
         show_logs_in_console: bool = True,
         extension_directory: str = None,
-        visualize: bool = VISUALIZE_DEFAULT_VALUE,
     ):
         _Base.__init__(self, show_logs_in_console)
         _AutomationSystem.__init__(self, extension_directory)
         self.individual_class = None
-        self.visualize = visualize
 
         self._logger.info(f"List of available `Parent Selection Methods` functions:{self.AVAILABLE_PARENT_SELECTION_METHODS}")
         self._logger.info(f"List of available `Remaining Selection Methods` functions:{self.AVAILABLE_REMAINING_SELECTION_METHODS}")
@@ -384,7 +383,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         if visualize:
             visualizer = Visualizer()
         if analyze:
-            analyzer= FinalPopulationAnalyzer(self.base_directory, self.show_logs_in_console)
+            analyzer = FinalPopulationAnalyzer(self.base_directory, self.show_logs_in_console)
         if pruning_methods_params is not None:
             for pruning_param in pruning_methods_params:
                 if pruning_param is None:
@@ -521,7 +520,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         self._logger.info("Results have been saved")
         if visualize:
             visualizer.plot_diagrams(
-                statistics, 
+                statistics,
                 statistic_sampling_period,
                 current_iteration_number,
                 avg_fitness_list,
@@ -558,8 +557,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
         phenotypic_diversity_window_size: int = None,
         phenotypic_diversity_error_thereshold: float = None,
         checkpoint_save_period: int = None,
-        visualize:bool= False,
-        analyze:bool=False,
+        visualize: bool = VISUALIZE_DEFAULT_VALUE,
+        analyze: bool = ANALYZE_DEFAULT_VALUE,
     ) -> str:
         validation(
             self._logger,
