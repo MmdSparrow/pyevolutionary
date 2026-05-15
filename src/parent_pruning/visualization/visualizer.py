@@ -7,25 +7,25 @@ from parent_pruning._enums import StatisticsEnum
 
 
 class Visualizer:
-    def __init__(self, statistics:list, statistic_sampling_period:int, results_directory:str):
-        # TODO: use bitmap for faster access to memory
-        self.statistics = statistics
-        self.statistic_sampling_period = statistic_sampling_period
-        self.results_directory = results_directory
+    def __init__(self):
+        pass
 
     def plot_diagrams(
         self,
+        statistics: list[str],
+        statistic_sampling_period: int,
         iterations_number: int,
         avg_fitness_list: list[float],
         var_fitness_list: list[float],
         best_fitness_list: list[float],
         pruning_count_list_in_each_iteration: list[list],
         pruning_methods: list[str],
+        results_directory: str,
     ):
-        if self.statistics is None:
+        if statistics is None:
             return
 
-        rows_number = len(self.statistics)
+        rows_number = len(statistics)
         if pruning_methods is not None:
             rows_number = rows_number - 1 + len(pruning_methods)
 
@@ -37,40 +37,40 @@ class Visualizer:
         column_index = 1
         row_index = 1
 
-        if StatisticsEnum.AVG_FITNESS in self.statistics:
+        if StatisticsEnum.AVG_FITNESS in statistics:
             plt.subplot(rows_number, column_index, row_index)
-            plt.plot([self.statistic_sampling_period * i for i in range(int(iterations_number / self.statistic_sampling_period))], avg_fitness_list)
+            plt.plot([statistic_sampling_period * i for i in range(int(iterations_number / statistic_sampling_period))], avg_fitness_list)
             plt.xlabel("iteration")
             plt.ylabel("avg fitness")
             plt.title("avg fitness in each iteration")
 
             row_index += 1
 
-        if StatisticsEnum.VAR_FITNESS in self.statistics:
+        if StatisticsEnum.VAR_FITNESS in statistics:
             plt.subplot(rows_number, column_index, row_index)
-            plt.plot([self.statistic_sampling_period * i for i in range(int(iterations_number / self.statistic_sampling_period))], var_fitness_list)
+            plt.plot([statistic_sampling_period * i for i in range(int(iterations_number / statistic_sampling_period))], var_fitness_list)
             plt.xlabel("iteration")
             plt.ylabel("var fitness")
             plt.title("var fitness in each iteration")
 
             row_index += 1
 
-        if StatisticsEnum.BEST_FITNESS in self.statistics:
+        if StatisticsEnum.BEST_FITNESS in statistics:
             plt.subplot(rows_number, column_index, row_index)
-            plt.plot([self.statistic_sampling_period * i for i in range(int(iterations_number / self.statistic_sampling_period))], best_fitness_list)
+            plt.plot([statistic_sampling_period * i for i in range(int(iterations_number / statistic_sampling_period))], best_fitness_list)
             plt.xlabel("iteration")
             plt.ylabel("best fitness")
             plt.title("best fitness in each iteration")
 
             row_index += 1
 
-        if StatisticsEnum.PRUNINGS in self.statistics:
+        if StatisticsEnum.PRUNINGS in statistics:
             pruning_count_list = np.array(pruning_count_list_in_each_iteration)
             pruning_count_list = pruning_count_list.T
             for pruning_method_index in range(len(pruning_methods)):
                 plt.subplot(rows_number, column_index, row_index)
                 plt.plot(
-                    [self.statistic_sampling_period * i for i in range(int(iterations_number / self.statistic_sampling_period))],
+                    [statistic_sampling_period * i for i in range(int(iterations_number / statistic_sampling_period))],
                     pruning_count_list[pruning_method_index],
                 )
                 plt.xlabel("iteration")
@@ -80,18 +80,24 @@ class Visualizer:
                 row_index += 1
 
         plt.tight_layout()
-        plt.savefig(os.path.join(self.results_directory, "diagrams.png"))
+        plt.savefig(os.path.join(results_directory, "diagrams.png"))
         plt.close()
 
-    def plot_results_diagrams(self, output_base_directory:str):
-        self.results_directory = os.path.join(output_base_directory, "results")
-        with open(os.path.join(self.results_directory, "results.pkl"), "rb") as file_to_read:
-            avg_fitness_list, var_fitness_list, best_fitness_list, pruning_count_list, pruning_methods = pickle.load(file_to_read)
-            self.statistics = pickle.load(file_to_read)
-            self.statistic_sampling_period = pickle.load(file_to_read)
+    def plot_results_diagrams(self, result_pkl_file_path: str, result_direcotry: str):
+        with open(os.path.join(result_pkl_file_path), "rb") as file_to_read:
+            avg_fitness_list, var_fitness_list, best_fitness_list, pruning_count_list = pickle.load(file_to_read)
+            statistics = pickle.load(file_to_read)
+            statistic_sampling_period = pickle.load(file_to_read)
+            pruning_methods = pickle.load(file_to_read)
             current_iteration_number = pickle.load(file_to_read)
-            self.plot_diagrams(current_iteration_number, avg_fitness_list, var_fitness_list, best_fitness_list, pruning_count_list, pruning_methods)
-
-    # def visualize_checkpoint(self):
-        # TODO
-        # pass
+            self.plot_diagrams(
+                statistics,
+                statistic_sampling_period,
+                current_iteration_number,
+                avg_fitness_list,
+                var_fitness_list,
+                best_fitness_list,
+                pruning_count_list,
+                pruning_methods,
+                result_direcotry,
+            )

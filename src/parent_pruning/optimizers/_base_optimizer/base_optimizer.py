@@ -8,11 +8,11 @@ import parent_pruning._pruning.pruning_methods as pruning_methods_module
 import parent_pruning._selection_methods.parent_selection as parent_selection_module
 import parent_pruning._selection_methods.remaining_selection as remaining_selection_module
 import parent_pruning._thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
-from parent_pruning.analyzers.final_population_analyzer import FinalPopulationAnalyzer
 
 from .__validator import validation
 from parent_pruning._base import Base as _Base
 from parent_pruning.visualization import Visualizer
+from parent_pruning.analyzers import FinalPopulationAnalyzer
 from .._utils import init_function_by_name, replace_with_enum
 from parent_pruning._termination_condition import TerminationCondition
 from parent_pruning.individuals._individual_structure import IndividualStructure
@@ -53,7 +53,6 @@ class BaseOptimizer(_Base, _AutomationSystem):
         module_path = None
         if self.extension_directory is not None:
             module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE)
-        # self.parent_selection_func = init_function_by_name(
         return init_function_by_name(
             parent_selection_module,
             module_path,
@@ -71,7 +70,6 @@ class BaseOptimizer(_Base, _AutomationSystem):
         module_path = None
         if self.extension_directory is not None:
             module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE)
-        # self.remaining_selection_func = init_function_by_name(
         return init_function_by_name(
             remaining_selection_module,
             module_path,
@@ -333,7 +331,6 @@ class BaseOptimizer(_Base, _AutomationSystem):
         statistics,
         statistic_sampling_period,
         pruning_methods,
-        pruning_methods_params,
         current_iteration_number,
         final_population,
     ):
@@ -345,7 +342,6 @@ class BaseOptimizer(_Base, _AutomationSystem):
             pickle.dump(statistics, file_to_write)
             pickle.dump(statistic_sampling_period, file_to_write)
             pickle.dump(pruning_methods, file_to_write)
-            pickle.dump(pruning_methods_params, file_to_write)
             pickle.dump(current_iteration_number, file_to_write)
 
         with open(os.path.join(self.result_directory, "final_population.pkl"), "wb") as file_to_write:
@@ -386,7 +382,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         statistics = replace_with_enum("statistics", statistics, self._logger)
         mode = replace_with_enum("modes", mode, self._logger)
         if visualize:
-            visualizer = Visualizer(statistics, statistic_sampling_period, self.result_directory)
+            visualizer = Visualizer()
         if analyze:
             analyzer= FinalPopulationAnalyzer(self.base_directory, self.show_logs_in_console)
         if pruning_methods_params is not None:
@@ -519,19 +515,21 @@ class BaseOptimizer(_Base, _AutomationSystem):
             statistics,
             statistic_sampling_period,
             pruning_methods,
-            pruning_methods_params,
             current_iteration_number,
             population,
         )
         self._logger.info("Results have been saved")
         if visualize:
             visualizer.plot_diagrams(
+                statistics, 
+                statistic_sampling_period,
                 current_iteration_number,
                 avg_fitness_list,
                 var_fitness_list,
                 best_fitness_list,
                 pruning_count_list,
                 pruning_methods,
+                self.result_directory,
             )
             self._logger.info("Diagrams plotted successfuly")
         if analyze:
@@ -568,7 +566,6 @@ class BaseOptimizer(_Base, _AutomationSystem):
             self.AVAILABLE_PARENT_SELECTION_METHODS,
             self.AVAILABLE_REMAINING_SELECTION_METHODS,
             self.AVAILABLE_PRUNING_METHODS,
-            #########################
             genome_size,
             population_size,
             generation_size,
@@ -600,6 +597,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
             crossover_probability,
             mutation_probability,
             mode,
+            pruning_methods,
+            pruning_methods_params,
         )
         self._logger.info("Run algorithm from scratch")
         best_chromosome = self.__create_individual(genome_size)
@@ -699,6 +698,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
             crossover_probability,
             mutation_probability,
             mode,
+            pruning_methods,
+            pruning_methods_params,
             checkpoint_path,
         )
         return self.__algorithm(

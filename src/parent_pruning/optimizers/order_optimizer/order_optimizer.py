@@ -63,6 +63,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         crossover_probability,
         mutation_probability,
         mode,
+        pruning_methods,
+        pruning_methods_params,
         checkpoint_path=None,
     ):
         self._logger.info("Generate Note File")
@@ -76,7 +78,9 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
             \nTermination Conditions: {termination_conditions}\
             \nCrossover Probability: {crossover_probability}\
             \nMutation Probability: {mutation_probability}\
-            \nMode: {mode}"
+            \nMode: {mode}\
+            \nPruning Methods: {pruning_methods}\
+            \nPruning Methods Params: {pruning_methods_params}"
         if checkpoint_path:
             text = text + f"\nContinue from checkpoint {checkpoint_path}"
         with open(os.path.join(self.base_directory, "note.txt"), "w") as file_to_write:
