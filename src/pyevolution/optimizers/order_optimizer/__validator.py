@@ -1,4 +1,4 @@
-from parent_pruning._utils.custom_exceptions import InvalidValueError
+from pyevolution._utils.custom_exceptions import InvalidValueError
 
 
 def validation(

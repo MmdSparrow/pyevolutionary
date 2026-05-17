@@ -1,8 +1,8 @@
 import os
 import importlib.util
 
-from parent_pruning._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
-from parent_pruning._utils.custom_exceptions import ImplementationError, FunctionNotSupportedError, InvalidValueError
+from pyevolution._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
+from pyevolution._utils.custom_exceptions import ImplementationError, FunctionNotSupportedError, InvalidValueError
 
 
 def __get_module_by_name(module_path):

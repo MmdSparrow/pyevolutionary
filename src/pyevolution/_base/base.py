@@ -3,7 +3,7 @@ import sys
 import logging
 
 from datetime import datetime
-from parent_pruning._configs.directories import RESULT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, CHECKPOINT_DIRECTORY_DEFAULT
+from pyevolution._configs.directories import RESULT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, CHECKPOINT_DIRECTORY_DEFAULT
 
 
 class Base:

@@ -1,13 +1,13 @@
 import os
-import parent_pruning._mutation.order_mutation_methods as _order_mutation_module
-import parent_pruning._crossover.order_crossover_methods as _order_crossover_module
+import pyevolution._mutation.order_mutation_methods as _order_mutation_module
+import pyevolution._crossover.order_crossover_methods as _order_crossover_module
 
 from .__validator import validation
-from parent_pruning.individuals import OrderIndividual
-from parent_pruning.optimizers._utils import init_function_by_name
-from parent_pruning._automation_system import AutomationSystemOrder
-from parent_pruning.optimizers._base_optimizer.base_optimizer import BaseOptimizer
-from parent_pruning._configs.order_optimizer_config import (
+from pyevolution.individuals import OrderIndividual
+from pyevolution.optimizers._utils import init_function_by_name
+from pyevolution._automation_system import AutomationSystemOrder
+from pyevolution.optimizers._base_optimizer.base_optimizer import BaseOptimizer
+from pyevolution._configs.order_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
     MUTATION_PROBABILITY_DEFAULT_VALUE,
@@ -15,11 +15,11 @@ from parent_pruning._configs.order_optimizer_config import (
     VISUALIZE_DEFAULT_VALUE,
     ANALYZE_DEFAULT_VALUE,
 )
-from parent_pruning._configs.directories import (
+from pyevolution._configs.directories import (
     EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE,
     EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE,
 )
-from parent_pruning._configs.base_optimizer_config import (
+from pyevolution._configs.base_optimizer_config import (
     AVAILABLE_MODES,
     AVAILABLE_TERMINATION_CONDITIONS,
     AVAILABLE_STATISTICS,

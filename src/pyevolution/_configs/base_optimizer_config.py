@@ -1,4 +1,4 @@
-from parent_pruning._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
+from pyevolution._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
 
 
 AVAILABLE_MODES = [ModesEnum.AGGREGGATE.value, ModesEnum.FORGETFUL.value]

@@ -1,6 +1,6 @@
 import random
 
-from parent_pruning.individuals import OrderIndividual
+from pyevolution.individuals import OrderIndividual
 
 
 def __OX(parent1, parent2, start, end, size):

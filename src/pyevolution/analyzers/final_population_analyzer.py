@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from collections import Counter
-from parent_pruning._configs.directories import LOG_DIRECTORY_DEFAULT, ANALYZE_DIRECOTRY_DEFAULT
+from pyevolution._configs.directories import LOG_DIRECTORY_DEFAULT, ANALYZE_DIRECOTRY_DEFAULT
 
 
 class FinalPopulationAnalyzer:

@@ -1,6 +1,6 @@
-from parent_pruning._validations import is_presented, is_bigger, is_probability
-from parent_pruning._utils.custom_exceptions import InvalidValueError, FunctionNotSupportedError, ValueCantBeNoneError, ValueConflictError
-from parent_pruning._configs.base_optimizer_config import (
+from pyevolution._validations import is_presented, is_bigger, is_probability
+from pyevolution._utils.custom_exceptions import InvalidValueError, FunctionNotSupportedError, ValueCantBeNoneError, ValueConflictError
+from pyevolution._configs.base_optimizer_config import (
     AVAILABLE_MODES,
     AVAILABLE_TERMINATION_CONDITIONS,
     AVAILABLE_STATISTICS,

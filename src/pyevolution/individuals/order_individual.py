@@ -2,8 +2,8 @@ import copy
 import random
 import logging
 
-from parent_pruning.individuals._individual_structure import IndividualStructure
-from parent_pruning._utils.custom_exceptions.value_conflict_error import ValueConflictError
+from pyevolution.individuals._individual_structure import IndividualStructure
+from pyevolution._utils.custom_exceptions.value_conflict_error import ValueConflictError
 
 
 class OrderIndividual(IndividualStructure):

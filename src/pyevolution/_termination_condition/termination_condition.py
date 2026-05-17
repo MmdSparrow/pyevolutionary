@@ -1,4 +1,4 @@
-from parent_pruning._enums import TerminationConditionsEnum
+from pyevolution._enums import TerminationConditionsEnum
 
 
 class TerminationCondition:

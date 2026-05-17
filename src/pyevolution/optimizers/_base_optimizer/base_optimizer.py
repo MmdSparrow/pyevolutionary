@@ -4,28 +4,28 @@ import json
 import copy
 import pickle
 import random
-import parent_pruning._pruning.pruning_methods as pruning_methods_module
-import parent_pruning._selection_methods.parent_selection as parent_selection_module
-import parent_pruning._selection_methods.remaining_selection as remaining_selection_module
-import parent_pruning._thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
+import pyevolution._pruning.pruning_methods as pruning_methods_module
+import pyevolution._selection_methods.parent_selection as parent_selection_module
+import pyevolution._selection_methods.remaining_selection as remaining_selection_module
+import pyevolution._thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
 
 from .__validator import validation
-from parent_pruning._base import Base as _Base
-from parent_pruning.visualization import Visualizer
-from parent_pruning.analyzers import FinalPopulationAnalyzer
+from pyevolution._base import Base as _Base
+from pyevolution.visualization import Visualizer
+from pyevolution.analyzers import FinalPopulationAnalyzer
 from .._utils import init_function_by_name, replace_with_enum
-from parent_pruning._termination_condition import TerminationCondition
-from parent_pruning.individuals._individual_structure import IndividualStructure
-from parent_pruning._automation_system import AutomationSystem as _AutomationSystem
-from parent_pruning._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
-from parent_pruning._utils.custom_exceptions import FileNotExistError, InvalidValueError
+from pyevolution._termination_condition import TerminationCondition
+from pyevolution.individuals._individual_structure import IndividualStructure
+from pyevolution._automation_system import AutomationSystem as _AutomationSystem
+from pyevolution._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
+from pyevolution._utils.custom_exceptions import FileNotExistError, InvalidValueError
 from .__utils import (
     compute_avg_fitness,
     compute_var_fitness_with_avg,
     copy_parent_to_child,
     increase_age_of_all_population,
 )
-from parent_pruning._configs.base_optimizer_config import (
+from pyevolution._configs.base_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
     MUTATION_PROBABILITY_DEFAULT_VALUE,
@@ -36,7 +36,7 @@ from parent_pruning._configs.base_optimizer_config import (
     AVAILABLE_TERMINATION_CONDITIONS,
     AVAILABLE_STATISTICS,
 )
-from parent_pruning._configs.directories import (
+from pyevolution._configs.directories import (
     EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE,
     EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE,
     EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE,

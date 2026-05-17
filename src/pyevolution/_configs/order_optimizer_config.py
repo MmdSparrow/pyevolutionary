@@ -1,4 +1,4 @@
-from parent_pruning._enums import ModesEnum, TerminationConditionsEnum
+from pyevolution._enums import ModesEnum, TerminationConditionsEnum
 
 
 TERMINATION_CONDITIONS_DEFAULT_VALUE = [TerminationConditionsEnum.ITERATION_NUMBER.value]
