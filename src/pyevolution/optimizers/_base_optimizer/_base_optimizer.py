@@ -434,7 +434,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
                         )
 
             avg_fitness = None
-            if TerminationConditionsEnum.PHENOTYPIC_DIVERSITY in termination_condition_handler.termination_conditions:
+            if TerminationConditionsEnum.PHENOTYPIC_DIVERSITY in termination_conditions:
                 avg_fitness = compute_avg_fitness(population)
 
             if current_iteration_number % statistic_sampling_period == 0:

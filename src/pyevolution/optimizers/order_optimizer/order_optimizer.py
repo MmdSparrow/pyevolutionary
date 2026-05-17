@@ -5,8 +5,8 @@ import pyevolution._crossover.order_crossover_methods as _order_crossover_module
 from .__validator import validation
 from pyevolution.individuals import OrderIndividual
 from pyevolution.optimizers._utils import init_function_by_name
-from pyevolution._automation_system import AutomationSystemOrder
-from pyevolution.optimizers._base_optimizer.base_optimizer import BaseOptimizer
+from pyevolution._automation_system import AutomationSystemOrder as _AutomationSystemOrder
+from pyevolution.optimizers._base_optimizer._base_optimizer import BaseOptimizer as _BaseOptimizer
 from pyevolution._configs.order_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
@@ -26,7 +26,7 @@ from pyevolution._configs.base_optimizer_config import (
 )
 
 
-class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
+class OrderOptimizer(_AutomationSystemOrder, _BaseOptimizer):
     def _mutation_func_determiner(self, mutation_method):
         module_path = None
         if self.extension_directory is not None:
@@ -94,8 +94,8 @@ class OrderOptimizer(AutomationSystemOrder, BaseOptimizer):
         show_logs_in_console: bool = True,
         extension_directory: str = None,
     ):
-        AutomationSystemOrder.__init__(self, extension_directory)
-        BaseOptimizer.__init__(
+        _AutomationSystemOrder.__init__(self, extension_directory)
+        _BaseOptimizer.__init__(
             self,
             input_data,
             evaluation_function,

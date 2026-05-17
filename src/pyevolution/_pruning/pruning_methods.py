@@ -1,4 +1,3 @@
-# TODO: do_replace option
 def age_pruning(choromosome_list, current_iteration_number, age_thereshold, scheduler_func=None, scheduler_start=None, scheduler_end=None):
     prune_count = 0
     new_age_thereshold = age_thereshold
@@ -21,7 +20,3 @@ def score_pruning(choromosome_list, current_iteration_number, score_thereshold, 
             prune_count += 1
             choromosome_list.pop(chromosome_index)
     return prune_count
-
-
-# def avg_pruning(choromosome_list, avg_fitness, current_iteration_number=None, scheduler_method=None, scheduler_start=None, scheduler_end=None):
-#     pass
