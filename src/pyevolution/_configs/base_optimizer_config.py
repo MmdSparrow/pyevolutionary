@@ -1,10 +1,20 @@
 from pyevolution._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
 
 
+__all__ = [
+    "AVAILABLE_MODES",
+    "AVAILABLE_TERMINATION_CONDITIONS",
+    "AVAILABLE_STATISTICS",
+    "TERMINATION_CONDITIONS_DEFAULT_VALUE",
+    "CROSSOVER_PROBABILITY_DEFAULT_VALUE",
+    "MUTATION_PROBABILITY_DEFAULT_VALUE",
+    "MODE_DEFAULT_VALUE",
+    "VISUALIZE_DEFAULT_VALUE",
+    "ANALYZE_DEFAULT_VALUE",
+]
 AVAILABLE_MODES = [ModesEnum.AGGREGGATE.value, ModesEnum.FORGETFUL.value]
 AVAILABLE_TERMINATION_CONDITIONS = [
     TerminationConditionsEnum.PHENOTYPIC_DIVERSITY.value,
-    # TerminationConditionsEnum.GENOTYPIC_DIVERSITY.value,
     TerminationConditionsEnum.FITNESS_LIMIT.value,
     TerminationConditionsEnum.ITERATION_NUMBER.value,
     TerminationConditionsEnum.EVALUATION_NUMBER.value,

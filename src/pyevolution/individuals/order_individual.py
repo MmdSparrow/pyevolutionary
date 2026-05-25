@@ -5,6 +5,8 @@ import logging
 from pyevolution.individuals._individual_structure import IndividualStructure
 from pyevolution._utils.custom_exceptions.value_conflict_error import ValueConflictError
 
+__all__ = ["OrderIndividual"]
+
 
 class OrderIndividual(IndividualStructure):
     def __generate_uniform_random_permutation(self, genome_size):
@@ -12,11 +14,11 @@ class OrderIndividual(IndividualStructure):
         random.shuffle(sequence)
         return sequence
 
-    def __init__(self, genome_size: int, input_genome:list=None, init_with_random_genome:bool=True, logger:logging.Logger=None):
+    def __init__(self, genome_size: int, input_genome: list = None, init_with_random_genome: bool = True, logger: logging.Logger = None):
         super().__init__()
 
         if input_genome is not None and init_with_random_genome:
-            raise ValueConflictError(logger, input_message= "Both `input_genome` and `init_with_random_genome` can't be apply at the same time")
+            raise ValueConflictError(logger, input_message="Both `input_genome` and `init_with_random_genome` can't be apply at the same time")
 
         if input_genome is not None:
             self.genome = copy.copy(input_genome)

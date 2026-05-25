@@ -5,10 +5,12 @@ import matplotlib.pyplot as plt
 
 from pyevolution._enums import StatisticsEnum
 
+__all__ = ["Visualizer"]
+
 
 class Visualizer:
     def __init__(self):
-        pass
+        super().__init__()
 
     def plot_diagrams(
         self,

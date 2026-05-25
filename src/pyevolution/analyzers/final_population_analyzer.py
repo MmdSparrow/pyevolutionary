@@ -33,6 +33,7 @@ class FinalPopulationAnalyzer:
         self.base_directory = base_directory
         self.__create_log_folders(self.base_directory)
         self.__init_logger(show_logs_in_console)
+        super().__init__()
 
     def load_chromosome_list(self, chromosome_list_pkl_path:str):
         with open(chromosome_list_pkl_path, "rb") as file_to_read:

@@ -13,5 +13,5 @@ __all__ = [
     "ImplementationError",
     "ValueConflictError",
     "ValueCantBeNoneError",
-    "FileNotExistError"
+    "FileNotExistError",
 ]

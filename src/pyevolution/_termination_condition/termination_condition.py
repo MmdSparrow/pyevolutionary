@@ -1,5 +1,7 @@
 from pyevolution._enums import TerminationConditionsEnum
 
+__all__ = ["TerminationCondition"]
+
 
 class TerminationCondition:
     def __init__(
@@ -19,6 +21,7 @@ class TerminationCondition:
         self.__fitness_limit_threshold = fitness_limit_threshold
         self.__iterations_number_threshold = iterations_number_threshold
         self.__evaluation_number_threshold = evaluation_number_threshold
+        super().__init__()
 
     def check_termination(self, avg_fitness, best_fitness, current_iteration_number, generation_size, population_size):
         done = False

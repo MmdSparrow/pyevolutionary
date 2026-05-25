@@ -1,5 +1,7 @@
 from enum import Enum
 
+__all__ = ["TerminationConditionsEnum"]
+
 
 class TerminationConditionsEnum(Enum):
     PHENOTYPIC_DIVERSITY = "phenotypic diversity"

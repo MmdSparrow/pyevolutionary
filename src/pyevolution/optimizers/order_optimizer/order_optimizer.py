@@ -25,8 +25,10 @@ from pyevolution._configs.base_optimizer_config import (
     AVAILABLE_STATISTICS,
 )
 
+__all__ = ["OrderOptimizer"]
 
-class OrderOptimizer(_AutomationSystemOrder, _BaseOptimizer):
+
+class OrderOptimizer(_BaseOptimizer, _AutomationSystemOrder):
     def _mutation_func_determiner(self, mutation_method):
         module_path = None
         if self.extension_directory is not None:
@@ -89,19 +91,22 @@ class OrderOptimizer(_AutomationSystemOrder, _BaseOptimizer):
 
     def __init__(
         self,
-        input_data,
         evaluation_function,
         show_logs_in_console: bool = True,
         extension_directory: str = None,
     ):
-        _AutomationSystemOrder.__init__(self, extension_directory)
-        _BaseOptimizer.__init__(
-            self,
-            input_data,
-            evaluation_function,
-            show_logs_in_console,
-            extension_directory,
+        super().__init__(
+            evaluation_function=evaluation_function,
+            show_logs_in_console=show_logs_in_console,
+            extension_directory=extension_directory,
         )
+        # _AutomationSystemOrder.__init__(self, extension_directory)
+        # _BaseOptimizer.__init__(
+        #     self,
+        #     evaluation_function,
+        #     show_logs_in_console,
+        #     extension_directory,
+        # )
         self._logger.info(f"List of available `Order Crossover Methods` functions:{self.AVAILABLE_CROSSOVER_METHODS}")
         self._logger.info(f"List of available `Order Mutation Methods` functions:{self.AVAILABLE_MUTATION_METHODS}")
         self.individual_class = OrderIndividual

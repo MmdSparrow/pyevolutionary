@@ -5,6 +5,8 @@ import logging
 from datetime import datetime
 from pyevolution._configs.directories import RESULT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, CHECKPOINT_DIRECTORY_DEFAULT
 
+__all__ = ["Base"]
+
 
 class Base:
     def __create_folders(self):
@@ -32,7 +34,8 @@ class Base:
             console_handler.setFormatter(formatter)
             self._logger.addHandler(console_handler)
 
-    def __init__(self, show_logs_in_console):
+    def __init__(self, show_logs_in_console, **kwargs):
         self.__create_folders()
-        self.show_logs_in_console= show_logs_in_console
+        self.show_logs_in_console = show_logs_in_console
         self.__init_logger()
+        super().__init__(**kwargs)

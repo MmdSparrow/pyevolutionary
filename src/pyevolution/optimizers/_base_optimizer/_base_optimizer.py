@@ -43,6 +43,7 @@ from pyevolution._configs.directories import (
     EXTENSION_DIRECTORY_SCHEDULER_METHODS_MODULE,
 )
 
+__all__=["BaseOptimizer"]
 
 class BaseOptimizer(_Base, _AutomationSystem):
     def __parent_selection_fucn_determiner(self, parent_selection_type):
@@ -236,20 +237,20 @@ class BaseOptimizer(_Base, _AutomationSystem):
 
     def __init__(
         self,
-        input_data,
         evaluation_function,
         show_logs_in_console: bool = True,
         extension_directory: str = None,
     ):
-        _Base.__init__(self, show_logs_in_console)
-        _AutomationSystem.__init__(self, extension_directory)
+        super().__init__(
+            show_logs_in_console= show_logs_in_console,
+            extension_directory=extension_directory,
+        )
         self.individual_class = None
 
         self._logger.info(f"List of available `Parent Selection Methods` functions:{self.AVAILABLE_PARENT_SELECTION_METHODS}")
         self._logger.info(f"List of available `Remaining Selection Methods` functions:{self.AVAILABLE_REMAINING_SELECTION_METHODS}")
         self._logger.info(f"List of available `Pruning Methods` functions: {self.AVAILABLE_PRUNING_METHODS}")
 
-        self.input_data = input_data
         self.evaluation_func = evaluation_function
 
     def __create_individual(self, genome_size):
@@ -260,7 +261,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
 
     def __evaluationAll(self, population: list[IndividualStructure]) -> None:
         for choromosome in population:
-            self.evaluation_func(choromosome, self.input_data)
+            self.evaluation_func(choromosome)
 
     def __parent_selection(self, parent_selection_func, q_tornument_param, population):
         if q_tornument_param is None:
@@ -306,8 +307,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
                 self.mutation_func(child1)
             if random.random() < mutation_probability:
                 self.mutation_func(child2)
-            self.evaluation_func(child1, self.input_data)
-            self.evaluation_func(child2, self.input_data)
+            self.evaluation_func(child1)
+            self.evaluation_func(child2)
             if child1.fitness <= parent1.fitness and child2.fitness <= parent1.fitness:
                 parent1.decrease_parent_score()
             else:
@@ -601,7 +602,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         )
         self._logger.info("Run algorithm from scratch")
         best_chromosome = self.__create_individual(genome_size)
-        self.evaluation_func(best_chromosome, self.input_data)
+        self.evaluation_func(best_chromosome)
         population = self.__create_population(genome_size, population_size)
         self.__evaluationAll(population)
 
@@ -782,3 +783,6 @@ class BaseOptimizer(_Base, _AutomationSystem):
         print("Available Modes:")
         print(AVAILABLE_MODES)
         print()
+
+
+del _Base, _AutomationSystem

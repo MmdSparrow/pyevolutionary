@@ -2,7 +2,7 @@ import os
 import importlib.util
 
 
-def get_non_private_functions_in_module(module, add_prefix=''):
+def get_non_private_functions_in_module(module, add_prefix=""):
     functions_list = []
     for name in dir(module):
         if not (name.startswith("__") or name.endswith("__")):
@@ -12,7 +12,7 @@ def get_non_private_functions_in_module(module, add_prefix=''):
     return functions_list
 
 
-def get_non_private_functions_from_module_path(module_path, add_prefix=''):
+def get_non_private_functions_from_module_path(module_path, add_prefix=""):
     if not os.path.isfile(module_path):
         raise FileNotFoundError(f"No such file: {module_path}")
 
