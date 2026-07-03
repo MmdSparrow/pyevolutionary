@@ -85,8 +85,8 @@ class Visualizer:
         plt.savefig(os.path.join(results_directory, "diagrams.png"))
         plt.close()
 
-    def plot_results_diagrams(self, result_pkl_file_path: str, result_direcotry: str):
-        with open(os.path.join(result_pkl_file_path), "rb") as file_to_read:
+    def plot_results_diagrams(self, output_directory: str):
+        with open(os.path.join(output_directory, 'results', 'results.pkl'), "rb") as file_to_read:
             avg_fitness_list, var_fitness_list, best_fitness_list, pruning_count_list = pickle.load(file_to_read)
             statistics = pickle.load(file_to_read)
             statistic_sampling_period = pickle.load(file_to_read)
@@ -101,5 +101,5 @@ class Visualizer:
                 best_fitness_list,
                 pruning_count_list,
                 pruning_methods,
-                result_direcotry,
+                os.path.join(output_directory, 'results'),
             )

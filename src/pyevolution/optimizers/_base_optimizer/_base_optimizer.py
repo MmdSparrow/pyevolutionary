@@ -652,7 +652,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             analyze,
         )
 
-    def continue_checkpoint(self, checkpoint_path: str, visualize: bool, analyze: bool) -> str:
+    def continue_checkpoint(self, checkpoint_path: str, visualize: bool= False, analyze: bool= False) -> str:
         if checkpoint_path is None:
             raise InvalidValueError(self._logger, input_message="Checkpoint base directory is none")
         if not os.path.exists(checkpoint_path):

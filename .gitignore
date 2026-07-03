@@ -1,7 +1,6 @@
+.env/
 build/
-test.ipynb
-test.py
-temp.py
-temp.ipynb
-test/
+pyevolution.egg-info/
 outputs/
+test/
+test.py

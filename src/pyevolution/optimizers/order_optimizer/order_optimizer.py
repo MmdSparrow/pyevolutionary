@@ -136,7 +136,7 @@ class OrderOptimizer(_BaseOptimizer, _AutomationSystemOrder):
         checkpoint_save_period: int = None,
         visualize: bool = VISUALIZE_DEFAULT_VALUE,
         analyze: bool = ANALYZE_DEFAULT_VALUE,
-    ):
+    )-> str:
         validation(
             self._logger,
             self.AVAILABLE_CROSSOVER_METHODS,
@@ -146,7 +146,7 @@ class OrderOptimizer(_BaseOptimizer, _AutomationSystemOrder):
         )
         self.crossover_method = crossover_method
         self.mutation_method = mutation_method
-        self._run(
+        return self._run(
             genome_size,
             population_size,
             generation_size,
