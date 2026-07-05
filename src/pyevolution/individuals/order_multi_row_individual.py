@@ -26,7 +26,9 @@ class OrderMultiRowIndividual(IndividualStructure):
 
         if input_genome is not None and init_with_random_genome:
             raise ValueConflictError(logger, input_message="Both `input_genome` and `init_with_random_genome` can't be apply at the same time")
-
+        if init_with_random_genome and genome_length is None:
+            raise ValueError(logger, input_message="For initializing genome is need to pass valid genome_length")
+        
         if input_genome is not None:
             self.genome = copy.copy(input_genome)
             return
