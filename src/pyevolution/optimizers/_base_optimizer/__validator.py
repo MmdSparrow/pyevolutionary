@@ -9,14 +9,18 @@ from pyevolution._configs.base_optimizer_config import (
 
 def validation(
     logger,
+    AVAILABLE_CROSSOVER_METHODS,
+    AVAILABLE_MUTATION_METHODS,
     AVAILABLE_PARENT_SELECTION_METHODS,
     AVAILABLE_REMAINING_SELECTION_METHODS,
     AVAILABLE_PRUNING_METHODS,
-    genome_size,
+    genome_length,
     population_size,
     generation_size,
     parent_selection_method,
     remaining_selection_method,
+    crossover_method,
+    mutation_method,
     termination_conditions,
     crossover_probability,
     mutation_probability,
@@ -30,9 +34,9 @@ def validation(
     phenotypic_diversity_error_thereshold,
     checkpoint_save_period,
 ):
-    if not is_presented(genome_size):
+    if not is_presented(genome_length):
         raise ValueCantBeNoneError(logger, input_message="genome size")
-    if not is_bigger(genome_size, 1, is_required=True):
+    if not is_bigger(genome_length, 1, is_required=True):
         raise InvalidValueError(logger, input_message="genome size must be bigger than 1")
     if not is_presented(population_size):
         raise ValueCantBeNoneError(logger, input_message="genome size")
@@ -42,6 +46,10 @@ def validation(
         raise ValueCantBeNoneError(logger, input_message="generation size")
     if not is_bigger(generation_size, 0, is_required=True):
         raise InvalidValueError(logger, input_message="generation size must be bigger than 0")
+    if crossover_method not in AVAILABLE_CROSSOVER_METHODS:
+        raise InvalidValueError(logger, crossover_method, "crossover method", AVAILABLE_CROSSOVER_METHODS)
+    if mutation_method not in AVAILABLE_MUTATION_METHODS:
+        raise InvalidValueError(logger, mutation_method, "mutation method", AVAILABLE_MUTATION_METHODS)
     if parent_selection_method.split("#")[0] not in AVAILABLE_PARENT_SELECTION_METHODS:
         raise FunctionNotSupportedError(logger, parent_selection_method, "parent selection")
     if remaining_selection_method.split("#")[0] not in AVAILABLE_REMAINING_SELECTION_METHODS:

@@ -2,17 +2,17 @@ import random
 
 
 def gene_swap(chromosome):
-    genome_size = len(chromosome.genome)
-    point1 = random.randint(0, genome_size - 1)
-    point2 = random.randint(0, genome_size - 1)
+    genome_length = len(chromosome.genome)
+    point1 = random.randint(0, genome_length - 1)
+    point2 = random.randint(0, genome_length - 1)
     chromosome.genome[point1], chromosome.genome[point2] = chromosome.genome[point2], chromosome.genome[point1]
 
 
 def genome_subsequence_swap(chromosome):
-    genome_size = len(chromosome.genome)
-    subsequence_size = random.randint(2, int(genome_size / 2))
-    first_subsequence_start = random.randint(0, genome_size - 2 * subsequence_size)
-    second_subsequence_start = random.randint(first_subsequence_start + subsequence_size + 1, genome_size)
+    genome_length = len(chromosome.genome)
+    subsequence_size = random.randint(2, int(genome_length / 2))
+    first_subsequence_start = random.randint(0, genome_length - 2 * subsequence_size)
+    second_subsequence_start = random.randint(first_subsequence_start + subsequence_size + 1, genome_length)
     genome = __swap_subsequences(
         chromosome.genome,
         first_subsequence_start,

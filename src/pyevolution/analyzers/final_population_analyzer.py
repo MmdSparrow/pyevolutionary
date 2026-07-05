@@ -88,14 +88,14 @@ class FinalPopulationAnalyzer:
         counts= np.array(unique_genome_count)
         probs = counts / counts.sum()
         final_answer=-np.sum(probs * np.log2(probs))
-        self._logger.info("entropy diversity calculated")
+        self._logger.info("Entropy diversity calculated")
         return final_answer
     
     def __gini(self, unique_genome_count):
         counts= np.array(unique_genome_count)
         probs = counts / counts.sum()
         final_answer= 1 - np.sum(probs ** 2)
-        self._logger.info("gini diversity calculated")
+        self._logger.info("GINI diversity calculated")
         return final_answer
     
     def __convert_genome_list_to_string(self, genome):

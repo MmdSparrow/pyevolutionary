@@ -11,19 +11,23 @@ from pyevolution._configs.directories import (
     EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE,
     EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE,
     EXTENSION_DIRECTORY_SCHEDULER_METHODS_MODULE,
+    EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE,
+    EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE,
 )
 
 __all__ = ["AutomationSystem"]
 
 
 class AutomationSystem:
-    def __init__(self, extension_directory=None, **kwargs):
+    def __init__(self, crossover_module, mutation_module, extension_directory=None, **kwargs):
         self.extension_directory = extension_directory
         if extension_directory is None:
             self.AVAILABLE_SCHEDULER_METHODS: Final[List[str]] = get_non_private_functions_in_module(thereshold_scheduler_module)
             self.AVAILABLE_PARENT_SELECTION_METHODS: Final[List[str]] = get_non_private_functions_in_module(parent_selection_module)
             self.AVAILABLE_REMAINING_SELECTION_METHODS: Final[List[str]] = get_non_private_functions_in_module(remaining_selection_module)
             self.AVAILABLE_PRUNING_METHODS: Final[List[str]] = get_non_private_functions_in_module(pruning_methods_module)
+            self.AVAILABLE_CROSSOVER_METHODS: Final[List[str]] = get_non_private_functions_in_module(crossover_module)
+            self.AVAILABLE_MUTATION_METHODS: Final[List[str]] = get_non_private_functions_in_module(mutation_module)
         else:
             self.AVAILABLE_SCHEDULER_METHODS: Final[List[str]] = get_non_private_functions_in_module(
                 thereshold_scheduler_module
@@ -44,5 +48,15 @@ class AutomationSystem:
                 pruning_methods_module
             ) + get_non_private_functions_from_module_path(
                 os.path.join(extension_directory, EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE), add_prefix="extension_directory_"
+            )
+            self.AVAILABLE_CROSSOVER_METHODS: Final[List[str]] = get_non_private_functions_in_module(
+                crossover_module
+            ) + get_non_private_functions_from_module_path(
+                os.path.join(extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE), add_prefix="extension_directory_"
+            )
+            self.AVAILABLE_MUTATION_METHODS: Final[List[str]] = get_non_private_functions_in_module(
+                mutation_module
+            ) + get_non_private_functions_from_module_path(
+                os.path.join(extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE), add_prefix="extension_directory_"
             )
         super().__init__(**kwargs)

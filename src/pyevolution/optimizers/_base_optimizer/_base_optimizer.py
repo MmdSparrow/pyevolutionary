@@ -25,6 +25,7 @@ from .__utils import (
     copy_parent_to_child,
     increase_age_of_all_population,
 )
+
 from pyevolution._configs.base_optimizer_config import (
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
@@ -41,9 +42,13 @@ from pyevolution._configs.directories import (
     EXTENSION_DIRECTORY_PRUNING_METHODS_MODULE,
     EXTENSION_DIRECTORY_REMAINING_SELECTION_METHODS_MODULE,
     EXTENSION_DIRECTORY_SCHEDULER_METHODS_MODULE,
+    EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE,
+    EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE,
 )
 
+
 __all__=["BaseOptimizer"]
+
 
 class BaseOptimizer(_Base, _AutomationSystem):
     def __parent_selection_fucn_determiner(self, parent_selection_type):
@@ -109,6 +114,30 @@ class BaseOptimizer(_Base, _AutomationSystem):
             "scheduler method",
             self._logger,
         )
+        
+    def __mutation_func_determiner(self, mutation_method):
+        module_path = None
+        if self.extension_directory is not None:
+            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE)
+        self.mutation_func = init_function_by_name(
+            self.mutation_module,
+            module_path,
+            mutation_method,
+            "mutation",
+            self._logger,
+        )
+
+    def __crossover_func_determiner(self, crossover_method):
+        module_path = None
+        if self.extension_directory is not None:
+            module_path = os.path.join(self.extension_directory, EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE)
+        self.crossover_func = init_function_by_name(
+            self.crossover_module,
+            module_path,
+            crossover_method,
+            "crossover",
+            self._logger,
+        )
 
     def __save_checkpoint(
         self,
@@ -119,6 +148,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
         generation_size,
         parent_selection_method,
         remaining_selection_method,
+        crossover_method,
+        mutation_method,
         termination_conditions,
         crossover_probability,
         mutation_probability,
@@ -148,8 +179,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
             pickle.dump(generation_size, file_to_write)
             pickle.dump(parent_selection_method, file_to_write)
             pickle.dump(remaining_selection_method, file_to_write)
-            pickle.dump(self.crossover_method, file_to_write)
-            pickle.dump(self.mutation_method, file_to_write)
+            pickle.dump(crossover_method, file_to_write)
+            pickle.dump(mutation_method, file_to_write)
             pickle.dump([condition_enum.value for condition_enum in termination_conditions], file_to_write)
             pickle.dump(crossover_probability, file_to_write)
             pickle.dump(mutation_probability, file_to_write)
@@ -184,8 +215,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
             generation_size = pickle.load(file_to_read)
             parent_selection_method = pickle.load(file_to_read)
             remaining_selection_method = pickle.load(file_to_read)
-            self.crossover_method = pickle.load(file_to_read)
-            self.mutation_method = pickle.load(file_to_read)
+            crossover_method = pickle.load(file_to_read)
+            mutation_method = pickle.load(file_to_read)
             termination_conditions = pickle.load(file_to_read)
             crossover_probability = pickle.load(file_to_read)
             mutation_probability = pickle.load(file_to_read)
@@ -214,6 +245,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
                 generation_size,
                 parent_selection_method,
                 remaining_selection_method,
+                crossover_method,
+                mutation_method,
                 termination_conditions,
                 crossover_probability,
                 mutation_probability,
@@ -235,13 +268,54 @@ class BaseOptimizer(_Base, _AutomationSystem):
                 elapsed_time,
             )
 
+
+    def __generate_note_file(
+        self,
+        genome_length,
+        population_size,
+        generation_size,
+        parent_selection_method,
+        remaining_selection_method,
+        crossover_method,
+        mutation_method,
+        termination_conditions,
+        crossover_probability,
+        mutation_probability,
+        mode,
+        pruning_methods,
+        pruning_methods_params,
+        checkpoint_path=None,
+    ):
+        self._logger.info("Generate Note File")
+        text = f"Genome Length: {genome_length}\
+            \nPopulation Size: {population_size}\
+            \nGeneration Size: {generation_size}\
+            \nParent Selection Method: {parent_selection_method}\
+            \nRemaining Selection Method: {remaining_selection_method}\
+            \nCrossover Method: {crossover_method}\
+            \nMutation Method: {mutation_method}\
+            \nTermination Conditions: {termination_conditions}\
+            \nCrossover Probability: {crossover_probability}\
+            \nMutation Probability: {mutation_probability}\
+            \nMode: {mode}\
+            \nPruning Methods: {pruning_methods}\
+            \nPruning Methods Params: {pruning_methods_params}"
+        if checkpoint_path:
+            text = text + f"\nContinue from checkpoint {checkpoint_path}"
+        with open(os.path.join(self.base_directory, "note.txt"), "w") as file_to_write:
+            file_to_write.write(text)
+            
     def __init__(
         self,
+        crossover_module,
+        mutation_module,
         evaluation_function,
         show_logs_in_console: bool = True,
         extension_directory: str = None,
     ):
         super().__init__(
+            crossover_module=crossover_module,
+            mutation_module=mutation_module,
             show_logs_in_console= show_logs_in_console,
             extension_directory=extension_directory,
         )
@@ -252,12 +326,14 @@ class BaseOptimizer(_Base, _AutomationSystem):
         self._logger.info(f"List of available `Pruning Methods` functions: {self.AVAILABLE_PRUNING_METHODS}")
 
         self.evaluation_func = evaluation_function
+        self.crossover_module= crossover_module
+        self.mutation_module= mutation_module
 
-    def __create_individual(self, genome_size):
-        return self.individual_class(genome_size)
+    def __create_individual(self, genome_length):
+        return self.individual_class(genome_length)
 
-    def __create_population(self, genome_size, population_size):
-        return [self.__create_individual(genome_size) for _ in range(population_size)]
+    def __create_population(self, genome_length, population_size):
+        return [self.__create_individual(genome_length) for _ in range(population_size)]
 
     def __evaluationAll(self, population: list[IndividualStructure]) -> None:
         for choromosome in population:
@@ -353,6 +429,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
         generation_size,
         parent_selection_method,
         remaining_selection_method,
+        crossover_method,
+        mutation_method,
         termination_conditions,
         crossover_probability,
         mutation_probability,
@@ -394,8 +472,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
         pruning_methods_functions_list = self.__pruning_methods_funcs_determiner(pruning_methods)
         parent_selection_func, parent_selection_q_tornument_param = self.__parent_selection_fucn_determiner(parent_selection_method)
         remaining_selection_func, remaining_selection_q_tornument_param = self.__remaining_selection_func_determiner(remaining_selection_method)
-        self._mutation_func_determiner(self.mutation_method)
-        self._crossover_func_determiner(self.crossover_method)
+        self.__mutation_func_determiner(mutation_method)
+        self.__crossover_func_determiner(crossover_method)
         termination_conditions = replace_with_enum("termination_conditions", termination_conditions, self._logger)
         termination_condition_handler = TerminationCondition(
             termination_conditions,
@@ -482,6 +560,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
                         generation_size,
                         parent_selection_method,
                         remaining_selection_method,
+                        crossover_method,
+                        mutation_method,
                         termination_conditions,
                         crossover_probability,
                         mutation_probability,
@@ -504,8 +584,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
                     )
 
         end_time = time.time()
-        self._logger.info(f"Best answer fitness: {best_chromosome.fitness}")
-        self._logger.info(f"Algorithm runtime: {end_time - start_time + elapsed_time} seconds")
+        self._logger.info(f"Best Answer Fitness: {best_chromosome.fitness}")
+        self._logger.info(f"Algorithm Runtime: {end_time - start_time + elapsed_time} seconds")
         self.__save_final_result(
             best_chromosome,
             avg_fitness_list,
@@ -539,11 +619,13 @@ class BaseOptimizer(_Base, _AutomationSystem):
 
     def _run(
         self,
-        genome_size: int,
+        genome_length: int,
         population_size: int,
         generation_size: int,
         parent_selection_method: str,
         remaining_selection_method: str,
+        crossover_method: str,
+        mutation_method: str,
         termination_conditions: list[str] = TERMINATION_CONDITIONS_DEFAULT_VALUE,
         crossover_probability: float = CROSSOVER_PROBABILITY_DEFAULT_VALUE,
         mutation_probability: float = MUTATION_PROBABILITY_DEFAULT_VALUE,
@@ -563,14 +645,18 @@ class BaseOptimizer(_Base, _AutomationSystem):
     ) -> str:
         validation(
             self._logger,
+            self.AVAILABLE_CROSSOVER_METHODS,
+            self.AVAILABLE_MUTATION_METHODS,
             self.AVAILABLE_PARENT_SELECTION_METHODS,
             self.AVAILABLE_REMAINING_SELECTION_METHODS,
             self.AVAILABLE_PRUNING_METHODS,
-            genome_size,
+            genome_length,
             population_size,
             generation_size,
             parent_selection_method,
             remaining_selection_method,
+            crossover_method,
+            mutation_method,
             termination_conditions,
             crossover_probability,
             mutation_probability,
@@ -585,14 +671,14 @@ class BaseOptimizer(_Base, _AutomationSystem):
             checkpoint_save_period,
         )
         self._logger.info("Vlidation is passed successfuly")
-        self._generate_note_file(
-            genome_size,
+        self.__generate_note_file(
+            genome_length,
             population_size,
             generation_size,
             parent_selection_method,
             remaining_selection_method,
-            self.crossover_method,
-            self.mutation_method,
+            crossover_method,
+            mutation_method,
             termination_conditions,
             crossover_probability,
             mutation_probability,
@@ -601,9 +687,9 @@ class BaseOptimizer(_Base, _AutomationSystem):
             pruning_methods_params,
         )
         self._logger.info("Run algorithm from scratch")
-        best_chromosome = self.__create_individual(genome_size)
+        best_chromosome = self.__create_individual(genome_length)
         self.evaluation_func(best_chromosome)
-        population = self.__create_population(genome_size, population_size)
+        population = self.__create_population(genome_length, population_size)
         self.__evaluationAll(population)
 
         current_iteration_number = 1
@@ -626,6 +712,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
             generation_size,
             parent_selection_method,
             remaining_selection_method,
+            crossover_method,
+            mutation_method,
             termination_conditions,
             crossover_probability,
             mutation_probability,
@@ -666,6 +754,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
             generation_size,
             parent_selection_method,
             remaining_selection_method,
+            crossover_method,
+            mutation_method,
             termination_conditions,
             crossover_probability,
             mutation_probability,
@@ -686,14 +776,14 @@ class BaseOptimizer(_Base, _AutomationSystem):
             pruning_count_list,
             elapsed_time,
         ) = self.__load_checkpoint(checkpoint_path)
-        self._generate_note_file(
+        self.__generate_note_file(
             len(best_chromosome.genome),
             population_size,
             generation_size,
             parent_selection_method,
             remaining_selection_method,
-            self.crossover_method,
-            self.mutation_method,
+            crossover_method,
+            mutation_method,
             termination_conditions,
             crossover_probability,
             mutation_probability,
@@ -763,15 +853,19 @@ class BaseOptimizer(_Base, _AutomationSystem):
         print("Available Modes:")
         print(AVAILABLE_MODES)
 
+    def show_available_crossover_methods(self, return_instead_of_print=False):
+        if return_instead_of_print:
+            return self.AVAILABLE_CROSSOVER_METHODS
+        print("Available Crossover types:")
+        print(self.AVAILABLE_CROSSOVER_METHODS)
+
+    def show_available_mutation_methods(self, return_instead_of_print=False):
+        if return_instead_of_print:
+            return self.AVAILABLE_MUTATION_METHODS
+        print("Available Mutation types:")
+        print(self.AVAILABLE_MUTATION_METHODS)
+
     def show_all_available_functions_and_values_of_project(self):
-        print("Available Parent Selection Methods:")
-        print(self.AVAILABLE_PARENT_SELECTION_METHODS)
-        print()
-
-        print("Available Remaining Selection Methods:")
-        print(self.AVAILABLE_REMAINING_SELECTION_METHODS)
-        print()
-
         print("Available Termination Conditions:")
         print(AVAILABLE_TERMINATION_CONDITIONS)
         print()
@@ -784,5 +878,23 @@ class BaseOptimizer(_Base, _AutomationSystem):
         print(AVAILABLE_MODES)
         print()
 
+        print("Available Thereshold Scheduler Methods:")
+        print(self.AVAILABLE_SCHEDULER_METHODS)
+        print()
+
+        print("Available Parent Selection Methods:")
+        print(self.AVAILABLE_PARENT_SELECTION_METHODS)
+        print()
+
+        print("Available Remaining Selection Methods:")
+        print(self.AVAILABLE_REMAINING_SELECTION_METHODS)
+        print()
+
+        print("Available Mutation types:")
+        print(self.AVAILABLE_MUTATION_METHODS)
+        print()
+
+        print("Available Crossover types:")
+        print(self.AVAILABLE_CROSSOVER_METHODS)
 
 del _Base, _AutomationSystem

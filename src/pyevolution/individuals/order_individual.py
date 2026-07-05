@@ -9,12 +9,12 @@ __all__ = ["OrderIndividual"]
 
 
 class OrderIndividual(IndividualStructure):
-    def __generate_uniform_random_permutation(self, genome_size):
-        sequence = list(range(genome_size))
+    def __generate_uniform_random_permutation(self, genome_length):
+        sequence = list(range(genome_length))
         random.shuffle(sequence)
         return sequence
 
-    def __init__(self, genome_size: int, input_genome: list = None, init_with_random_genome: bool = True, logger: logging.Logger = None):
+    def __init__(self, genome_length: int, input_genome: list = None, init_with_random_genome: bool = True, logger: logging.Logger = None):
         super().__init__()
 
         if input_genome is not None and init_with_random_genome:
@@ -25,9 +25,9 @@ class OrderIndividual(IndividualStructure):
             return
 
         if init_with_random_genome:
-            self.genome = self.__generate_uniform_random_permutation(genome_size)
+            self.genome = self.__generate_uniform_random_permutation(genome_length)
         else:
-            self.genome = [None] * genome_size
+            self.genome = [None] * genome_length
 
     def __circular_equivalence(list1, list2):
         if len(list1) != len(list2):
