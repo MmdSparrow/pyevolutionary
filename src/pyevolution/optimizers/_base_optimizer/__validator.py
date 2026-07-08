@@ -29,7 +29,7 @@ def validation(
     iterations_number,
     statistics,
     statistic_sampling_period,
-    evaluation_number,
+    evaluations_number,
     phenotypic_diversity_window_size,
     phenotypic_diversity_error_thereshold,
     checkpoint_save_period,
@@ -77,7 +77,7 @@ def validation(
     if statistics is not None and len(statistics) != 0:
         if statistic_sampling_period is None:
             raise ValueConflictError(logger, input_message="Statistics set but its sampling peiord not set")
-    if not is_bigger(evaluation_number):
+    if not is_bigger(evaluations_number):
         raise InvalidValueError(logger, input_message="Evaluation number must be bigger than 0")
     if not is_bigger(phenotypic_diversity_window_size):
         raise InvalidValueError(logger, input_message="Phenotypic diversity window size must be bigger than 0")

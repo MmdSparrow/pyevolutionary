@@ -47,7 +47,7 @@ from pyevolution._configs.directories import (
 )
 
 
-__all__=["BaseOptimizer"]
+__all__ = ["BaseOptimizer"]
 
 
 class BaseOptimizer(_Base, _AutomationSystem):
@@ -114,7 +114,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             "scheduler method",
             self._logger,
         )
-        
+
     def __mutation_func_determiner(self, mutation_method):
         module_path = None
         if self.extension_directory is not None:
@@ -159,7 +159,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         iterations_number,
         statistics,
         statistic_sampling_period,
-        evaluation_number,
+        evaluations_number,
         fitness_limit_threshold,
         phenotypic_diversity_window_size,
         phenotypic_diversity_error_thereshold,
@@ -193,7 +193,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             pickle.dump(iterations_number, file_to_write)
             pickle.dump([statistic_enum.value for statistic_enum in statistics], file_to_write)
             pickle.dump(statistic_sampling_period, file_to_write)
-            pickle.dump(evaluation_number, file_to_write)
+            pickle.dump(evaluations_number, file_to_write)
             pickle.dump(fitness_limit_threshold, file_to_write)
             pickle.dump(phenotypic_diversity_window_size, file_to_write)
             pickle.dump(phenotypic_diversity_error_thereshold, file_to_write)
@@ -226,7 +226,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             iterations_number = pickle.load(file_to_read)
             statistics = pickle.load(file_to_read)
             statistic_sampling_period = pickle.load(file_to_read)
-            evaluation_number = pickle.load(file_to_read)
+            evaluations_number = pickle.load(file_to_read)
             fitness_limit_threshold = pickle.load(file_to_read)
             phenotypic_diversity_window_size = pickle.load(file_to_read)
             phenotypic_diversity_error_thereshold = pickle.load(file_to_read)
@@ -256,7 +256,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
                 iterations_number,
                 statistics,
                 statistic_sampling_period,
-                evaluation_number,
+                evaluations_number,
                 fitness_limit_threshold,
                 phenotypic_diversity_window_size,
                 phenotypic_diversity_error_thereshold,
@@ -267,7 +267,6 @@ class BaseOptimizer(_Base, _AutomationSystem):
                 pruning_count_list,
                 elapsed_time,
             )
-
 
     def __generate_note_file(
         self,
@@ -304,7 +303,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             text = text + f"\nContinue from checkpoint {checkpoint_path}"
         with open(os.path.join(self.base_directory, "note.txt"), "w") as file_to_write:
             file_to_write.write(text)
-            
+
     def __init__(
         self,
         crossover_module,
@@ -316,7 +315,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         super().__init__(
             crossover_module=crossover_module,
             mutation_module=mutation_module,
-            show_logs_in_console= show_logs_in_console,
+            show_logs_in_console=show_logs_in_console,
             extension_directory=extension_directory,
         )
         self.individual_class = None
@@ -326,8 +325,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
         self._logger.info(f"List of available `Pruning Methods` functions: {self.AVAILABLE_PRUNING_METHODS}")
 
         self.evaluation_func = evaluation_function
-        self.crossover_module= crossover_module
-        self.mutation_module= mutation_module
+        self.crossover_module = crossover_module
+        self.mutation_module = mutation_module
 
     def __create_individual(self, genome_length):
         return self.individual_class(genome_length)
@@ -440,7 +439,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         iterations_number,
         statistics,
         statistic_sampling_period,
-        evaluation_number,
+        evaluations_number,
         fitness_limit_threshold,
         phenotypic_diversity_window_size,
         phenotypic_diversity_error_thereshold,
@@ -481,7 +480,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             phenotypic_diversity_error_thereshold,
             fitness_limit_threshold,
             iterations_number,
-            evaluation_number,
+            evaluations_number,
         )
         start_time = time.time()
         while True:
@@ -571,7 +570,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
                         iterations_number,
                         statistics,
                         statistic_sampling_period,
-                        evaluation_number,
+                        evaluations_number,
                         fitness_limit_threshold,
                         phenotypic_diversity_window_size,
                         phenotypic_diversity_error_thereshold,
@@ -635,7 +634,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         iterations_number: int = None,
         statistics: list[str] = None,
         statistic_sampling_period: int = None,
-        evaluation_number: int = None,
+        evaluations_number: int = None,
         fitness_limit_threshold: float = None,
         phenotypic_diversity_window_size: int = None,
         phenotypic_diversity_error_thereshold: float = None,
@@ -665,7 +664,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             iterations_number,
             statistics,
             statistic_sampling_period,
-            evaluation_number,
+            evaluations_number,
             phenotypic_diversity_window_size,
             phenotypic_diversity_error_thereshold,
             checkpoint_save_period,
@@ -723,7 +722,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             iterations_number,
             statistics,
             statistic_sampling_period,
-            evaluation_number,
+            evaluations_number,
             fitness_limit_threshold,
             phenotypic_diversity_window_size,
             phenotypic_diversity_error_thereshold,
@@ -740,7 +739,9 @@ class BaseOptimizer(_Base, _AutomationSystem):
             analyze,
         )
 
-    def continue_checkpoint(self, checkpoint_path: str, visualize: bool= False, analyze: bool= False) -> str:
+    def continue_checkpoint(
+        self, checkpoint_path: str, new_iterations_number: int = None, new_evaluations_number: int = None, visualize: bool = False, analyze: bool = False
+    ) -> str:
         if checkpoint_path is None:
             raise InvalidValueError(self._logger, input_message="Checkpoint base directory is none")
         if not os.path.exists(checkpoint_path):
@@ -765,7 +766,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             iterations_number,
             statistics,
             statistic_sampling_period,
-            evaluation_number,
+            evaluations_number,
             fitness_limit_threshold,
             phenotypic_diversity_window_size,
             phenotypic_diversity_error_thereshold,
@@ -776,6 +777,10 @@ class BaseOptimizer(_Base, _AutomationSystem):
             pruning_count_list,
             elapsed_time,
         ) = self.__load_checkpoint(checkpoint_path)
+        if new_iterations_number is not None:
+            iterations_number = new_iterations_number
+        if new_evaluations_number is not None:
+            evaluations_number = new_evaluations_number
         self.__generate_note_file(
             len(best_chromosome.genome),
             population_size,
@@ -806,7 +811,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
             iterations_number,
             statistics,
             statistic_sampling_period,
-            evaluation_number,
+            evaluations_number,
             fitness_limit_threshold,
             phenotypic_diversity_window_size,
             phenotypic_diversity_error_thereshold,
@@ -896,5 +901,6 @@ class BaseOptimizer(_Base, _AutomationSystem):
 
         print("Available Crossover types:")
         print(self.AVAILABLE_CROSSOVER_METHODS)
+
 
 del _Base, _AutomationSystem

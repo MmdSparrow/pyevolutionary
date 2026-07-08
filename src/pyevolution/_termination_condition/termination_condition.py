@@ -11,7 +11,7 @@ class TerminationCondition:
         phenotypic_diversity_error_thereshold,
         fitness_limit_threshold,
         iterations_number_threshold,
-        evaluation_number_threshold,
+        evaluations_number_threshold,
     ):
         self.__termination_conditions = termination_conditions
         self.__phenotypic_diversity_window_size = phenotypic_diversity_window_size
@@ -20,7 +20,7 @@ class TerminationCondition:
         self.__phenotypic_diversity_safisty_count = 0
         self.__fitness_limit_threshold = fitness_limit_threshold
         self.__iterations_number_threshold = iterations_number_threshold
-        self.__evaluation_number_threshold = evaluation_number_threshold
+        self.__evaluations_number_threshold = evaluations_number_threshold
         super().__init__()
 
     def check_termination(self, avg_fitness, best_fitness, current_iteration_number, generation_size, population_size):
@@ -44,8 +44,8 @@ class TerminationCondition:
             if output:
                 reasons_list.append("Iteration Number")
             done = done or output
-        if TerminationConditionsEnum.EVALUATION_NUMBER in self.__termination_conditions:
-            output = self.__evaluation_number(current_iteration_number, generation_size, population_size)
+        if TerminationConditionsEnum.EVALUATIONS_NUMBER in self.__termination_conditions:
+            output = self.__evaluations_number(current_iteration_number, generation_size, population_size)
             if output:
                 reasons_list.append("Evaluation Number")
             done = done or output
@@ -71,5 +71,5 @@ class TerminationCondition:
     def __iterations_number(self, iterations_number):
         return iterations_number >= self.__iterations_number_threshold
 
-    def __evaluation_number(self, iteration_number, generation_size, population_size):
-        return iteration_number * generation_size + population_size >= self.__evaluation_number_threshold
+    def __evaluations_number(self, iteration_number, generation_size, population_size):
+        return iteration_number * generation_size + population_size >= self.__evaluations_number_threshold

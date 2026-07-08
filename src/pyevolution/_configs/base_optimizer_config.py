@@ -17,7 +17,7 @@ AVAILABLE_TERMINATION_CONDITIONS = [
     TerminationConditionsEnum.PHENOTYPIC_DIVERSITY.value,
     TerminationConditionsEnum.FITNESS_LIMIT.value,
     TerminationConditionsEnum.ITERATION_NUMBER.value,
-    TerminationConditionsEnum.EVALUATION_NUMBER.value,
+    TerminationConditionsEnum.EVALUATIONS_NUMBER.value,
 ]
 AVAILABLE_STATISTICS = [StatisticsEnum.AVG_FITNESS.value, StatisticsEnum.BEST_FITNESS.value, StatisticsEnum.VAR_FITNESS.value, StatisticsEnum.PRUNINGS.value]
 
