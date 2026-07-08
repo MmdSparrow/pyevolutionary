@@ -619,7 +619,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
 
     def _run(
         self,
-        genome_length: int,
+        genome_length: int | list[int],
         population_size: int,
         generation_size: int,
         parent_selection_method: str,

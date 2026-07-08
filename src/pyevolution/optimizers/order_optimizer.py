@@ -58,7 +58,7 @@ class OrderOptimizer(_BaseOptimizer):
         checkpoint_save_period: int = None,
         visualize: bool = VISUALIZE_DEFAULT_VALUE,
         analyze: bool = ANALYZE_DEFAULT_VALUE,
-    )-> str:
+    ) -> str:
         return self._run(
             genome_length,
             population_size,

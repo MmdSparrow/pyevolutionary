@@ -35,7 +35,7 @@ class OrderMultiRowOptimizer(_BaseOptimizer):
 
     def run(
         self,
-        genome_length: int,
+        genome_length: list[int],
         population_size: int,
         generation_size: int,
         parent_selection_method: str,
@@ -58,7 +58,7 @@ class OrderMultiRowOptimizer(_BaseOptimizer):
         checkpoint_save_period: int = None,
         visualize: bool = VISUALIZE_DEFAULT_VALUE,
         analyze: bool = ANALYZE_DEFAULT_VALUE,
-    )-> str:
+    ) -> str:
         return self._run(
             genome_length,
             population_size,

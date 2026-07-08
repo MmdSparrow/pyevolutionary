@@ -7,17 +7,18 @@ from pyevolution.individuals import OrderIndividual
 def OX1(parent1, parent2):
     length = len(parent1.genome)
     start, end = sorted([random.randrange(length) for _ in range(2)])
-    child1_genome, child2_genome= _OX(parent1.genome, parent2.genome, start, end, length)
-    child1= OrderIndividual(input_genome=child1_genome, init_with_random_genome=False)
-    child2= OrderIndividual(input_genome=child2_genome, init_with_random_genome=False)
+    child1_genome, child2_genome = _OX(parent1.genome, parent2.genome, start, end, length)
+    child1 = OrderIndividual(input_genome=child1_genome, init_with_random_genome=False)
+    child2 = OrderIndividual(input_genome=child2_genome, init_with_random_genome=False)
     return child1, child2
+
 
 def OX2(parent1, parent2):
     length = len(parent1.genome)
     point = random.randint(0, len(parent1.genome) - 1)
-    child1_genome, child2_genome= _OX(parent1.genome, parent2.genome, 0, point, length)
-    child1= OrderIndividual(input_genome=child1_genome, init_with_random_genome=False)
-    child2= OrderIndividual(input_genome=child2_genome, init_with_random_genome=False)
+    child1_genome, child2_genome = _OX(parent1.genome, parent2.genome, 0, point, length)
+    child1 = OrderIndividual(input_genome=child1_genome, init_with_random_genome=False)
+    child2 = OrderIndividual(input_genome=child2_genome, init_with_random_genome=False)
     return child1, child2
 
 

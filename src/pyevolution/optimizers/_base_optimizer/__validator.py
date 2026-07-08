@@ -36,8 +36,8 @@ def validation(
 ):
     if not is_presented(genome_length):
         raise ValueCantBeNoneError(logger, input_message="genome size")
-    if not is_bigger(genome_length, 1, is_required=True):
-        raise InvalidValueError(logger, input_message="genome size must be bigger than 1")
+    # if not is_bigger(genome_length, 1, is_required=True):
+        # raise InvalidValueError(logger, input_message="genome size must be bigger than 1")
     if not is_presented(population_size):
         raise ValueCantBeNoneError(logger, input_message="genome size")
     if not is_bigger(population_size, 2, is_required=True):

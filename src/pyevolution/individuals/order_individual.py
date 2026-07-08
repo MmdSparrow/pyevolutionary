@@ -14,14 +14,14 @@ class OrderIndividual(IndividualStructure):
         random.shuffle(sequence)
         return sequence
 
-    def __init__(self, genome_length: int=None, input_genome: list = None, init_with_random_genome: bool = True, logger: logging.Logger = None):
+    def __init__(self, genome_length: int = None, input_genome: list = None, init_with_random_genome: bool = True, logger: logging.Logger = None):
         super().__init__()
 
         if input_genome is not None and init_with_random_genome:
             raise ValueConflictError(logger, input_message="Both `input_genome` and `init_with_random_genome` can't be apply at the same time")
         if init_with_random_genome and genome_length is None:
             raise ValueError(logger, input_message="For initializing genome is need to pass valid genome_length")
-        
+
         if input_genome is not None:
             self.genome = copy.copy(input_genome)
             return

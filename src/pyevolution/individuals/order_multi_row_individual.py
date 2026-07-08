@@ -10,25 +10,25 @@ __all__ = ["OrderMultiRowIndividual"]
 
 class OrderMultiRowIndividual(IndividualStructure):
     def __generate_uniform_random_permutation(self, genome_length: list[int]):
-        total_gnome_size= sum(genome_length)
-        sequence = list(range(total_gnome_size))
+        total_gnome_length = sum(genome_length)
+        sequence = list(range(total_gnome_length))
         random.shuffle(sequence)
-        list_of_sequences= []
-        start_index=0
+        list_of_sequences = []
+        start_index = 0
         for length in genome_length:
-            end_index=start_index + length
+            end_index = start_index + length
             list_of_sequences.append(sequence[start_index:end_index])
-            start_index= end_index
+            start_index = end_index
         return list_of_sequences
-                
-    def __init__(self, genome_length: list[int], input_genome: list[int] = None, init_with_random_genome: bool = True, logger: logging.Logger = None):
+
+    def __init__(self, genome_length: list[int] = None, input_genome: list[int] = None, init_with_random_genome: bool = True, logger: logging.Logger = None):
         super().__init__()
 
         if input_genome is not None and init_with_random_genome:
             raise ValueConflictError(logger, input_message="Both `input_genome` and `init_with_random_genome` can't be apply at the same time")
         if init_with_random_genome and genome_length is None:
             raise ValueError(logger, input_message="For initializing genome is need to pass valid genome_length")
-        
+
         if input_genome is not None:
             self.genome = copy.copy(input_genome)
             return
@@ -36,7 +36,6 @@ class OrderMultiRowIndividual(IndividualStructure):
         if init_with_random_genome:
             self.genome = self.__generate_uniform_random_permutation(genome_length)
         else:
-            
             self.genome = [[None] * i for i in genome_length]
 
     def __circular_equivalence(list1, list2):

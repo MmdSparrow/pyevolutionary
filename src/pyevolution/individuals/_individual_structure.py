@@ -3,8 +3,8 @@ class IndividualStructure:
         self.genome: list = None
         self.fitness: float = None
         self.age: int = 0
-        self.crossover_attendance:int = 0
-        self.parent_score:int = 0
+        self.crossover_attendance: int = 0
+        self.parent_score: int = 0
 
     def __len__(self):
         return len(self.genome)
@@ -29,7 +29,7 @@ class IndividualStructure:
             "fitness": self.fitness,
         }
 
-    def to_dict_full_details(self)-> dict:
+    def to_dict_full_details(self) -> dict:
         return {
             "genome": self.genome,
             "fitness": self.fitness,
