@@ -9,7 +9,8 @@ __all__ = ["OrderMultiRowIndividual"]
 
 
 class OrderMultiRowIndividual(IndividualStructure):
-    def __generate_uniform_random_permutation(self, genome_length: list[int]):
+    @staticmethod
+    def __generate_uniform_random_permutation(genome_length: list[int]):
         total_gnome_length = sum(genome_length)
         sequence = list(range(total_gnome_length))
         random.shuffle(sequence)
@@ -38,6 +39,7 @@ class OrderMultiRowIndividual(IndividualStructure):
         else:
             self.genome = [[None] * i for i in genome_length]
 
+    @staticmethod
     def __circular_equivalence(list1, list2):
         if len(list1) != len(list2):
             return False

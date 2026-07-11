@@ -9,7 +9,8 @@ __all__ = ["OrderIndividual"]
 
 
 class OrderIndividual(IndividualStructure):
-    def __generate_uniform_random_permutation(self, genome_length):
+    @staticmethod
+    def __generate_uniform_random_permutation(genome_length):
         sequence = list(range(genome_length))
         random.shuffle(sequence)
         return sequence
@@ -31,6 +32,7 @@ class OrderIndividual(IndividualStructure):
         else:
             self.genome = [None] * genome_length
 
+    @staticmethod
     def __circular_equivalence(list1, list2):
         if len(list1) != len(list2):
             return False

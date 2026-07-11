@@ -338,7 +338,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
         for choromosome in population:
             self.evaluation_func(choromosome)
 
-    def __parent_selection(self, parent_selection_func, q_tornument_param, population):
+    @staticmethod
+    def __parent_selection(parent_selection_func, q_tornument_param, population):
         if q_tornument_param is None:
             return parent_selection_func(population)
         return parent_selection_func(population, q_tornument_param)
@@ -348,7 +349,8 @@ class BaseOptimizer(_Base, _AutomationSystem):
             return remaining_selection_func(chromosome_list, remaining_size)
         return remaining_selection_func(chromosome_list, self.rs_q, remaining_size)
 
-    def __select_next_generation_basedon_mode(self, mode, population, children):
+    @staticmethod
+    def __select_next_generation_basedon_mode(mode, population, children):
         if mode == ModesEnum.FORGETFUL:
             return children
         elif mode == ModesEnum.AGGREGGATE:
@@ -614,7 +616,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         if analyze:
             analyzer.load_final_population_from_result_directory()
             analyzer.run_full_analyzer()
-        return self.base_directory
+        return self.output_directory_name
 
     def _run(
         self,

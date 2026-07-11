@@ -35,17 +35,17 @@ class TerminationCondition:
             done = done or output
             done = done or output
         if TerminationConditionsEnum.FITNESS_LIMIT in self.__termination_conditions:
-            output = self.__fitness_limit(best_fitness)
+            output = self.__reach_fitness_limit_threshold(best_fitness)
             if output:
                 reasons_list.append("Fitness Limit")
             done = done or output
         if TerminationConditionsEnum.ITERATION_NUMBER in self.__termination_conditions:
-            output = self.__iterations_number(current_iteration_number)
+            output = self.__reach_iterations_number_threshold(current_iteration_number)
             if output:
                 reasons_list.append("Iteration Number")
             done = done or output
         if TerminationConditionsEnum.EVALUATIONS_NUMBER in self.__termination_conditions:
-            output = self.__evaluations_number(current_iteration_number, generation_size, population_size)
+            output = self.__reach_evaluations_number_threshold(current_iteration_number, generation_size, population_size)
             if output:
                 reasons_list.append("Evaluation Number")
             done = done or output
@@ -65,11 +65,11 @@ class TerminationCondition:
         self.__previous_avg_fitness = current_avg_fitness
         return False
 
-    def __fitness_limit(self, best_fitness):
+    def __reach_fitness_limit_threshold(self, best_fitness):
         return best_fitness >= self.__fitness_limit_threshold
 
-    def __iterations_number(self, iterations_number):
+    def __reach_iterations_number_threshold(self, iterations_number):
         return iterations_number >= self.__iterations_number_threshold
 
-    def __evaluations_number(self, iteration_number, generation_size, population_size):
+    def __reach_evaluations_number_threshold(self, iteration_number, generation_size, population_size):
         return iteration_number * generation_size + population_size >= self.__evaluations_number_threshold

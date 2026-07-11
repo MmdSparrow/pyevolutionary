@@ -10,8 +10,8 @@ __all__ = ["Base"]
 
 class Base:
     def __create_folders(self):
-        folder_name = datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
-        self.base_directory = os.path.join("outputs", folder_name)
+        self.output_directory_name= datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
+        self.base_directory = os.path.join("outputs", self.output_directory_name)
 
         self.result_directory = os.path.join(self.base_directory, RESULT_DIRECTORY_DEFAULT)
         os.makedirs(self.result_directory, exist_ok=True)

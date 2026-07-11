@@ -12,8 +12,8 @@ class Visualizer:
     def __init__(self):
         super().__init__()
 
+    @staticmethod
     def plot_diagrams(
-        self,
         statistics: list[str],
         statistic_sampling_period: int,
         iterations_number: int,
@@ -85,14 +85,15 @@ class Visualizer:
         plt.savefig(os.path.join(results_directory, "diagrams.png"))
         plt.close()
 
-    def plot_results_diagrams(self, output_directory: str):
+    @staticmethod
+    def plot_results_diagrams(output_directory: str):
         with open(os.path.join(output_directory, 'results', 'results.pkl'), "rb") as file_to_read:
             avg_fitness_list, var_fitness_list, best_fitness_list, pruning_count_list = pickle.load(file_to_read)
             statistics = pickle.load(file_to_read)
             statistic_sampling_period = pickle.load(file_to_read)
             pruning_methods = pickle.load(file_to_read)
             current_iteration_number = pickle.load(file_to_read)
-            self.plot_diagrams(
+            Visualizer.plot_diagrams(
                 statistics,
                 statistic_sampling_period,
                 current_iteration_number,
