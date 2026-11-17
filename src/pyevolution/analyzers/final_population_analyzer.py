@@ -1,12 +1,13 @@
-import os
-import sys
-import pickle
 import logging
-import numpy as np
-import matplotlib.pyplot as plt
-
+import os
+import pickle
+import sys
 from collections import Counter
-from pyevolution._configs.directories import LOG_DIRECTORY_DEFAULT, ANALYZE_DIRECOTRY_DEFAULT
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+from pyevolution._configs.directories import ANALYZE_DIRECOTRY_DEFAULT, LOG_DIRECTORY_DEFAULT
 
 
 class FinalPopulationAnalyzer:
@@ -17,22 +18,22 @@ class FinalPopulationAnalyzer:
         self.analyze_directory = os.path.join(base_directory, ANALYZE_DIRECOTRY_DEFAULT)
         os.makedirs(self.analyze_directory, exist_ok=True)
 
-    def __init_logger(self, show_logs_in_console):
+    def __init_logger(self, verbose):
         self._logger = logging.getLogger("analyzer_logger")
         self._logger.setLevel(logging.INFO)
         handler = logging.FileHandler(os.path.join(self.log_directory, "analyze.log"))
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)
-        if show_logs_in_console:
+        if verbose:
             console_handler = logging.StreamHandler(sys.stdout)
             console_handler.setFormatter(formatter)
             self._logger.addHandler(console_handler)
 
-    def __init__(self, base_directory: str, show_logs_in_console: bool = False):
+    def __init__(self, base_directory: str, verbose: bool = False):
         self.base_directory = base_directory
         self.__create_log_folders(self.base_directory)
-        self.__init_logger(show_logs_in_console)
+        self.__init_logger(verbose)
         super().__init__()
 
     def load_chromosome_list(self, chromosome_list_pkl_path: str):
@@ -115,7 +116,7 @@ class FinalPopulationAnalyzer:
             else:
                 genome_dict[genome_str] = (1, chromosome.fitness)
 
-        unique_genome_list = [self.__convert_string_genome_to_list(x) for x in genome_dict.keys()]
+        unique_genome_list = [self.__convert_string_genome_to_list(x) for x in genome_dict]
         unique_genome_count, unique_genome_fitness = zip(*list(genome_dict.values()))
         unique_genome_count = list(unique_genome_count)
         unique_genome_fitness = list(unique_genome_fitness)
@@ -132,11 +133,13 @@ class FinalPopulationAnalyzer:
         self._logger.info("Number of unique genoume counted")
 
         with open(os.path.join(self.analyze_directory, "unique_genome.txt"), "a", encoding="utf-8") as file_to_write:
-            for index in range(len(unique_genome_list)):
-                file_to_write.write(f"[{unique_genome_list[index]}] - count: {unique_genome_count[index]}, fitness: {unique_genome_fitness[index]}\n")
+            file_to_write.writelines(
+                f"[{unique_genome_list[index]}] - count: {unique_genome_count[index]}, fitness: {unique_genome_fitness[index]}\n"
+                for index in range(len(unique_genome_list))
+            )
 
         with open(os.path.join(self.analyze_directory, "analyze_result.txt"), "a", encoding="utf-8") as file_to_write:
-            file_to_write.write("########################## Genotypic Diversity ##########################\n")
+            file_to_write.write(f"{'#' * 26} Genotypic Diversity {'#' * 26}\n")
             file_to_write.write(f"Genotypic Diversity Rate - genome scale: {len(genome_dict) / len(self.chromosome_list)}\n")
             file_to_write.write(f"Genotypic Diversity Entropy - genome scale: {self.__entropy(unique_genome_count)}\n")
             file_to_write.write(f"Genotypic Diversity GINI - genome scale: {self.__gini(unique_genome_count)}\n")
@@ -152,13 +155,12 @@ class FinalPopulationAnalyzer:
         att_value_counts = Counter(att_value_list)
 
         with open(os.path.join(self.analyze_directory, "analyze_result.txt"), "a", encoding="utf-8") as file_to_write:
-            file_to_write.write(f"########################## Analyze {attribute_name.capitalize()} ##########################\n")
+            file_to_write.write(f"{'#' * 26} Analyze {attribute_name.capitalize()} {'#' * 26}\n")
             file_to_write.write(f"Max Value: {att_value_max}\n")
             file_to_write.write(f"Min Value: {att_value_min}\n")
             file_to_write.write(f"Avg Value: {att_value_avg}\n")
             file_to_write.write(f"Count by {attribute_name}:\n")
-            for key, count in sorted(att_value_counts.items()):
-                file_to_write.write(f"{attribute_name}={key}: {count}\n")
+            file_to_write.writelines(f"{attribute_name}={key}: {count}\n" for key, count in sorted(att_value_counts.items()))
             file_to_write.write("\n")
 
         # 2) Plot the score distribution (histogram / empirical distribution)

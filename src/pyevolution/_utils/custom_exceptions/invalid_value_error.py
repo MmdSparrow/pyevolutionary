@@ -7,4 +7,4 @@ class InvalidValueError(BaseError):
             message = f"Value {value_for_condition} is not valid for variable {variable} (valid values: {valid_values})"
         else:
             message= input_message
-        super(InvalidValueError, self).__init__(logger, message)
+        super().__init__(logger, message)

@@ -309,13 +309,13 @@ class BaseOptimizer(_Base, _AutomationSystem):
         crossover_module,
         mutation_module,
         evaluation_function,
-        show_logs_in_console: bool = True,
+        verbose: bool = True,
         extension_directory: str = None,
     ):
         super().__init__(
             crossover_module=crossover_module,
             mutation_module=mutation_module,
-            show_logs_in_console=show_logs_in_console,
+            verbose=verbose,
             extension_directory=extension_directory,
         )
         self.individual_class = None
@@ -463,7 +463,7 @@ class BaseOptimizer(_Base, _AutomationSystem):
         if visualize:
             visualizer = Visualizer()
         if analyze:
-            analyzer = FinalPopulationAnalyzer(self.base_directory, self.show_logs_in_console)
+            analyzer = FinalPopulationAnalyzer(self.base_directory, self.verbose)
         if pruning_methods_params is not None:
             for pruning_param in pruning_methods_params:
                 if pruning_param is None:

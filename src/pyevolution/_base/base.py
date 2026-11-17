@@ -1,16 +1,16 @@
+import logging
 import os
 import sys
-import logging
-
 from datetime import datetime
-from pyevolution._configs.directories import RESULT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, CHECKPOINT_DIRECTORY_DEFAULT
+
+from pyevolution._configs.directories import CHECKPOINT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, RESULT_DIRECTORY_DEFAULT
 
 __all__ = ["Base"]
 
 
 class Base:
     def __create_folders(self):
-        self.output_directory_name= datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
+        self.output_directory_name = datetime.now().astimezone().strftime("%Y-%m-%d_%H-%M-%S")
         self.base_directory = os.path.join("outputs", self.output_directory_name)
 
         self.result_directory = os.path.join(self.base_directory, RESULT_DIRECTORY_DEFAULT)
@@ -29,13 +29,13 @@ class Base:
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)
-        if self.show_logs_in_console:
+        if self.verbose:
             console_handler = logging.StreamHandler(sys.stdout)
             console_handler.setFormatter(formatter)
             self._logger.addHandler(console_handler)
 
-    def __init__(self, show_logs_in_console, **kwargs):
+    def __init__(self, verbose, **kwargs):
         self.__create_folders()
-        self.show_logs_in_console = show_logs_in_console
+        self.verbose = verbose
         self.__init_logger()
         super().__init__(**kwargs)

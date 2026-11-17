@@ -1,8 +1,8 @@
-import os
 import importlib.util
+import os
 
 from pyevolution._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
-from pyevolution._utils.custom_exceptions import ImplementationError, FunctionNotSupportedError, InvalidValueError
+from pyevolution._utils.custom_exceptions import FunctionNotSupportedError, ImplementationError, InvalidValueError
 
 
 def __get_module_by_name(module_path):
@@ -25,13 +25,13 @@ def init_function_by_name(module, extension_module_path, func_name, function_obj
     func = None
     try:
         if extension_module_path is None:
-            raise Exception("Extetnsion directory not presented")
+            raise ValueError("Extetnsion directory not presented")
         extension_module = __get_module_by_name(extension_module_path)
         func = getattr(extension_module, func_name, None)
         if not func:
-            raise Exception("Function not founded in extension directory")
+            raise ValueError("Function not founded in extension directory")
         logger.info(f"Function {func_name} is loaded from extension directory")
-    except Exception:
+    except ValueError:
         # read from default module
         func = getattr(module, func_name, None)
         if not func:

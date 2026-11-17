@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import os
 import pickle
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 from pyevolution._enums import StatisticsEnum
 
@@ -32,7 +35,7 @@ class Visualizer:
             rows_number = rows_number - 1 + len(pruning_methods)
 
         if rows_number == 0:
-            raise Exception()
+            raise ValueError()
 
         plt.figure(figsize=(1.75 * rows_number, 6))
 
@@ -87,7 +90,7 @@ class Visualizer:
 
     @staticmethod
     def plot_results_diagrams(output_directory: str):
-        with open(os.path.join(output_directory, 'results', 'results.pkl'), "rb") as file_to_read:
+        with open(os.path.join(output_directory, "results", "results.pkl"), "rb") as file_to_read:
             avg_fitness_list, var_fitness_list, best_fitness_list, pruning_count_list = pickle.load(file_to_read)
             statistics = pickle.load(file_to_read)
             statistic_sampling_period = pickle.load(file_to_read)
@@ -102,5 +105,5 @@ class Visualizer:
                 best_fitness_list,
                 pruning_count_list,
                 pruning_methods,
-                os.path.join(output_directory, 'results'),
+                os.path.join(output_directory, "results"),
             )

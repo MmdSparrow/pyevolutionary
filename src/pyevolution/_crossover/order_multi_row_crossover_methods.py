@@ -1,7 +1,8 @@
 import random
 
-from ._utils_common import _OX
 from pyevolution.individuals import OrderMultiRowIndividual
+
+from ._utils_common import _OX
 
 
 def __rebuild_flatted_2d_list(flatted_list, lengths):

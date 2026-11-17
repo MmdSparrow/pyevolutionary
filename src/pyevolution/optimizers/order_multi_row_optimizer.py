@@ -1,17 +1,17 @@
-import pyevolution._mutation.order_multi_row_mutation_methods as _order_multi_row_mutation_module
+from __future__ import annotations
+
 import pyevolution._crossover.order_multi_row_crossover_methods as _order_multi_row_crossover_module
-
-from pyevolution.individuals import OrderMultiRowIndividual
-from pyevolution.optimizers._base_optimizer._base_optimizer import BaseOptimizer as _BaseOptimizer
-
+import pyevolution._mutation.order_multi_row_mutation_methods as _order_multi_row_mutation_module
 from pyevolution._configs.order_multi_row_optimizer_config import (
+    ANALYZE_DEFAULT_VALUE,
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
     MUTATION_PROBABILITY_DEFAULT_VALUE,
     TERMINATION_CONDITIONS_DEFAULT_VALUE,
     VISUALIZE_DEFAULT_VALUE,
-    ANALYZE_DEFAULT_VALUE,
 )
+from pyevolution.individuals import OrderMultiRowIndividual
+from pyevolution.optimizers._base_optimizer._base_optimizer import BaseOptimizer as _BaseOptimizer
 
 __all__ = ["OrderMultiRowOptimizer"]
 
@@ -20,14 +20,14 @@ class OrderMultiRowOptimizer(_BaseOptimizer):
     def __init__(
         self,
         evaluation_function,
-        show_logs_in_console: bool = True,
-        extension_directory: str = None,
+        verbose: bool = True,
+        extension_directory: str | None = None,
     ):
         super().__init__(
             crossover_module=_order_multi_row_crossover_module,
             mutation_module=_order_multi_row_mutation_module,
             evaluation_function=evaluation_function,
-            show_logs_in_console=show_logs_in_console,
+            verbose=verbose,
             extension_directory=extension_directory,
         )
 
@@ -46,16 +46,16 @@ class OrderMultiRowOptimizer(_BaseOptimizer):
         crossover_probability: float = CROSSOVER_PROBABILITY_DEFAULT_VALUE,
         mutation_probability: float = MUTATION_PROBABILITY_DEFAULT_VALUE,
         mode: str = MODE_DEFAULT_VALUE,
-        pruning_methods: list[str] = None,
-        pruning_methods_params: list[dict] = None,
-        iterations_number: int = None,
-        statistics: list[str] = None,
-        statistic_sampling_period: int = None,
-        evaluations_number: int = None,
-        fitness_limit_threshold: float = None,
-        phenotypic_diversity_window_size: int = None,
-        phenotypic_diversity_error_thereshold: float = None,
-        checkpoint_save_period: int = None,
+        pruning_methods: list[str] | None = None,
+        pruning_methods_params: list[dict] | None = None,
+        iterations_number: int | None = None,
+        statistics: list[str] | None = None,
+        statistic_sampling_period: int | None = None,
+        evaluations_number: int | None = None,
+        fitness_limit_threshold: float | None = None,
+        phenotypic_diversity_window_size: int | None = None,
+        phenotypic_diversity_error_thereshold: float | None = None,
+        checkpoint_save_period: int | None = None,
         visualize: bool = VISUALIZE_DEFAULT_VALUE,
         analyze: bool = ANALYZE_DEFAULT_VALUE,
     ) -> str:

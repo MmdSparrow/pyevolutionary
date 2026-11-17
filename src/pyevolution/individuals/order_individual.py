@@ -1,9 +1,11 @@
-import copy
-import random
-import logging
+from __future__ import annotations
 
-from pyevolution.individuals._individual_structure import IndividualStructure
+import copy
+import logging
+import random
+
 from pyevolution._utils.custom_exceptions.value_conflict_error import ValueConflictError
+from pyevolution.individuals._individual_structure import IndividualStructure
 
 __all__ = ["OrderIndividual"]
 
@@ -15,7 +17,13 @@ class OrderIndividual(IndividualStructure):
         random.shuffle(sequence)
         return sequence
 
-    def __init__(self, genome_length: int = None, input_genome: list = None, init_with_random_genome: bool = True, logger: logging.Logger = None):
+    def __init__(
+        self,
+        genome_length: int | None = None,
+        input_genome: list | None = None,
+        init_with_random_genome: bool = True,
+        logger: logging.Logger | None = None,
+    ):
         super().__init__()
 
         if input_genome is not None and init_with_random_genome:
@@ -55,4 +63,4 @@ class OrderIndividual(IndividualStructure):
         return f"OrderIndividual(genome={self.genome!r}, fitness={self.fitness!r}, age={self.age!r}, crossover_attendance={self.crossover_attendance!r}, parent_score={self.parent_score!r})"
 
 
-del IndividualStructure, logging
+del IndividualStructure

@@ -1,5 +1,5 @@
-import os
 import importlib.util
+import os
 
 
 def get_non_private_functions_in_module(module, add_prefix=""):

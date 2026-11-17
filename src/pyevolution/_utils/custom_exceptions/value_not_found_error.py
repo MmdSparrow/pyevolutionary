@@ -7,4 +7,4 @@ class ValueNotFoundError(BaseError):
             message = f"Value {value} not found"
         else:
             message= input_message
-        super(ValueNotFoundError, self).__init__(logger, message)
+        super().__init__(logger, message)

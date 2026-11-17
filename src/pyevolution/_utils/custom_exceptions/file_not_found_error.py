@@ -7,4 +7,4 @@ class FileNotExistError(BaseError):
             message= (f"File {file_path} not found")
         else:
             message= input_message
-        super(FileNotExistError, self).__init__(logger, message)
+        super().__init__(logger, message)

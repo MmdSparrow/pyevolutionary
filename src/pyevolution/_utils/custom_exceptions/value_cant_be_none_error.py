@@ -7,4 +7,4 @@ class ValueCantBeNoneError(BaseError):
             message = f"Variable {variable} can't be None"
         else:
             message= input_message
-        super(ValueCantBeNoneError, self).__init__(logger, message)
+        super().__init__(logger, message)
