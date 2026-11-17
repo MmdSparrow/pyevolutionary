@@ -1,4 +1,4 @@
-from pyevolution._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
+from pyevolutionary._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
 
 __all__ = [
     "ANALYZE_DEFAULT_VALUE",

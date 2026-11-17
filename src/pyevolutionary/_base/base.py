@@ -3,7 +3,7 @@ import os
 import sys
 from datetime import datetime
 
-from pyevolution._configs.directories import CHECKPOINT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, RESULT_DIRECTORY_DEFAULT
+from pyevolutionary._configs.directories import CHECKPOINT_DIRECTORY_DEFAULT, LOG_DIRECTORY_DEFAULT, RESULT_DIRECTORY_DEFAULT
 
 __all__ = ["Base"]
 

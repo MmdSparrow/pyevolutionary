@@ -6,9 +6,9 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyevolution"
-version = "0.4.0"
-keywords = ["pyevolution", "evalutionary algorithm", "optimization", "chromosome"]
+name = "pyevolutionary"
+version = "0.4.1"
+keywords = ["pyevolutionary", "evalutionary algorithm", "optimization", "chromosome"]
 description = "This Python framework provides a comprehensive implementation of evolutionary algorithms, supporting both binary and ordinal individuals, as well as their crossover and mutation operations. The framework includes features such as automated result analysis and diagram plotting for better visualization. It is specifically designed to facilitate the pruning algorithm, which prunes those deemed less effective based on their performance scores."
 readme = "README.md"
 requires-python = ">=3.8"

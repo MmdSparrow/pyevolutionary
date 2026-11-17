@@ -1,8 +1,8 @@
 import importlib.util
 import os
 
-from pyevolution._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
-from pyevolution._utils.custom_exceptions import FunctionNotSupportedError, ImplementationError, InvalidValueError
+from pyevolutionary._enums import ModesEnum, StatisticsEnum, TerminationConditionsEnum
+from pyevolutionary._utils.custom_exceptions import FunctionNotSupportedError, ImplementationError, InvalidValueError
 
 
 def __get_module_by_name(module_path):

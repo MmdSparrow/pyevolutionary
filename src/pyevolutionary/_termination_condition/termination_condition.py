@@ -1,4 +1,4 @@
-from pyevolution._enums import TerminationConditionsEnum
+from pyevolutionary._enums import TerminationConditionsEnum
 
 __all__ = ["TerminationCondition"]
 

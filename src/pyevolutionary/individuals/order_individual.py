@@ -4,30 +4,23 @@ import copy
 import logging
 import random
 
-from pyevolution._utils.custom_exceptions.value_conflict_error import ValueConflictError
-from pyevolution.individuals._individual_structure import IndividualStructure
+from pyevolutionary._utils.custom_exceptions.value_conflict_error import ValueConflictError
+from pyevolutionary.individuals._individual_structure import IndividualStructure
 
-__all__ = ["OrderMultiRowIndividual"]
+__all__ = ["OrderIndividual"]
 
 
-class OrderMultiRowIndividual(IndividualStructure):
+class OrderIndividual(IndividualStructure):
     @staticmethod
-    def __generate_uniform_random_permutation(genome_length: list[int]):
-        total_gnome_length = sum(genome_length)
-        sequence = list(range(total_gnome_length))
+    def __generate_uniform_random_permutation(genome_length):
+        sequence = list(range(genome_length))
         random.shuffle(sequence)
-        list_of_sequences = []
-        start_index = 0
-        for length in genome_length:
-            end_index = start_index + length
-            list_of_sequences.append(sequence[start_index:end_index])
-            start_index = end_index
-        return list_of_sequences
+        return sequence
 
     def __init__(
         self,
-        genome_length: list[int] | None = None,
-        input_genome: list[int] | None = None,
+        genome_length: int | None = None,
+        input_genome: list | None = None,
         init_with_random_genome: bool = True,
         logger: logging.Logger | None = None,
     ):
@@ -45,7 +38,7 @@ class OrderMultiRowIndividual(IndividualStructure):
         if init_with_random_genome:
             self.genome = self.__generate_uniform_random_permutation(genome_length)
         else:
-            self.genome = [[None] * i for i in genome_length]
+            self.genome = [None] * genome_length
 
     @staticmethod
     def __circular_equivalence(list1, list2):

@@ -6,7 +6,7 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pyevolution._enums import StatisticsEnum
+from pyevolutionary._enums import StatisticsEnum
 
 __all__ = ["Visualizer"]
 

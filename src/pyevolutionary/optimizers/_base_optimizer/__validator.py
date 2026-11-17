@@ -1,6 +1,6 @@
-from pyevolution._validations import is_presented, is_bigger, is_probability
-from pyevolution._utils.custom_exceptions import InvalidValueError, FunctionNotSupportedError, ValueCantBeNoneError, ValueConflictError
-from pyevolution._configs.base_optimizer_config import (
+from pyevolutionary._validations import is_presented, is_bigger, is_probability
+from pyevolutionary._utils.custom_exceptions import InvalidValueError, FunctionNotSupportedError, ValueCantBeNoneError, ValueConflictError
+from pyevolutionary._configs.base_optimizer_config import (
     AVAILABLE_MODES,
     AVAILABLE_TERMINATION_CONDITIONS,
     AVAILABLE_STATISTICS,

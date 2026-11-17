@@ -3,11 +3,11 @@ from __future__ import annotations
 import os
 from typing import Final
 
-import pyevolution._pruning.pruning_methods as pruning_methods_module
-import pyevolution._selection_methods.parent_selection as parent_selection_module
-import pyevolution._selection_methods.remaining_selection as remaining_selection_module
-import pyevolution._thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
-from pyevolution._configs.directories import (
+import pyevolutionary._pruning.pruning_methods as pruning_methods_module
+import pyevolutionary._selection_methods.parent_selection as parent_selection_module
+import pyevolutionary._selection_methods.remaining_selection as remaining_selection_module
+import pyevolutionary._thereshold_scheduler.thereshold_scheduler_methods as thereshold_scheduler_module
+from pyevolutionary._configs.directories import (
     EXTENSION_DIRECTORY_CROSSOVER_METHODS_MODULE,
     EXTENSION_DIRECTORY_MUTATION_METHODS_MODULE,
     EXTENSION_DIRECTORY_PARENT_SELECTION_METHODS_MODULE,

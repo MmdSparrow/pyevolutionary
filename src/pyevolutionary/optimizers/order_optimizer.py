@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import pyevolution._crossover.order_multi_row_crossover_methods as _order_multi_row_crossover_module
-import pyevolution._mutation.order_multi_row_mutation_methods as _order_multi_row_mutation_module
-from pyevolution._configs.order_multi_row_optimizer_config import (
+import pyevolutionary._crossover.order_crossover_methods as _order_crossover_module
+import pyevolutionary._mutation.order_mutation_methods as _order_mutation_module
+from pyevolutionary._configs.order_optimizer_config import (
     ANALYZE_DEFAULT_VALUE,
     CROSSOVER_PROBABILITY_DEFAULT_VALUE,
     MODE_DEFAULT_VALUE,
@@ -10,13 +10,13 @@ from pyevolution._configs.order_multi_row_optimizer_config import (
     TERMINATION_CONDITIONS_DEFAULT_VALUE,
     VISUALIZE_DEFAULT_VALUE,
 )
-from pyevolution.individuals import OrderMultiRowIndividual
-from pyevolution.optimizers._base_optimizer._base_optimizer import BaseOptimizer as _BaseOptimizer
+from pyevolutionary.individuals import OrderIndividual
+from pyevolutionary.optimizers._base_optimizer._base_optimizer import BaseOptimizer as _BaseOptimizer
 
-__all__ = ["OrderMultiRowOptimizer"]
+__all__ = ["OrderOptimizer"]
 
 
-class OrderMultiRowOptimizer(_BaseOptimizer):
+class OrderOptimizer(_BaseOptimizer):
     def __init__(
         self,
         evaluation_function,
@@ -24,18 +24,18 @@ class OrderMultiRowOptimizer(_BaseOptimizer):
         extension_directory: str | None = None,
     ):
         super().__init__(
-            crossover_module=_order_multi_row_crossover_module,
-            mutation_module=_order_multi_row_mutation_module,
+            crossover_module=_order_crossover_module,
+            mutation_module=_order_mutation_module,
             evaluation_function=evaluation_function,
             verbose=verbose,
             extension_directory=extension_directory,
         )
 
-        self.individual_class = OrderMultiRowIndividual
+        self.individual_class = OrderIndividual
 
     def run(
         self,
-        genome_length: list[int],
+        genome_length: int,
         population_size: int,
         generation_size: int,
         parent_selection_method: str,

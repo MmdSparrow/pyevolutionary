@@ -1,6 +1,6 @@
 import random
 
-from pyevolution.individuals import OrderIndividual
+from pyevolutionary.individuals import OrderIndividual
 
 from ._utils_common import _OX
 

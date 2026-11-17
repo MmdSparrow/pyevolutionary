@@ -1,0 +1,275 @@
+# PyEvolutionary
+
+**A flexible and extensible Python framework for evolutionary optimization.**
+
+PyEvolutionary is a Python library designed to simplify the implementation and execution of evolutionary algorithms. It provides a configurable optimization framework with support for custom evolutionary operators, multi-row individuals, population management, advanced pruning strategies, statistical analysis, and automatic visualization.
+
+Unlike libraries that focus on predefined evolutionary algorithms, PyEvolutionary provides a flexible architecture that allows users to customize the evolutionary process according to their optimization problems.
+
+One of its key features is its **population pruning mechanism**, which helps eliminate unnecessary individuals and accelerate convergence toward optimal solutions.
+
+---
+
+## 📦 Installation
+
+You can install PyEvolutionary directly from PyPI using pip:
+
+```bash
+pip install pyevolutionary
+```
+
+To upgrade to the latest version:
+
+```bash
+pip install --upgrade pyevolutionary
+```
+
+---
+
+## ✨ Key Features
+
+- **Multi-row Individuals:** Support for individuals consisting of multiple rows, making it suitable for multi-agent optimization problems.
+- **Custom Evolutionary Operators:** Define your own selection, crossover, mutation, and other evolutionary functions in external Python files.
+- **Built-in Operators:** Explore and use preimplemented evolutionary operators without implementing them yourself.
+- **Dynamic Function Loading:** Select custom or built-in functions by name. PyEvolutionary automatically loads and executes the selected functions.
+- **Advanced Population Pruning:** Apply multiple pruning strategies to control population growth and accelerate optimization.
+- **Flexible Selection Strategies:** Independently configure parent selection and remaining population selection.
+- **Configurable Evolutionary Strategies:** Support different evolutionary modes, including `(μ + λ)`.
+- **Multiple Termination Conditions:** Stop optimization based on iteration count, evaluation count, fitness thresholds, or phenotypic diversity.
+- **Statistical Analysis:** Monitor optimization performance using configurable statistical metrics.
+- **Automatic Visualization:** Generate optimization diagrams based on configured statistics and parameters.
+- **Checkpointing:** Save optimization checkpoints at configurable intervals.
+
+---
+
+## 🚀 Usage
+
+PyEvolutionary provides a configurable `run()` interface that allows users to define the evolutionary process through its parameters.
+
+### Example
+
+```python
+output_directory_name = orderMultiRowOptimizer.run(
+    genome_length=cars_max_travels_number,
+    population_size=200,
+    generation_size=200,
+
+    # Selection
+    parent_selection_method="q_tournoment#6",
+    remaining_selection_method="rank_based",
+
+    # Evolutionary operators
+    crossover_method="rebuild",
+    mutation_method="gene_swap",
+
+    # Termination conditions
+    termination_conditions=[
+        "iteration number",
+        # "phenotypic diversity",
+        # "evaluation number",
+        # "fitness limit",
+    ],
+
+    crossover_probability=0.8,
+    mutation_probability=0.4,
+
+    # Evolutionary strategy
+    mode="m+l",
+
+    # Population pruning
+    pruning_methods=[
+        "age_pruning",
+        "score_pruning",
+    ],
+
+    pruning_methods_params=[
+        {"age_thereshold": 3},
+        {"score_thereshold": -6},
+    ],
+
+    # Optimization limits
+    iterations_number=1000,
+    evaluations_number=None,
+    fitness_limit_threshold=None,
+
+    # Diversity monitoring
+    phenotypic_diversity_window_size=None,
+    phenotypic_diversity_error_thereshold=None,
+
+    # Statistics
+    statistics=[
+        "avg fitness",
+        "var fitness",
+        "best fitness",
+        "prunings",
+    ],
+
+    statistic_sampling_period=10,
+
+    # Checkpointing and visualization
+    checkpoint_save_period=100,
+    visualize=True,
+
+    # analyze=True,
+)
+```
+
+The example demonstrates a multi-row optimization problem with configurable selection, crossover, mutation, termination conditions, and population pruning.
+
+---
+
+## 🧬 Multi-row Individuals
+
+PyEvolutionary supports individuals represented by multiple rows rather than restricting individuals to a single chromosome.
+
+This capability is particularly useful for optimization problems involving multiple agents, where each row can represent an individual agent's genome or configuration.
+
+It allows evolutionary optimization to be applied to more complex problems that require coordinated optimization of multiple entities.
+
+---
+
+## 🔧 Custom Evolutionary Operators
+
+One of the main design principles of PyEvolutionary is extensibility.
+
+Users are not restricted to the operators already implemented in the library. They can implement their own evolutionary functions in external Python files and pass the function names to PyEvolutionary.
+
+For example, users can provide custom implementations of:
+
+- Parent selection
+- Remaining population selection
+- Crossover
+- Mutation
+- Population pruning
+- Other supported evolutionary operations
+
+PyEvolutionary automatically locates and loads the selected functions, allowing users to extend the optimization process without modifying the library's internal implementation.
+
+The library also provides preimplemented operators that users can explore and select directly.
+
+---
+
+## ✂️ Population Pruning
+
+**Population pruning is one of the most important features of PyEvolutionary.**
+
+In conventional evolutionary optimization, population management can introduce unnecessary computational overhead. Individuals that are no longer useful may continue occupying population resources and participating in subsequent generations.
+
+PyEvolutionary addresses this problem through configurable pruning strategies.
+
+Multiple pruning methods can be combined and configured independently.
+
+### Available Pruning Strategies
+
+#### Age-based Pruning
+
+Removes individuals according to their age.
+
+Users can configure an age threshold to control how long individuals remain in the population.
+
+#### Score-based Pruning
+
+Removes individuals according to their fitness or score.
+
+Users can specify a score threshold to determine which individuals should be removed.
+
+### Combining Pruning Strategies
+
+PyEvolutionary allows multiple pruning methods to be applied within the same optimization process.
+
+For example:
+
+```python
+pruning_methods=[
+    "age_pruning",
+    "score_pruning",
+]
+
+pruning_methods_params=[
+    {"age_thereshold": 3},
+    {"score_thereshold": -6},
+]
+```
+
+The objective is to improve population management, reduce unnecessary computational effort, and potentially accelerate convergence toward optimal solutions.
+
+---
+
+## 📊 Statistics and Visualization
+
+PyEvolutionary provides built-in statistical monitoring and visualization capabilities.
+
+Users can select which metrics should be recorded during optimization.
+
+Available statistics include:
+
+| Statistic | Description |
+|---|---|
+| Average Fitness | Average fitness of the population |
+| Fitness Variance | Variance of population fitness |
+| Best Fitness | Best fitness achieved |
+| Prunings | Information about population pruning |
+
+Users can also configure the sampling period to control how frequently statistics are collected.
+
+The library automatically generates visualization diagrams based on the selected statistics and optimization configuration.
+
+This makes it easier to analyze convergence behavior, population performance, and the impact of different evolutionary strategies.
+
+---
+
+## 🎯 Termination Conditions
+
+PyEvolutionary supports multiple termination conditions, allowing optimization processes to stop when predefined criteria are satisfied.
+
+Supported conditions include:
+
+- **Iteration Number:** Stop after a specified number of iterations.
+- **Evaluation Number:** Stop after a specified number of fitness evaluations.
+- **Fitness Limit:** Stop when a specified fitness threshold is reached.
+- **Phenotypic Diversity:** Stop based on changes in population diversity.
+
+Users can configure the termination conditions according to their optimization requirements.
+
+---
+
+## 💾 Checkpointing
+
+Long-running optimization processes can periodically save checkpoints.
+
+Users can configure the checkpoint saving period to preserve optimization progress and facilitate recovery or further analysis.
+
+---
+
+## 🛠️ Design Philosophy
+
+PyEvolutionary is built around three main principles:
+
+1. **Flexibility:** Allow users to configure different aspects of the evolutionary process independently.
+2. **Extensibility:** Make it possible to introduce custom evolutionary operators without modifying the library.
+3. **Efficiency:** Provide population pruning mechanisms to reduce unnecessary computational effort and improve optimization performance.
+
+---
+
+## 📌 Project Goals
+
+The long-term goal of PyEvolutionary is to provide a general-purpose evolutionary optimization framework that supports a wide range of optimization problems.
+
+Potential application areas include:
+
+- Multi-agent optimization
+- Combinatorial optimization
+- Scheduling and resource allocation
+- Engineering optimization
+- Parameter optimization
+- Artificial intelligence and machine learning
+
+---
+
+## 📄 License
+
+MIT License.
+
+---
+
+**PyEvolutionary — Flexible Evolutionary Optimization in Python.**

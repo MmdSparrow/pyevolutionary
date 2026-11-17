@@ -7,7 +7,7 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pyevolution._configs.directories import ANALYZE_DIRECOTRY_DEFAULT, LOG_DIRECTORY_DEFAULT
+from pyevolutionary._configs.directories import ANALYZE_DIRECOTRY_DEFAULT, LOG_DIRECTORY_DEFAULT
 
 
 class FinalPopulationAnalyzer:
